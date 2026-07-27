@@ -1,0 +1,653 @@
+<!-- =========================================================
+     K630-REF OLD PLAYERS PAGE
+     File: pages/old-players.html
+     Version: 630.0.51
+     Sprint 6 - Leave Kingdom Date Integration
+
+     Purpose:
+     - Show players who are no longer current K630 members
+     - Preserve official archived season performance
+     - Support future return-player assessment
+     - Automatically exclude players who rejoined K630
+
+     Fixed columns:
+     - #
+     - ID
+     - Name
+     - Server Status
+     - T4/T5
+     - Start Power
+     - Historical Power
+     - Power Growth
+     - Top Merits
+     - Average Merits (V)
+     - Average Merits (%)
+     - Date Leave Kingdom
+
+     Archived season columns:
+     - Merits
+     - Power
+     - M-P (%)
+
+     Layout:
+     - Search covers ID and Name
+     - No Alliance column
+     - No Note column
+     - Date Leave Kingdom is part of the fixed table
+     - Magenta boundary marks the Leave Date column
+     - One shared vertical scrollbar
+     - Horizontal scrolling only for archived seasons
+========================================================= -->
+
+<section
+  class="old-players-page"
+  id="oldPlayersPage"
+>
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <header class="op-header">
+
+    <div class="op-header-copy">
+
+      <span class="op-header-kicker">
+        Kingdom 630
+      </span>
+
+      <h1>
+        Old Players
+      </h1>
+
+      <p>
+        Historical performance of players who are no longer active members of Kingdom 630.
+      </p>
+
+    </div>
+
+    <div class="op-header-actions">
+
+      <div
+        class="op-count"
+        id="opPlayerCount"
+      >
+        0 old players
+      </div>
+
+      <button
+        id="opResetFilters"
+        class="op-reset-button"
+        type="button"
+      >
+
+        <i
+          class="fa-solid fa-filter-circle-xmark"
+          aria-hidden="true"
+        ></i>
+
+        Reset all filters
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- =====================================================
+       COMPLETE FILTER HEADER
+  ====================================================== -->
+
+  <section
+    class="op-column-filter-workspace"
+    aria-label="Old Players filters"
+  >
+
+    <div class="op-column-filter-split">
+
+      <!-- =============================================
+           LEFT TABLE FILTERS
+      ============================================== -->
+
+      <div class="op-left-filter-grid">
+
+        <!-- # -->
+
+        <div
+          class="op-filter-spacer op-filter-col-index"
+          aria-hidden="true"
+        ></div>
+
+        <!-- SEARCH: ID OR NAME -->
+
+        <label class="op-column-filter op-search-column-filter">
+
+          <span>
+            Search ID / Name
+          </span>
+
+          <span class="op-column-search-wrap">
+
+            <i
+              class="fa-solid fa-magnifying-glass"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              id="opSearchInput"
+              type="search"
+              placeholder="Search..."
+              autocomplete="off"
+            >
+
+          </span>
+
+        </label>
+
+        <!-- SERVER STATUS -->
+
+        <label class="op-column-filter op-filter-col-status">
+
+          <span>
+            Status
+          </span>
+
+          <select id="opStatusFilter">
+
+            <option value="all">
+              All
+            </option>
+
+            <option value="3">
+              LV3
+            </option>
+
+            <option value="2">
+              LV2
+            </option>
+
+            <option value="1">
+              LV1
+            </option>
+
+            <option value="0">
+              LV0
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- T4/T5 -->
+
+        <label class="op-column-filter op-filter-col-tier">
+
+          <span>
+            T4/T5
+          </span>
+
+          <select id="opTierFilter">
+
+            <option value="all">
+              All
+            </option>
+
+            <option value="T5">
+              T5
+            </option>
+
+            <option value="T4">
+              T4
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- START POWER -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-power
+            op-power-filter-start
+          "
+        >
+
+          <span>
+            Start Power
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="startPower"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- HISTORICAL POWER -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-power
+          "
+        >
+
+          <span>
+            Historical
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="historicalPower"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- POWER GROWTH -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-power
+            op-power-filter-end
+          "
+        >
+
+          <span>
+            Growth
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="powerGrowth"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- TOP MERITS -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-top-merits
+          "
+        >
+
+          <span>
+            Top Merits
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="topMerits"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- AVERAGE MERITS VALUE -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-average
+            op-average-filter-start
+          "
+        >
+
+          <span>
+            Average (V)
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="meritsAverageValue"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- AVERAGE MERITS PERCENT -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-average
+            op-average-filter-end
+          "
+        >
+
+          <span>
+            Average (%)
+          </span>
+
+          <select
+            class="op-sort-select"
+            data-sort-key="meritsAveragePercent"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- DATE LEAVE KINGDOM -->
+
+        <label
+          class="
+            op-column-filter
+            op-filter-col-leave-date
+          "
+        >
+
+          <span>
+            Date Leave
+          </span>
+
+          <select
+            class="op-sort-select op-date-sort-select"
+            data-sort-key="leaveDateTimestamp"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              Newest
+            </option>
+
+            <option value="asc">
+              Oldest
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+      <!-- =============================================
+           RIGHT SEASON FILTERS
+      ============================================== -->
+
+      <div
+        class="op-right-filter-shell"
+        id="opRightFilterShell"
+      >
+
+        <div
+          class="op-season-filter-row"
+          id="opSeasonFilters"
+          aria-label="Archived season filters"
+        >
+
+          <div class="op-season-filter-empty">
+            Season filters appear after archived season data is loaded.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       TABLE WORKSPACE
+  ====================================================== -->
+
+  <section
+    class="op-workspace"
+    aria-label="Old Players historical performance table"
+  >
+
+    <div
+      class="op-vertical-scroll"
+      id="opVerticalScroll"
+    >
+
+      <div class="op-split">
+
+        <!-- =============================================
+             LEFT PLAYER TABLE
+        ============================================== -->
+
+        <div
+          class="op-left-shell"
+          id="opLeftShell"
+        >
+
+          <table
+            class="op-table op-left-table"
+            aria-label="Old Players analysis"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th class="op-col-index">
+                  #
+                </th>
+
+                <th class="op-col-id">
+                  ID
+                </th>
+
+                <th class="op-col-name">
+                  Name
+                </th>
+
+                <th class="op-col-status">
+                  Server<br>Status
+                </th>
+
+                <th class="op-col-tier">
+                  T4/T5
+                </th>
+
+                <th class="op-col-power op-power-group-start">
+                  Start<br>Power
+                </th>
+
+                <th class="op-col-power">
+                  Historical<br>Power
+                </th>
+
+                <th class="op-col-power op-power-group-end">
+                  Power<br>Growth
+                </th>
+
+                <th class="op-col-top-merits">
+                  Top<br>Merits
+                </th>
+
+                <th class="op-col-average op-average-group-start">
+                  Average<br>Merits<br>(V)
+                </th>
+
+                <th class="op-col-average op-average-group-end">
+                  Average<br>Merits<br>(%)
+                </th>
+
+                <th class="op-col-leave-date">
+                  Date Leave<br>Kingdom
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="opLeftTableBody">
+
+              <tr>
+
+                <td
+                  colspan="12"
+                  class="op-empty"
+                >
+                  Loading Old Players data...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- =============================================
+             RIGHT SEASON TABLE
+        ============================================== -->
+
+        <div
+          class="op-right-shell"
+          id="opRightShell"
+        >
+
+          <table
+            class="op-table op-right-table"
+            aria-label="Old Players archived season performance"
+          >
+
+            <thead id="opRightTableHead">
+
+              <tr>
+
+                <th
+                  colspan="3"
+                  class="op-season-placeholder"
+                >
+                  Seasons will appear after archived season data is loaded.
+                </th>
+
+              </tr>
+
+              <tr>
+
+                <th class="op-season-column">
+                  Merits
+                </th>
+
+                <th class="op-season-column">
+                  Power
+                </th>
+
+                <th class="op-season-column">
+                  M-P (%)
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="opRightTableBody">
+
+              <tr>
+
+                <td
+                  colspan="3"
+                  class="op-empty"
+                >
+                  No archived season data found.
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</section>

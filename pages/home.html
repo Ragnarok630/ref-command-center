@@ -1,0 +1,885 @@
+<!-- =========================================================
+     K630-REF HOME PAGE
+     File: pages/home.html
+     Version: 630.0.27
+     Sprint 6 - Home UI Finalisation
+
+     Important:
+     - Does not modify the topbar
+     - Does not modify the sidebar
+     - Does not modify the bottom bar
+     - Existing chart canvas IDs remain unchanged
+========================================================= -->
+
+<section
+  class="home-page"
+  id="homePage"
+>
+
+  <!-- =====================================================
+       HERO BANNER
+  ====================================================== -->
+
+  <section
+    class="home-hero-section"
+    aria-label="Rebels of Fury banner"
+  >
+
+    <div class="hero-image-banner">
+
+      <img
+        src="assets/images/hero-rebels-of-fury.png"
+        alt="Rebels of Fury - Kingdom 630"
+        class="hero-banner-img"
+      >
+
+      <!--
+        Static outer glow only.
+        The moving gold highlight / moving glow ball has
+        intentionally been removed.
+      -->
+      <span
+        class="hero-glow-layer"
+        aria-hidden="true"
+      ></span>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       CURRENT KINGDOM INFORMATION
+  ====================================================== -->
+
+  <section
+    class="home-context-bar"
+    aria-label="Current kingdom information"
+  >
+
+    <!-- KINGDOM -->
+
+    <article class="home-context-item">
+
+      <div class="home-context-icon home-context-icon-gold">
+
+        <i
+          class="fa-solid fa-shield-halved"
+          aria-hidden="true"
+        ></i>
+
+      </div>
+
+      <div class="home-context-copy">
+
+        <span class="home-context-label">
+          Kingdom
+        </span>
+
+        <strong id="homeKingdomLabel">
+          630 - Bloodsoaked Battle
+        </strong>
+
+      </div>
+
+    </article>
+
+    <!-- CURRENT SEASON -->
+
+    <article class="home-context-item">
+
+      <div class="home-context-icon home-context-icon-purple">
+
+        <i
+          class="fa-solid fa-calendar-days"
+          aria-hidden="true"
+        ></i>
+
+      </div>
+
+      <div class="home-context-copy">
+
+        <span class="home-context-label">
+          Current Season
+        </span>
+
+        <strong id="homeSeasonLabel">
+          Season Not Set
+        </strong>
+
+        <small id="homeSeasonNameLabel">
+          No active season
+        </small>
+
+      </div>
+
+    </article>
+
+    <!-- CURRENT LOCATION -->
+
+    <article class="home-context-item">
+
+      <div class="home-context-icon home-context-icon-gold">
+
+        <i
+          class="fa-solid fa-dragon"
+          aria-hidden="true"
+        ></i>
+
+      </div>
+
+      <div class="home-context-copy">
+
+        <span class="home-context-label">
+          Current Location
+        </span>
+
+        <strong id="homeLocationLabel">
+          Home Kingdom
+        </strong>
+
+        <small id="homeMigrationLabel">
+          Open for Migration
+        </small>
+
+      </div>
+
+    </article>
+
+  </section>
+
+  <!-- =====================================================
+       KINGDOM STATISTICS
+  ====================================================== -->
+
+  <section
+    class="dashboard-section home-statistics-section"
+    aria-labelledby="homeStatisticsTitle"
+  >
+
+    <div class="section-header home-section-header">
+
+      <div>
+
+        <span class="section-kicker">
+          Kingdom Overview
+        </span>
+
+        <h2 id="homeStatisticsTitle">
+          Live Server Statistics
+        </h2>
+
+      </div>
+
+      <div class="section-badge">
+
+        <i
+          class="fa-solid fa-crown"
+          aria-hidden="true"
+        ></i>
+
+        Kingdom 630
+
+      </div>
+
+    </div>
+
+    <div class="dashboard-grid home-stat-grid">
+
+      <!-- TOTAL WARRIORS -->
+
+      <article class="stat-card home-stat-card stat-card-purple">
+
+        <div class="stat-icon stat-icon-warriors">
+
+          <i
+            class="fa-solid fa-user-shield"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Warriors
+          </span>
+
+          <strong id="homeTotalWarriors">
+            0
+          </strong>
+
+          <small>
+            Kingdom fighters
+          </small>
+
+        </div>
+
+      </article>
+
+      <!-- TOTAL FARMERS -->
+
+      <article class="stat-card home-stat-card stat-card-gold">
+
+        <div class="stat-icon stat-icon-farmers">
+
+          <i
+            class="fa-solid fa-wheat-awn"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Farmers
+          </span>
+
+          <strong id="homeTotalFarmers">
+            0
+          </strong>
+
+          <small>
+            Kingdom support
+          </small>
+
+        </div>
+
+      </article>
+
+      <!-- TOTAL SERVER POWER -->
+
+      <article class="stat-card home-stat-card stat-card-purple">
+
+        <div class="stat-icon stat-icon-power">
+
+          <i
+            class="fa-solid fa-bolt"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Server Power
+          </span>
+
+          <strong id="homeTotalPower">
+            0
+          </strong>
+
+          <small>
+            Current kingdom strength
+          </small>
+
+        </div>
+
+      </article>
+
+      <!-- TOTAL SERVER MERITS -->
+
+      <article class="stat-card home-stat-card stat-card-gold">
+
+        <div class="stat-icon stat-icon-merits">
+
+          <i
+            class="fa-solid fa-medal"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Server Merits
+          </span>
+
+          <strong id="homeTotalMerits">
+            0
+          </strong>
+
+          <small>
+            Current season performance
+          </small>
+
+        </div>
+
+      </article>
+
+      <!-- TOTAL SERVER KILLS -->
+
+      <article class="stat-card home-stat-card stat-card-purple">
+
+        <div class="stat-icon stat-icon-kills">
+
+          <i
+            class="fa-solid fa-skull"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Server Kills
+          </span>
+
+          <strong id="homeTotalKills">
+            0
+          </strong>
+
+          <small>
+            Battle contribution
+          </small>
+
+        </div>
+
+      </article>
+
+      <!-- TOTAL SERVER HEALING -->
+
+      <article class="stat-card home-stat-card stat-card-gold">
+
+        <div class="stat-icon stat-icon-healing">
+
+          <i
+            class="fa-solid fa-circle-plus"
+            aria-hidden="true"
+          ></i>
+
+        </div>
+
+        <div class="stat-card-content">
+
+          <span>
+            Total Server Healing
+          </span>
+
+          <strong id="homeTotalHealing">
+            0
+          </strong>
+
+          <small>
+            Support activity
+          </small>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       KINGDOM CHARTS
+  ====================================================== -->
+
+  <section
+    class="dashboard-section home-chart-section"
+    aria-labelledby="homeChartSectionTitle"
+  >
+
+    <div class="section-header home-section-header">
+
+      <div>
+
+        <span class="section-kicker">
+          Kingdom Trends
+        </span>
+
+        <h2 id="homeChartSectionTitle">
+          Server Performance
+        </h2>
+
+      </div>
+
+    </div>
+
+    <div class="panel-grid home-chart-grid">
+
+      <!-- POWER CHART -->
+
+      <article class="dashboard-panel home-chart-panel">
+
+        <div class="home-panel-header">
+
+          <div class="home-panel-title">
+
+            <span class="home-panel-icon home-panel-icon-purple">
+
+              <i
+                class="fa-solid fa-bolt"
+                aria-hidden="true"
+              ></i>
+
+            </span>
+
+            <div>
+
+              <span class="home-panel-kicker">
+                Kingdom Strength
+              </span>
+
+              <h3>
+                Kingdom 630 Server Power
+              </h3>
+
+            </div>
+
+          </div>
+
+          <span
+            id="homePowerChartSeason"
+            class="table-badge"
+          >
+            Current Season
+          </span>
+
+        </div>
+
+        <div class="chart-box home-chart-box">
+
+          <canvas
+            id="serverPowerChart"
+            aria-label="Kingdom 630 server power chart"
+          ></canvas>
+
+        </div>
+
+      </article>
+
+      <!-- MERITS CHART -->
+
+      <article class="dashboard-panel home-chart-panel">
+
+        <div class="home-panel-header">
+
+          <div class="home-panel-title">
+
+            <span class="home-panel-icon home-panel-icon-gold">
+
+              <i
+                class="fa-solid fa-medal"
+                aria-hidden="true"
+              ></i>
+
+            </span>
+
+            <div>
+
+              <span class="home-panel-kicker">
+                Season Performance
+              </span>
+
+              <h3>
+                Kingdom 630 Season Merits
+              </h3>
+
+            </div>
+
+          </div>
+
+          <span
+            id="homeMeritsChartSeason"
+            class="table-badge"
+          >
+            Current Season
+          </span>
+
+        </div>
+
+        <div class="chart-box home-chart-box">
+
+          <canvas
+            id="serverMeritsChart"
+            aria-label="Kingdom 630 season merits chart"
+          ></canvas>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       MERIT RANKINGS
+  ====================================================== -->
+
+  <section
+    class="panel-grid home-ranking-grid"
+    aria-label="Current merit rankings"
+  >
+
+    <!-- TOP ID MERITS -->
+
+    <article class="dashboard-panel table-panel home-ranking-panel">
+
+      <div class="table-panel-header">
+
+        <div class="home-panel-title">
+
+          <span class="home-panel-icon home-panel-icon-purple">
+
+            <i
+              class="fa-solid fa-user-group"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="home-panel-kicker">
+              Player Ranking
+            </span>
+
+            <h3>
+              Top ID Merits
+            </h3>
+
+          </div>
+
+        </div>
+
+        <span
+          id="homeTopIdSeasonBadge"
+          class="table-badge"
+        >
+          Current Season
+        </span>
+
+      </div>
+
+      <div class="home-ranking-table-wrap">
+
+        <table class="ranking-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Rank
+              </th>
+
+              <th>
+                Player ID
+              </th>
+
+              <th>
+                Kingdom
+              </th>
+
+              <th class="text-end">
+                Merits
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="homeTopIdMeritsBody">
+
+            <tr class="top-rank">
+
+              <td>
+                <span class="rank-badge gold-rank">
+                  1
+                </span>
+              </td>
+
+              <td>
+                Player_001
+              </td>
+
+              <td>
+                630
+              </td>
+
+              <td class="text-end merit-value">
+                2,450,000
+              </td>
+
+            </tr>
+
+            <tr class="top-rank">
+
+              <td>
+                <span class="rank-badge silver-rank">
+                  2
+                </span>
+              </td>
+
+              <td>
+                Player_002
+              </td>
+
+              <td>
+                630
+              </td>
+
+              <td class="text-end merit-value">
+                2,150,000
+              </td>
+
+            </tr>
+
+            <tr class="top-rank">
+
+              <td>
+                <span class="rank-badge bronze-rank">
+                  3
+                </span>
+              </td>
+
+              <td>
+                Player_003
+              </td>
+
+              <td>
+                630
+              </td>
+
+              <td class="text-end merit-value">
+                1,980,000
+              </td>
+
+            </tr>
+
+            <tr>
+
+              <td>
+                <span class="rank-badge">
+                  4
+                </span>
+              </td>
+
+              <td>
+                Player_004
+              </td>
+
+              <td>
+                630
+              </td>
+
+              <td class="text-end merit-value">
+                1,750,000
+              </td>
+
+            </tr>
+
+            <tr>
+
+              <td>
+                <span class="rank-badge">
+                  5
+                </span>
+              </td>
+
+              <td>
+                Player_005
+              </td>
+
+              <td>
+                630
+              </td>
+
+              <td class="text-end merit-value">
+                1,520,000
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+    <!-- TOP SERVER MERITS -->
+
+    <article class="dashboard-panel table-panel home-ranking-panel">
+
+      <div class="table-panel-header">
+
+        <div class="home-panel-title">
+
+          <span class="home-panel-icon home-panel-icon-gold">
+
+            <i
+              class="fa-solid fa-trophy"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="home-panel-kicker">
+              Server Ranking
+            </span>
+
+            <h3>
+              Top Server Merits
+            </h3>
+
+          </div>
+
+        </div>
+
+        <span
+          id="homeTopServerSeasonBadge"
+          class="table-badge"
+        >
+          Current Season
+        </span>
+
+      </div>
+
+      <div class="home-ranking-table-wrap">
+
+        <table class="ranking-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Rank
+              </th>
+
+              <th>
+                Kingdom
+              </th>
+
+              <th class="text-end">
+                Merits
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="homeTopServerMeritsBody">
+
+            <tr class="top-rank home-server-630-row">
+
+              <td>
+                <span class="rank-badge gold-rank">
+                  1
+                </span>
+              </td>
+
+              <td>
+
+                <span class="home-kingdom-630">
+
+                  <i
+                    class="fa-solid fa-crown"
+                    aria-hidden="true"
+                  ></i>
+
+                  630
+
+                </span>
+
+              </td>
+
+              <td class="text-end merit-value">
+                22,450,000
+              </td>
+
+            </tr>
+
+            <tr class="top-rank">
+
+              <td>
+                <span class="rank-badge silver-rank">
+                  2
+                </span>
+              </td>
+
+              <td>
+                631
+              </td>
+
+              <td class="text-end merit-value">
+                19,850,000
+              </td>
+
+            </tr>
+
+            <tr class="top-rank">
+
+              <td>
+                <span class="rank-badge bronze-rank">
+                  3
+                </span>
+              </td>
+
+              <td>
+                632
+              </td>
+
+              <td class="text-end merit-value">
+                17,620,000
+              </td>
+
+            </tr>
+
+            <tr>
+
+              <td>
+                <span class="rank-badge">
+                  4
+                </span>
+              </td>
+
+              <td>
+                633
+              </td>
+
+              <td class="text-end merit-value">
+                15,880,000
+              </td>
+
+            </tr>
+
+            <tr>
+
+              <td>
+                <span class="rank-badge">
+                  5
+                </span>
+              </td>
+
+              <td>
+                634
+              </td>
+
+              <td class="text-end merit-value">
+                14,210,000
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+  </section>
+
+</section>

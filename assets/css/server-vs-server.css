@@ -1,0 +1,1720 @@
+/* =========================================================
+   K630-REF SERVER VS SERVER
+   File: assets/css/server-vs-server.css
+   Version: 630.0.59
+   Sprint 6 - Final Metric Controls
+
+   Rules:
+   - Reads one compact derived JSON summary
+   - Four charts in a 2 x 2 desktop grid
+   - Maximum 20 participating servers
+   - Legend uses fixed server colours
+   - Large metric selection buttons
+   - Week sort arrows for W0 through W6
+   - Clear table headers and numeric values
+   - Server 630 can display Home Kingdom
+   - Only central page content scrolls vertically
+   - Sidebar, topbar and bottombar are not modified
+========================================================= */
+
+/* =========================================================
+   PAGE ROOT
+========================================================= */
+
+.server-vs-server-page {
+  --svs-border:
+    rgba(
+      157,
+      78,
+      221,
+      0.32
+    );
+
+  --svs-border-soft:
+    rgba(
+      157,
+      78,
+      221,
+      0.14
+    );
+
+  --svs-gold:
+    #d9b45f;
+
+  --svs-purple:
+    #a65bff;
+
+  --svs-text:
+    #eee9ff;
+
+  --svs-muted:
+    #938ba7;
+
+  --svs-panel:
+    rgba(
+      12,
+      10,
+      18,
+      0.96
+    );
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  padding:
+    8px
+    10px
+    34px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  scrollbar-gutter: stable;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(
+      157,
+      78,
+      221,
+      0.84
+    )
+    rgba(
+      255,
+      255,
+      255,
+      0.025
+    );
+
+  color:
+    var(--svs-text);
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(157, 78, 221, 0.075),
+      transparent 34%
+    );
+}
+
+.server-vs-server-page::-webkit-scrollbar {
+  width: 9px;
+}
+
+.server-vs-server-page::-webkit-scrollbar-track {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.02
+    );
+}
+
+.server-vs-server-page::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      180deg,
+      #b833ff,
+      #6417c9
+    );
+
+  border:
+    2px solid
+    #090a0e;
+
+  border-radius: 999px;
+}
+
+.server-vs-server-page::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      #ca62ff,
+      #7b2ff7
+    );
+}
+
+.server-vs-server-page,
+.server-vs-server-page *,
+.server-vs-server-page *::before,
+.server-vs-server-page *::after {
+  box-sizing: border-box;
+}
+
+#k630ServerVsServerRoot {
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================================
+   PAGE LAYOUT
+========================================================= */
+
+.svs-page-content {
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    auto
+    auto
+    auto
+    auto;
+
+  gap: 9px;
+
+  padding-bottom: 18px;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.svs-header {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding:
+    0
+    2px;
+}
+
+.svs-header-copy {
+  min-width: 0;
+}
+
+.svs-header-kicker {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color:
+    var(--svs-purple);
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.svs-header h1 {
+  margin: 0;
+
+  color:
+    var(--svs-gold);
+
+  font-size:
+    clamp(
+      16px,
+      1.15vw,
+      20px
+    );
+
+  font-weight: 900;
+
+  line-height: 1.05;
+
+  text-shadow:
+    0 0 9px
+    rgba(
+      217,
+      180,
+      95,
+      0.17
+    );
+}
+
+.svs-header p {
+  margin:
+    4px
+    0
+    0;
+
+  color:
+    var(--svs-muted);
+
+  font-size: 9px;
+}
+
+.svs-header-status {
+  flex: none;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.svs-status-badge {
+  min-height: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding:
+    5px
+    10px;
+
+  color:
+    #d9c7ff;
+
+  background:
+    rgba(
+      32,
+      20,
+      48,
+      0.88
+    );
+
+  border:
+    1px solid
+    rgba(
+      166,
+      91,
+      255,
+      0.48
+    );
+
+  border-radius: 9px;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+.svs-status-badge i {
+  color:
+    #48e58c;
+
+  font-size: 7px;
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      rgba(
+        72,
+        229,
+        140,
+        0.65
+      )
+    );
+}
+
+.svs-status-badge[data-status="error"] i {
+  color: #ff6666;
+}
+
+.svs-status-badge[data-status="empty"] i {
+  color: #d9b45f;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.svs-summary-grid {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 7px;
+}
+
+.svs-summary-card {
+  min-width: 0;
+  min-height: 59px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 3px;
+
+  padding:
+    8px
+    10px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 15, 28, 0.98),
+      rgba(10, 9, 14, 0.98)
+    );
+
+  border:
+    1px solid
+    var(--svs-border);
+
+  border-radius: 10px;
+
+  box-shadow:
+    inset 0 0 16px
+    rgba(
+      157,
+      78,
+      221,
+      0.025
+    );
+}
+
+.svs-summary-card-label {
+  overflow: hidden;
+
+  color:
+    var(--svs-muted);
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.06em;
+
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.svs-summary-card-value {
+  overflow: hidden;
+
+  color:
+    var(--svs-gold);
+
+  font-size:
+    clamp(
+      13px,
+      1vw,
+      17px
+    );
+
+  font-weight: 900;
+
+  line-height: 1;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.svs-summary-card-meta {
+  overflow: hidden;
+
+  color:
+    #8e85a0;
+
+  font-size: 7px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   LEGEND PANEL
+========================================================= */
+
+.svs-legend-panel {
+  min-width: 0;
+
+  padding:
+    7px
+    8px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 14, 25, 0.98),
+      rgba(9, 9, 13, 0.98)
+    );
+
+  border:
+    1px solid
+    var(--svs-border);
+
+  border-radius: 10px;
+}
+
+.svs-panel-title-row {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 6px;
+}
+
+.svs-panel-title {
+  margin: 0;
+
+  color:
+    var(--svs-gold);
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+
+  text-transform: uppercase;
+}
+
+.svs-panel-help {
+  color:
+    #8f879a;
+
+  font-size: 7.5px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.svs-server-legend {
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      10,
+      minmax(64px, 1fr)
+    );
+
+  gap: 5px;
+}
+
+.svs-legend-item {
+  position: relative;
+
+  min-width: 0;
+  height: 25px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    0
+    5px;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background:
+    var(
+      --svs-server-colour,
+      #a65bff
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.38
+    );
+
+  border-radius: 5px;
+
+  box-shadow:
+    inset 0 0 8px
+    rgba(
+      0,
+      0,
+      0,
+      0.22
+    );
+
+  font-size: 8px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  white-space: nowrap;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.svs-legend-item:hover {
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    inset 0 0 8px
+    rgba(
+      0,
+      0,
+      0,
+      0.2
+    ),
+    0 0 8px
+    rgba(
+      166,
+      91,
+      255,
+      0.28
+    );
+}
+
+.svs-legend-item.is-hidden {
+  opacity: 0.25;
+
+  filter:
+    grayscale(0.75);
+}
+
+.svs-legend-item.is-hidden::after {
+  content: "";
+
+  position: absolute;
+
+  width: 80%;
+  height: 1px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  transform:
+    rotate(-12deg);
+}
+
+.svs-legend-item.is-home-server {
+  outline:
+    2px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  outline-offset: -3px;
+}
+
+/* =========================================================
+   CHART GRID
+========================================================= */
+
+.svs-chart-grid {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+}
+
+.svs-chart-card {
+  min-width: 0;
+  min-height: 292px;
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1fr);
+
+  padding:
+    7px
+    8px
+    8px;
+
+  overflow: hidden;
+
+  background:
+    var(--svs-panel);
+
+  border:
+    1px solid
+    var(--svs-border);
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 0 13px
+    rgba(
+      0,
+      0,
+      0,
+      0.24
+    );
+}
+
+.svs-chart-header {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  min-height: 27px;
+
+  padding:
+    0
+    2px
+    5px;
+}
+
+.svs-chart-title {
+  margin: 0;
+
+  color:
+    var(--svs-gold);
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.03em;
+
+  text-transform: uppercase;
+}
+
+.svs-chart-subtitle {
+  color:
+    #89818f;
+
+  font-size: 7.5px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.svs-chart-canvas-wrap {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 248px;
+
+  overflow: hidden;
+}
+
+.svs-chart-canvas-wrap canvas {
+  position: absolute;
+
+  inset: 0;
+
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =========================================================
+   METRIC TABLE PANEL
+========================================================= */
+
+.svs-metric-panel {
+  min-width: 0;
+
+  padding:
+    9px
+    9px
+    13px;
+
+  background:
+    var(--svs-panel);
+
+  border:
+    1px solid
+    var(--svs-border);
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 0 13px
+    rgba(
+      0,
+      0,
+      0,
+      0.22
+    );
+}
+
+/* =========================================================
+   LARGE METRIC BUTTONS
+========================================================= */
+
+.svs-metric-toolbar {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 8px;
+}
+
+.svs-metric-tabs {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: wrap;
+}
+
+.svs-metric-button {
+  --svs-button-accent:
+    #a65bff;
+
+  min-width: 76px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding:
+    0
+    13px;
+
+  color:
+    var(--svs-button-accent);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34, 26, 44, 0.98),
+      rgba(15, 12, 21, 0.98)
+    );
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--svs-button-accent)
+      72%,
+      transparent
+    );
+
+  border-radius: 8px;
+
+  box-shadow:
+    inset 0 0 10px
+    rgba(
+      255,
+      255,
+      255,
+      0.018
+    );
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.svs-metric-button i {
+  flex: none;
+
+  font-size: 11px;
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      color-mix(
+        in srgb,
+        var(--svs-button-accent)
+        58%,
+        transparent
+      )
+    );
+}
+
+.svs-metric-button span {
+  line-height: 1;
+}
+
+.svs-metric-button:hover {
+  transform:
+    translateY(-1px);
+
+  color:
+    #ffffff;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--svs-button-accent)
+      15%,
+      #110d18
+    );
+
+  border-color:
+    var(--svs-button-accent);
+
+  box-shadow:
+    0 0 9px
+    color-mix(
+      in srgb,
+      var(--svs-button-accent)
+      30%,
+      transparent
+    );
+}
+
+.svs-metric-button.is-active {
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--svs-button-accent)
+        52%,
+        #21172c
+      ),
+      color-mix(
+        in srgb,
+        var(--svs-button-accent)
+        30%,
+        #110d18
+      )
+    );
+
+  border-color:
+    var(--svs-button-accent);
+
+  box-shadow:
+    inset 0 0 9px
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    ),
+    0 0 10px
+    color-mix(
+      in srgb,
+      var(--svs-button-accent)
+      44%,
+      transparent
+    );
+}
+
+.svs-metric-button-merits {
+  --svs-button-accent:
+    #ffd21f;
+}
+
+.svs-metric-button-power {
+  --svs-button-accent:
+    #a65bff;
+}
+
+.svs-metric-button-kills {
+  --svs-button-accent:
+    #ff5757;
+}
+
+.svs-metric-button-dead {
+  --svs-button-accent:
+    #d3ced9;
+}
+
+.svs-metric-button-healed {
+  --svs-button-accent:
+    #84db43;
+}
+
+.svs-metric-summary {
+  flex: none;
+
+  padding:
+    5px
+    9px;
+
+  color:
+    #b0a6ba;
+
+  background:
+    rgba(
+      157,
+      78,
+      221,
+      0.055
+    );
+
+  border:
+    1px solid
+    rgba(
+      157,
+      78,
+      221,
+      0.18
+    );
+
+  border-radius: 6px;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   METRIC TABLE SHELL
+========================================================= */
+
+.svs-table-shell {
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  border:
+    1px solid
+    rgba(
+      157,
+      78,
+      221,
+      0.28
+    );
+
+  border-radius: 7px;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(
+      217,
+      180,
+      95,
+      0.76
+    )
+    rgba(
+      255,
+      255,
+      255,
+      0.025
+    );
+}
+
+.svs-table-shell::-webkit-scrollbar {
+  height: 8px;
+}
+
+.svs-table-shell::-webkit-scrollbar-track {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.02
+    );
+}
+
+.svs-table-shell::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      90deg,
+      #b88c22,
+      #ffd000
+    );
+
+  border:
+    2px solid
+    #090a0e;
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   METRIC TABLE
+========================================================= */
+
+.svs-metric-table {
+  width: 100%;
+  min-width: 860px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  table-layout: fixed;
+
+  font-size: 9px;
+}
+
+.svs-col-server {
+  width: 142px;
+}
+
+.svs-col-week {
+  width:
+    calc(
+      (
+        100% - 142px
+      ) / 7
+    );
+}
+
+.svs-metric-table th,
+.svs-metric-table td {
+  height: 29px;
+
+  padding:
+    4px
+    9px;
+
+  border-right:
+    1px solid
+    rgba(
+      157,
+      78,
+      221,
+      0.13
+    );
+
+  border-bottom:
+    1px solid
+    rgba(
+      157,
+      78,
+      221,
+      0.13
+    );
+
+  white-space: nowrap;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* =========================================================
+   TABLE HEADERS
+========================================================= */
+
+.svs-metric-table thead th {
+  height: 34px;
+
+  color:
+    #f0d37b;
+
+  background:
+    linear-gradient(
+      180deg,
+      #281934,
+      #191020
+    );
+
+  border-bottom:
+    1px solid
+    rgba(
+      217,
+      180,
+      95,
+      0.48
+    );
+
+  font-size: 8.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+
+  text-align: center;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 5px
+    rgba(
+      217,
+      180,
+      95,
+      0.12
+    );
+}
+
+.svs-metric-table thead th:first-child {
+  color:
+    #f2d66f;
+}
+
+/* =========================================================
+   WEEK HEADER AND SORT BUTTONS
+========================================================= */
+
+.svs-week-heading {
+  width: 100%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+}
+
+.svs-week-heading-label {
+  min-width: 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color:
+    #f0d37b;
+
+  font-size: 8.5px;
+  font-weight: 900;
+}
+
+.svs-week-sort-controls {
+  width: 14px;
+  height: 23px;
+
+  display: grid;
+
+  grid-template-rows:
+    1fr
+    1fr;
+
+  align-items: center;
+  justify-items: center;
+
+  gap: 0;
+}
+
+.svs-week-sort-button {
+  width: 14px;
+  height: 11px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  color:
+    #8f8798;
+
+  background:
+    transparent;
+
+  border: 0;
+  outline: 0;
+
+  font-size: 10px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    color 0.14s ease,
+    filter 0.14s ease,
+    transform 0.14s ease;
+}
+
+.svs-week-sort-button:hover {
+  color:
+    #ffffff;
+
+  transform:
+    scale(1.13);
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      rgba(
+        255,
+        255,
+        255,
+        0.32
+      )
+    );
+}
+
+.svs-week-sort-button.is-active {
+  color:
+    #ffd21f;
+
+  transform:
+    scale(1.16);
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(
+        255,
+        210,
+        31,
+        0.62
+      )
+    );
+}
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.svs-metric-table tbody td {
+  color:
+    #f1ecf7;
+
+  background:
+    rgba(
+      10,
+      9,
+      14,
+      0.84
+    );
+
+  font-size: 9px;
+  font-weight: 650;
+
+  text-align: right;
+}
+
+.svs-metric-table tbody tr:nth-child(even) td {
+  background:
+    rgba(
+      22,
+      16,
+      29,
+      0.66
+    );
+}
+
+.svs-metric-table tbody tr:hover td {
+  color:
+    #ffffff;
+
+  background:
+    rgba(
+      157,
+      78,
+      221,
+      0.15
+    );
+}
+
+.svs-metric-table th:first-child,
+.svs-metric-table td:first-child {
+  text-align: left;
+}
+
+.svs-metric-table th:last-child,
+.svs-metric-table td:last-child {
+  border-right: 0;
+}
+
+.svs-metric-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* =========================================================
+   SERVER CELL
+========================================================= */
+
+.svs-server-cell {
+  width: 100%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 7px;
+
+  overflow: hidden;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  text-overflow: ellipsis;
+}
+
+.svs-server-cell-dot {
+  width: 9px;
+  height: 9px;
+
+  flex: none;
+
+  background:
+    var(
+      --svs-server-colour,
+      #a65bff
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.34
+    );
+
+  border-radius: 2px;
+
+  box-shadow:
+    0 0 6px
+    var(
+      --svs-server-colour,
+      #a65bff
+    );
+}
+
+.svs-server-cell-number {
+  flex: none;
+
+  color:
+    #f4eefc;
+
+  font-weight: 900;
+}
+
+.svs-server-home-label {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color:
+    #f0d06c;
+
+  font-size: 7.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.035em;
+
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.svs-home-server-row td {
+  color:
+    #ffe9a8 !important;
+
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.115
+    ) !important;
+
+  font-weight: 900;
+}
+
+.svs-home-server-row:hover td {
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.17
+    ) !important;
+}
+
+.svs-table-empty {
+  height: 80px !important;
+
+  color:
+    #8d849e !important;
+
+  text-align: center !important;
+}
+
+/* =========================================================
+   LOADING, EMPTY AND ERROR STATES
+========================================================= */
+
+.loading-box,
+.svs-state-panel {
+  width: 100%;
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding:
+    24px;
+
+  color:
+    #9d94bb;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 14, 25, 0.98),
+      rgba(9, 9, 13, 0.98)
+    );
+
+  border:
+    1px solid
+    var(--svs-border);
+
+  border-radius: 11px;
+
+  text-align: center;
+}
+
+.loading-box i,
+.svs-state-panel i {
+  color:
+    var(--svs-purple);
+
+  font-size: 22px;
+
+  filter:
+    drop-shadow(
+      0 0 7px
+      rgba(
+        166,
+        91,
+        255,
+        0.4
+      )
+    );
+}
+
+.svs-state-title {
+  margin: 0;
+
+  color:
+    var(--svs-gold);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.svs-state-message {
+  max-width: 620px;
+
+  margin: 0;
+
+  color:
+    #968da2;
+
+  font-size: 9px;
+
+  line-height: 1.5;
+}
+
+.svs-state-path {
+  padding:
+    5px
+    8px;
+
+  color:
+    #cbb9e8;
+
+  background:
+    rgba(
+      157,
+      78,
+      221,
+      0.08
+    );
+
+  border:
+    1px solid
+    rgba(
+      157,
+      78,
+      221,
+      0.22
+    );
+
+  border-radius: 6px;
+
+  font-family:
+    Consolas,
+    "Courier New",
+    monospace;
+
+  font-size: 8px;
+}
+
+/* =========================================================
+   RESPONSIVE DESKTOP LAYOUT
+========================================================= */
+
+@media (max-width: 1350px) {
+  .svs-server-legend {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(72px, 1fr)
+      );
+  }
+
+  .svs-chart-card {
+    min-height: 270px;
+  }
+
+  .svs-chart-canvas-wrap {
+    min-height: 226px;
+  }
+
+  .svs-metric-button {
+    min-width: 70px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .svs-summary-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .svs-chart-grid {
+    grid-template-columns:
+      minmax(0, 1fr);
+  }
+
+  .svs-chart-card {
+    min-height: 285px;
+  }
+
+  .svs-chart-canvas-wrap {
+    min-height: 240px;
+  }
+
+  .svs-metric-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .svs-metric-summary {
+    align-self: flex-end;
+  }
+}
+
+/* =========================================================
+   SHORT DESKTOP HEIGHT
+========================================================= */
+
+@media (max-height: 820px) {
+  .server-vs-server-page {
+    padding-top: 6px;
+    padding-bottom: 30px;
+  }
+
+  .svs-header p {
+    display: none;
+  }
+
+  .svs-summary-card {
+    min-height: 53px;
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .svs-chart-card {
+    min-height: 255px;
+  }
+
+  .svs-chart-canvas-wrap {
+    min-height: 213px;
+  }
+
+  .svs-metric-button {
+    height: 31px;
+
+    font-size: 8px;
+  }
+
+  .svs-metric-table th,
+  .svs-metric-table td {
+    height: 27px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .svs-legend-item,
+  .svs-metric-button,
+  .svs-week-sort-button {
+    transition: none;
+  }
+}

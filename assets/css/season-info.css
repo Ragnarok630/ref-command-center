@@ -1,0 +1,1516 @@
+/* =========================================================
+   K630-REF SEASON INFO
+
+   File:
+   assets/css/season-info.css
+
+   Version:
+   630.1.0 Gold Master
+
+   Structure:
+   - Compact header
+   - Fixed player information on the left
+   - Weekly information on the right
+   - Note column included
+   - One shared vertical scrollbar
+   - Synchronized horizontal week scrolling
+   - Week 0 green styling
+   - Week 1 through Week 6 gold styling
+========================================================= */
+
+/* =========================================================
+   PAGE VARIABLES
+========================================================= */
+
+.season-info-page {
+  --si-base-index: 36px;
+  --si-base-id: 90px;
+  --si-base-name: 135px;
+  --si-base-alliance: 115px;
+  --si-base-tier: 62px;
+  --si-base-note: 72px;
+  --si-base-historical: 80px;
+
+  --si-base-width:
+    calc(
+      var(--si-base-index) +
+      var(--si-base-id) +
+      var(--si-base-name) +
+      var(--si-base-alliance) +
+      var(--si-base-tier) +
+      var(--si-base-note) +
+      var(--si-base-historical)
+    );
+
+  --si-week-merits: 88px;
+  --si-week-percent: 72px;
+  --si-week-power: 96px;
+  --si-week-rank: 60px;
+
+  --si-week-zero-width:
+    calc(
+      var(--si-week-merits) +
+      var(--si-week-power)
+    );
+
+  --si-week-width:
+    calc(
+      var(--si-week-merits) +
+      var(--si-week-percent) +
+      var(--si-week-power) +
+      var(--si-week-rank)
+    );
+
+  --si-weeks-total-width:
+    calc(
+      var(--si-week-zero-width) +
+      (var(--si-week-width) * 6)
+    );
+
+  --si-filter-height: 76px;
+  --si-table-header-height: 54px;
+  --si-row-height: 24px;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr);
+
+  gap: 7px;
+
+  padding:
+    8px
+    10px
+    10px;
+
+  overflow: hidden;
+
+  color: #eee9f8;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(143, 62, 211, 0.08),
+      transparent 34%
+    );
+}
+
+.season-info-page,
+.season-info-page *,
+.season-info-page *::before,
+.season-info-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.si-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  min-width: 0;
+
+  padding:
+    0
+    2px;
+}
+
+.si-header-copy {
+  min-width: 0;
+}
+
+.si-header-kicker {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: #a95bff;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.17em;
+
+  text-transform: uppercase;
+}
+
+.si-header h1 {
+  margin: 0;
+
+  color: #e3b95f;
+
+  font-size:
+    clamp(
+      17px,
+      1.15vw,
+      21px
+    );
+
+  font-weight: 900;
+
+  line-height: 1;
+
+  text-shadow:
+    0 0 9px
+    rgba(227, 185, 95, 0.2);
+}
+
+.si-header p {
+  margin:
+    4px
+    0
+    0;
+
+  color: #9990a8;
+
+  font-size: 9px;
+  line-height: 1.25;
+}
+
+.si-player-count {
+  flex: 0 0 auto;
+
+  min-width: 72px;
+
+  padding:
+    7px
+    12px;
+
+  color: #f2cb70;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(55, 28, 81, 0.92),
+      rgba(24, 14, 39, 0.96)
+    );
+
+  border:
+    1px solid
+    rgba(172, 89, 255, 0.52);
+
+  border-radius: 9px;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  text-align: center;
+  white-space: nowrap;
+
+  box-shadow:
+    inset 0 0 11px rgba(173, 84, 255, 0.08),
+    0 0 9px rgba(116, 35, 183, 0.12);
+}
+
+/* =========================================================
+   FILTER BAR
+========================================================= */
+
+.si-filter-bar {
+  display: grid;
+  grid-template-columns:
+    var(--si-base-width)
+    minmax(0, 1fr);
+
+  gap: 7px;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(161, 92, 220, 0.3);
+
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(17, 13, 24, 0.98),
+      rgba(8, 7, 12, 0.98)
+    );
+
+  box-shadow:
+    inset 0 0 15px rgba(147, 56, 214, 0.035);
+}
+
+/* =========================================================
+   BASE FILTER AREA
+========================================================= */
+
+.si-base-filter-area {
+  width: var(--si-base-width);
+  min-width: var(--si-base-width);
+  max-width: var(--si-base-width);
+
+  min-height: var(--si-filter-height);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding:
+    8px
+    10px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24, 17, 34, 0.98),
+      rgba(11, 9, 17, 0.98)
+    );
+
+  box-shadow:
+    inset -2px 0 0
+    rgba(167, 84, 239, 0.62);
+}
+
+.si-player-type-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.si-filter-btn {
+  min-width: 86px;
+  height: 29px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    0
+    12px;
+
+  color: #d9c8e9;
+
+  background:
+    rgba(12, 9, 19, 0.96);
+
+  border:
+    1px solid
+    rgba(166, 93, 229, 0.42);
+
+  border-radius: 999px;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.si-filter-btn:hover {
+  color: #f0d18c;
+
+  border-color:
+    rgba(234, 190, 89, 0.7);
+
+  transform: translateY(-1px);
+}
+
+.si-filter-btn.active {
+  color: #f0c96d;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(89, 52, 22, 0.35),
+      rgba(44, 25, 15, 0.52)
+    );
+
+  border-color:
+    rgba(233, 185, 72, 0.9);
+
+  box-shadow:
+    0 0 9px rgba(224, 178, 68, 0.18),
+    inset 0 0 12px rgba(224, 178, 68, 0.06);
+}
+
+.si-filter-summary {
+  width: 100%;
+
+  overflow: hidden;
+
+  color: #91889f;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   WEEK FILTER AREA
+========================================================= */
+
+.si-week-filter-area {
+  display: grid;
+  grid-template-rows:
+    minmax(0, 1fr)
+    12px;
+
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+.si-week-filter-shell {
+  width: 100%;
+  min-width: 0;
+
+  overflow: hidden;
+
+  background:
+    rgba(9, 8, 13, 0.8);
+}
+
+.si-week-filter-track {
+  display: flex;
+  align-items: stretch;
+
+  width: var(--si-weeks-total-width);
+  min-width: var(--si-weeks-total-width);
+  max-width: var(--si-weeks-total-width);
+
+  height: var(--si-filter-height);
+}
+
+/* =========================================================
+   WEEK SORT GROUPS
+========================================================= */
+
+.si-week-sort-group {
+  flex:
+    0
+    0
+    var(--si-week-width);
+
+  width: var(--si-week-width);
+  min-width: var(--si-week-width);
+  max-width: var(--si-week-width);
+
+  display: grid;
+
+  grid-template-columns:
+    var(--si-week-merits)
+    var(--si-week-percent)
+    var(--si-week-power)
+    var(--si-week-rank);
+
+  grid-template-rows:
+    20px
+    minmax(0, 1fr);
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31, 20, 27, 0.84),
+      rgba(14, 10, 16, 0.9)
+    );
+
+  box-shadow:
+    inset 2px 0 0 rgba(231, 185, 62, 0.82),
+    inset -2px 0 0 rgba(231, 185, 62, 0.82);
+}
+
+.si-week-sort-group--zero {
+  flex:
+    0
+    0
+    var(--si-week-zero-width);
+
+  width: var(--si-week-zero-width);
+  min-width: var(--si-week-zero-width);
+  max-width: var(--si-week-zero-width);
+
+  grid-template-columns:
+    var(--si-week-merits)
+    var(--si-week-power);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 55, 39, 0.8),
+      rgba(10, 25, 19, 0.92)
+    );
+
+  box-shadow:
+    inset 2px 0 0 rgba(57, 219, 137, 0.86),
+    inset -2px 0 0 rgba(57, 219, 137, 0.86);
+}
+
+.si-week-sort-group h2 {
+  grid-column:
+    1
+    /
+    -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 20px;
+
+  margin: 0;
+  padding:
+    0
+    4px;
+
+  color: #efca6e;
+
+  background:
+    rgba(75, 47, 17, 0.35);
+
+  border-bottom:
+    1px solid
+    rgba(228, 185, 73, 0.2);
+
+  font-size: 8px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  text-align: center;
+}
+
+.si-week-sort-group--zero h2 {
+  color: #92f0ba;
+
+  background:
+    rgba(24, 91, 60, 0.34);
+
+  border-bottom-color:
+    rgba(60, 219, 139, 0.2);
+}
+
+.si-week-sort-control {
+  display: grid;
+  grid-template-rows:
+    18px
+    24px;
+
+  align-content: center;
+
+  gap: 2px;
+
+  min-width: 0;
+
+  padding:
+    4px
+    4px
+    5px;
+
+  overflow: hidden;
+
+  border-left:
+    1px solid
+    rgba(225, 184, 70, 0.11);
+}
+
+.si-week-sort-control:nth-of-type(1) {
+  border-left: 0;
+}
+
+.si-week-sort-group--zero
+.si-week-sort-control {
+  border-left-color:
+    rgba(52, 211, 131, 0.13);
+}
+
+.si-week-sort-control span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+  height: 18px;
+
+  overflow: hidden;
+
+  color: #9c94a4;
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  line-height: 0.95;
+
+  text-align: center;
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+.si-week-sort-group--zero
+.si-week-sort-control span {
+  color: #95d3ae;
+}
+
+.si-week-sort-select {
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+
+  margin: 0;
+  padding:
+    0
+    4px;
+
+  color: #e5dce9;
+
+  background:
+    #100d15;
+
+  border:
+    1px solid
+    rgba(226, 183, 77, 0.28);
+
+  border-radius: 4px;
+  outline: 0;
+
+  font-size: 7px;
+
+  cursor: pointer;
+}
+
+.si-week-sort-select:focus {
+  border-color:
+    rgba(244, 197, 71, 0.82);
+
+  box-shadow:
+    0 0 7px
+    rgba(232, 181, 57, 0.14);
+}
+
+.si-week-sort-group--zero
+.si-week-sort-select {
+  color: #b9f7d2;
+
+  border-color:
+    rgba(50, 210, 130, 0.34);
+}
+
+.si-week-sort-group--zero
+.si-week-sort-select:focus {
+  border-color:
+    rgba(58, 224, 142, 0.88);
+
+  box-shadow:
+    0 0 7px
+    rgba(58, 224, 142, 0.14);
+}
+
+/* =========================================================
+   TOP HORIZONTAL SCROLLBAR
+========================================================= */
+
+.si-top-horizontal-scroll {
+  width: 100%;
+  min-width: 0;
+  height: 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  background:
+    rgba(7, 6, 10, 0.98);
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(221, 177, 64, 0.82)
+    rgba(255, 255, 255, 0.02);
+}
+
+.si-top-horizontal-scroll-content {
+  width: var(--si-weeks-total-width);
+  min-width: var(--si-weeks-total-width);
+  max-width: var(--si-weeks-total-width);
+
+  height: 1px;
+}
+
+.si-top-horizontal-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.si-top-horizontal-scroll::-webkit-scrollbar-track {
+  background:
+    rgba(255, 255, 255, 0.02);
+}
+
+.si-top-horizontal-scroll::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      90deg,
+      #a3761f,
+      #f2c94f
+    );
+
+  border:
+    2px solid
+    #09080c;
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   TABLE WORKSPACE
+========================================================= */
+
+.si-workspace {
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(161, 91, 220, 0.3);
+
+  border-radius: 9px;
+
+  background:
+    rgba(8, 7, 12, 0.96);
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.24),
+    inset 0 0 15px rgba(133, 48, 196, 0.025);
+}
+
+/* =========================================================
+   SHARED VERTICAL SCROLL
+========================================================= */
+
+.si-vertical-scroll {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  scrollbar-gutter: stable;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(157, 75, 221, 0.82)
+    rgba(255, 255, 255, 0.02);
+}
+
+.si-vertical-scroll::-webkit-scrollbar {
+  width: 9px;
+}
+
+.si-vertical-scroll::-webkit-scrollbar-track {
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.si-vertical-scroll::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      180deg,
+      #b947ff,
+      #6419bf
+    );
+
+  border:
+    2px solid
+    #08070b;
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   SPLIT TABLE
+========================================================= */
+
+.si-table-split {
+  display: grid;
+  grid-template-columns:
+    var(--si-base-width)
+    minmax(0, 1fr);
+
+  gap: 7px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+
+  align-items: start;
+}
+
+.si-base-shell {
+  position: relative;
+  z-index: 5;
+
+  width: var(--si-base-width);
+  min-width: var(--si-base-width);
+  max-width: var(--si-base-width);
+
+  overflow: hidden;
+
+  background:
+    rgba(11, 9, 16, 0.98);
+
+  box-shadow:
+    inset -2px 0 0
+    rgba(164, 81, 230, 0.62);
+}
+
+.si-weeks-shell {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  background:
+    rgba(11, 9, 16, 0.98);
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(221, 177, 64, 0.8)
+    rgba(255, 255, 255, 0.02);
+}
+
+.si-weeks-shell::-webkit-scrollbar {
+  height: 8px;
+}
+
+.si-weeks-shell::-webkit-scrollbar-track {
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.si-weeks-shell::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      90deg,
+      #a7791e,
+      #efc650
+    );
+
+  border:
+    2px solid
+    #08070b;
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   TABLE BASE
+========================================================= */
+
+.si-table {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  table-layout: fixed;
+
+  color: #e7e0ed;
+
+  font-size:
+    clamp(
+      8px,
+      0.52vw,
+      9.5px
+    );
+}
+
+.si-base-table {
+  width: var(--si-base-width);
+  min-width: var(--si-base-width);
+  max-width: var(--si-base-width);
+}
+
+.si-weeks-table {
+  width: var(--si-weeks-total-width);
+  min-width: var(--si-weeks-total-width);
+  max-width: var(--si-weeks-total-width);
+}
+
+/* =========================================================
+   BASE COLGROUP WIDTHS
+========================================================= */
+
+.si-base-col-index {
+  width: var(--si-base-index);
+}
+
+.si-base-col-id {
+  width: var(--si-base-id);
+}
+
+.si-base-col-name {
+  width: var(--si-base-name);
+}
+
+.si-base-col-alliance {
+  width: var(--si-base-alliance);
+}
+
+.si-base-col-tier {
+  width: var(--si-base-tier);
+}
+
+.si-base-col-note {
+  width: var(--si-base-note);
+}
+
+.si-base-col-historical {
+  width: var(--si-base-historical);
+}
+
+/* =========================================================
+   WEEK COLGROUP WIDTHS
+========================================================= */
+
+.si-data-col-merits {
+  width: var(--si-week-merits);
+}
+
+.si-data-col-percent {
+  width: var(--si-week-percent);
+}
+
+.si-data-col-power {
+  width: var(--si-week-power);
+}
+
+.si-data-col-rank {
+  width: var(--si-week-rank);
+}
+
+/* =========================================================
+   TABLE HEADERS
+========================================================= */
+
+.si-table thead th {
+  position: sticky;
+  top: 0;
+
+  z-index: 20;
+
+  height: var(--si-table-header-height);
+
+  padding:
+    3px
+    5px;
+
+  color: #e1ba63;
+
+  background:
+    linear-gradient(
+      180deg,
+      #201529,
+      #15101c
+    );
+
+  border-right:
+    1px solid
+    rgba(159, 86, 214, 0.16);
+
+  border-bottom:
+    1px solid
+    rgba(220, 177, 70, 0.34);
+
+  font-size:
+    clamp(
+      7.5px,
+      0.48vw,
+      9px
+    );
+
+  font-weight: 900;
+
+  line-height: 1.05;
+
+  text-align: center;
+  vertical-align: middle;
+
+  white-space: nowrap;
+}
+
+.si-base-table thead th:last-child {
+  border-right: 0;
+}
+
+.si-weeks-table thead tr:first-child th {
+  top: 0;
+
+  height: 22px;
+
+  padding:
+    2px
+    4px;
+}
+
+.si-weeks-table thead tr:nth-child(2) th {
+  top: 22px;
+
+  height: 32px;
+
+  padding:
+    3px
+    4px;
+
+  color: #cdbbe2;
+
+  background:
+    linear-gradient(
+      180deg,
+      #25182f,
+      #191020
+    );
+
+  white-space: normal;
+}
+
+/* =========================================================
+   WEEK HEADERS
+========================================================= */
+
+.si-week-title {
+  color: #efc96c !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #332315,
+      #21170f
+    ) !important;
+
+  border-left:
+    2px solid
+    rgba(233, 185, 65, 0.85) !important;
+
+  border-right:
+    2px solid
+    rgba(233, 185, 65, 0.85) !important;
+}
+
+.si-week-title--zero {
+  color: #9af2bf !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #193c2a,
+      #10251b
+    ) !important;
+
+  border-left-color:
+    rgba(54, 222, 138, 0.9) !important;
+
+  border-right-color:
+    rgba(54, 222, 138, 0.9) !important;
+}
+
+.si-week-zero-column {
+  color: #a8efc5 !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #1a3728,
+      #11241b
+    ) !important;
+}
+
+/* =========================================================
+   TABLE BODY
+========================================================= */
+
+.si-table tbody td {
+  height: var(--si-row-height);
+
+  padding:
+    2px
+    6px;
+
+  overflow: hidden;
+
+  color: #ddd7e5;
+
+  background:
+    rgba(12, 10, 17, 0.96);
+
+  border-right:
+    1px solid
+    rgba(157, 91, 207, 0.1);
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.035);
+
+  font-size:
+    clamp(
+      7.7px,
+      0.5vw,
+      9px
+    );
+
+  line-height: 1;
+
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.si-table tbody tr:nth-child(even) td {
+  background:
+    rgba(15, 12, 21, 0.98);
+}
+
+.si-table tbody tr:hover td {
+  background:
+    rgba(48, 25, 67, 0.72);
+}
+
+.si-base-table tbody td:last-child {
+  border-right: 0;
+}
+
+.si-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* =========================================================
+   BASE COLUMN ALIGNMENT
+========================================================= */
+
+.si-base-table th:nth-child(1),
+.si-base-table td:nth-child(1),
+.si-base-table th:nth-child(5),
+.si-base-table td:nth-child(5) {
+  text-align: center;
+}
+
+.si-base-table th:nth-child(2),
+.si-base-table td:nth-child(2),
+.si-base-table th:nth-child(7),
+.si-base-table td:nth-child(7) {
+  text-align: right;
+}
+
+.si-base-table th:nth-child(3),
+.si-base-table td:nth-child(3),
+.si-base-table th:nth-child(4),
+.si-base-table td:nth-child(4),
+.si-base-table th:nth-child(6),
+.si-base-table td:nth-child(6) {
+  text-align: left;
+}
+
+/* =========================================================
+   NOTE COLUMN
+========================================================= */
+
+.si-base-table td:nth-child(6) {
+  color: #c7b8d3;
+
+  font-size:
+    clamp(
+      7px,
+      0.45vw,
+      8.5px
+    );
+
+  font-style: italic;
+}
+
+.si-base-table td:nth-child(6):empty::after {
+  color: #6e6676;
+  content: "-";
+  font-style: normal;
+}
+
+/* =========================================================
+   PLAYER DATA STYLES
+========================================================= */
+
+.si-player-name{
+    display:block;
+
+    overflow:hidden;
+
+    color:#f1edf5;
+
+    font-size:11px;
+    font-weight:600;
+    line-height:18px;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.si-player-id {
+  color:#55b8ff;
+
+  font-family:
+    Consolas,
+    Monaco,
+    monospace;
+
+  font-size:11px;
+  font-weight:700;
+}
+
+.si-player-alliance{
+    color:#f1edf5;
+
+    font-size:9px;
+    font-weight:500;
+
+    padding-left:6px;
+}
+
+.si-tier {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 31px;
+
+  padding:
+    2px
+    5px;
+
+  border-radius: 999px;
+
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.si-tier--t4 {
+  color: #e4c8ff;
+
+  background:
+    rgba(123, 57, 185, 0.22);
+
+  border:
+    1px solid
+    rgba(172, 92, 238, 0.42);
+}
+
+.si-tier--t5 {
+  color: #ffd86c;
+
+  background:
+    rgba(126, 82, 17, 0.27);
+
+  border:
+    1px solid
+    rgba(239, 186, 57, 0.5);
+
+  text-shadow:
+    0 0 6px rgba(255, 205, 75, 0.22);
+}
+
+/* =========================================================
+   WEEK DATA ALIGNMENT
+========================================================= */
+
+.si-weeks-table tbody td {
+  text-align: right;
+}
+
+.si-weeks-table tbody td:nth-child(6n),
+.si-weeks-table tbody td:nth-child(10),
+.si-weeks-table tbody td:nth-child(14),
+.si-weeks-table tbody td:nth-child(18),
+.si-weeks-table tbody td:nth-child(22),
+.si-weeks-table tbody td:nth-child(26) {
+  text-align: center;
+}
+
+/* =========================================================
+   WEEK GROUP SEPARATORS
+========================================================= */
+
+.si-weeks-table thead tr:nth-child(2) th:nth-child(1),
+.si-weeks-table tbody td:nth-child(1) {
+  border-left:
+    2px solid
+    rgba(52, 219, 136, 0.82);
+}
+
+.si-weeks-table thead tr:nth-child(2) th:nth-child(2),
+.si-weeks-table tbody td:nth-child(2) {
+  border-right:
+    2px solid
+    rgba(52, 219, 136, 0.82);
+}
+
+.si-weeks-table thead tr:nth-child(2) th:nth-child(3),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(7),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(11),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(15),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(19),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(23),
+.si-weeks-table tbody td:nth-child(3),
+.si-weeks-table tbody td:nth-child(7),
+.si-weeks-table tbody td:nth-child(11),
+.si-weeks-table tbody td:nth-child(15),
+.si-weeks-table tbody td:nth-child(19),
+.si-weeks-table tbody td:nth-child(23) {
+  border-left:
+    2px solid
+    rgba(229, 181, 61, 0.72);
+}
+
+.si-weeks-table thead tr:nth-child(2) th:nth-child(6),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(10),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(14),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(18),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(22),
+.si-weeks-table thead tr:nth-child(2) th:nth-child(26),
+.si-weeks-table tbody td:nth-child(6),
+.si-weeks-table tbody td:nth-child(10),
+.si-weeks-table tbody td:nth-child(14),
+.si-weeks-table tbody td:nth-child(18),
+.si-weeks-table tbody td:nth-child(22),
+.si-weeks-table tbody td:nth-child(26) {
+  border-right:
+    2px solid
+    rgba(229, 181, 61, 0.72);
+}
+
+/* =========================================================
+   MERITS AND POWER
+========================================================= */
+
+.si-merits {
+  color: #e8c868;
+  font-weight: 800;
+}
+
+.si-merits-percent {
+  color: #c6a7e4;
+  font-weight: 800;
+}
+
+.si-current-power,
+.si-historical-power {
+  color: #ffffff;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* =========================================================
+   RANK
+========================================================= */
+
+.si-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 30px;
+
+  padding:
+    1px
+    5px;
+
+  border-radius: 5px;
+
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.si-rank--3 {
+  color: #d9b4ff;
+
+  background:
+    rgba(124, 56, 181, 0.28);
+
+  border:
+    1px solid
+    rgba(176, 91, 240, 0.45);
+}
+
+.si-rank--2 {
+  color: #9ce8bb;
+
+  background:
+    rgba(43, 137, 85, 0.23);
+
+  border:
+    1px solid
+    rgba(70, 199, 124, 0.4);
+}
+
+.si-rank--1 {
+  color: #ffe17b;
+
+  background:
+    rgba(145, 112, 27, 0.26);
+
+  border:
+    1px solid
+    rgba(232, 189, 71, 0.42);
+}
+
+.si-rank--0 {
+  color: #ff8b8b;
+
+  background:
+    rgba(151, 45, 45, 0.25);
+
+  border:
+    1px solid
+    rgba(235, 82, 82, 0.42);
+}
+
+/* =========================================================
+   PLAYER NOTE ICONS
+========================================================= */
+
+.si-note-symbols{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    min-width:28px;
+}
+
+.si-note-symbol{
+    font-size:17px;
+    line-height:1;
+    vertical-align:middle;
+}
+
+.si-note-empty{
+    opacity:.45;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.si-empty {
+  height: 54px !important;
+
+  color: #91899b !important;
+
+  text-align: center !important;
+}
+
+.si-empty-cell {
+  color: #91899b;
+  text-align: center;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1500px) {
+  .season-info-page {
+    --si-base-id: 82px;
+    --si-base-name: 120px;
+    --si-base-alliance: 80px;
+    --si-base-note: 130px;
+    --si-base-historical: 98px;
+
+    --si-week-merits: 82px;
+    --si-week-percent: 68px;
+    --si-week-power: 90px;
+    --si-week-rank: 56px;
+  }
+}
+
+@media (max-width: 1250px) {
+  .season-info-page {
+    --si-base-index: 32px;
+    --si-base-id: 78px;
+    --si-base-name: 110px;
+    --si-base-alliance: 72px;
+    --si-base-tier: 56px;
+    --si-base-note: 115px;
+    --si-base-historical: 92px;
+  }
+
+  .si-filter-btn {
+    min-width: 75px;
+    padding:
+      0
+      9px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .season-info-page {
+    overflow: auto;
+  }
+
+  .si-filter-bar,
+  .si-table-split {
+    grid-template-columns:
+      var(--si-base-width)
+      minmax(700px, 1fr);
+  }
+
+  .si-workspace {
+    min-height: 520px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .si-filter-btn {
+    transition: none;
+  }
+}

@@ -1,0 +1,632 @@
+<!-- =========================================================
+     K630-REF ACTIVE & AVERAGE PAGE
+     File: pages/active-average.html
+     Version: 630.0.47
+     Sprint 6 - Note Column Integration
+
+     Layout:
+     - Search covers ID, Name and Alliance
+     - Note column between Alliance and Server Status
+     - Note column supports:
+       - Red triangle: left during an archived season
+       - Gold star: manual Owner/Admin note
+       - Both icons can appear together
+     - All filters are part of one continuous filter header
+     - Season filters use the same height as base filters
+     - Left and right tables share one vertical scrollbar
+========================================================= -->
+
+<section
+  class="active-average-page"
+  id="activeAveragePage"
+>
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <header class="aa-header">
+
+    <div class="aa-header-copy">
+
+      <span class="aa-header-kicker">
+        Kingdom 630
+      </span>
+
+      <h1>
+        Active &amp; Average
+      </h1>
+
+      <p>
+        Current K630 members, historical power and archived season performance.
+      </p>
+
+    </div>
+
+    <div class="aa-header-actions">
+
+      <div
+        class="aa-count"
+        id="aaPlayerCount"
+      >
+        0 players
+      </div>
+
+      <button
+        id="aaResetFilters"
+        class="aa-reset-button"
+        type="button"
+      >
+
+        <i
+          class="fa-solid fa-filter-circle-xmark"
+          aria-hidden="true"
+        ></i>
+
+        Reset all filters
+
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- =====================================================
+       COMPLETE FILTER HEADER
+
+       Left filters and season filters use exactly the same
+       split and height as the tables below.
+  ====================================================== -->
+
+  <section
+    class="aa-column-filter-workspace"
+    aria-label="Active and Average filters"
+  >
+
+    <div class="aa-column-filter-split">
+
+      <!-- =============================================
+           LEFT TABLE FILTERS
+      ============================================== -->
+
+      <div class="aa-left-filter-grid">
+
+        <!-- # -->
+
+        <div
+          class="aa-filter-spacer aa-filter-col-index"
+          aria-hidden="true"
+        ></div>
+
+        <!-- SEARCH: ID, NAME OR ALLIANCE -->
+
+        <label class="aa-column-filter aa-search-column-filter">
+
+          <span>
+            Search ID / Name / Alliance
+          </span>
+
+          <span class="aa-column-search-wrap">
+
+            <i
+              class="fa-solid fa-magnifying-glass"
+              aria-hidden="true"
+            ></i>
+
+            <input
+              id="aaSearchInput"
+              type="search"
+              placeholder="Search..."
+              autocomplete="off"
+            >
+
+          </span>
+
+        </label>
+
+        <!-- NOTE -->
+
+        <div
+          class="aa-filter-spacer aa-filter-col-note"
+          aria-label="Player note indicators"
+          title="Red triangle: left during a season. Gold star: manual Owner/Admin note."
+        >
+
+          <span class="aa-note-filter-label">
+            Note
+          </span>
+
+          <span class="aa-note-filter-icons">
+            <i
+              class="fa-solid fa-triangle-exclamation aa-note-preview-left"
+              aria-hidden="true"
+            ></i>
+
+            <i
+              class="fa-solid fa-star aa-note-preview-star"
+              aria-hidden="true"
+            ></i>
+          </span>
+
+        </div>
+
+        <!-- SERVER STATUS -->
+
+        <label class="aa-column-filter aa-filter-col-status">
+
+          <span>
+            Status
+          </span>
+
+          <select id="aaStatusFilter">
+
+            <option value="all">
+              All
+            </option>
+
+            <option value="3">
+              LV3
+            </option>
+
+            <option value="2">
+              LV2
+            </option>
+
+            <option value="1">
+              LV1
+            </option>
+
+            <option value="0">
+              LV0
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- T4/T5 -->
+
+        <label class="aa-column-filter aa-filter-col-tier">
+
+          <span>
+            T4/T5
+          </span>
+
+          <select id="aaTierFilter">
+
+            <option value="all">
+              All
+            </option>
+
+            <option value="T5">
+              T5
+            </option>
+
+            <option value="T4">
+              T4
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- START POWER -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-power
+            aa-power-filter-start
+          "
+        >
+
+          <span>
+            Start Power
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="startPower"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- HISTORICAL POWER -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-power
+          "
+        >
+
+          <span>
+            Historical
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="historicalPower"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- POWER GROWTH -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-power
+            aa-power-filter-end
+          "
+        >
+
+          <span>
+            Growth
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="powerGrowth"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- TOP MERITS -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-top-merits
+          "
+        >
+
+          <span>
+            Top Merits
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="topMerits"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- AVERAGE MERITS VALUE -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-average
+            aa-average-filter-start
+          "
+        >
+
+          <span>
+            Average (V)
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="meritsAverageValue"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- AVERAGE MERITS PERCENT -->
+
+        <label
+          class="
+            aa-column-filter
+            aa-filter-col-average
+            aa-average-filter-end
+          "
+        >
+
+          <span>
+            Average (%)
+          </span>
+
+          <select
+            class="aa-sort-select"
+            data-sort-key="meritsAveragePercent"
+          >
+
+            <option value="">
+              Default
+            </option>
+
+            <option value="desc">
+              High
+            </option>
+
+            <option value="asc">
+              Low
+            </option>
+
+          </select>
+
+        </label>
+
+      </div>
+
+      <!-- =============================================
+           RIGHT SEASON FILTERS
+      ============================================== -->
+
+      <div
+        class="aa-right-filter-shell"
+        id="aaRightFilterShell"
+      >
+
+        <div
+          class="aa-season-filter-row"
+          id="aaSeasonFilters"
+          aria-label="Season filters"
+        >
+
+          <div class="aa-season-filter-empty">
+            Season filters appear after archived season data is loaded.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       TABLE WORKSPACE
+  ====================================================== -->
+
+  <section
+    class="aa-workspace"
+    aria-label="Player analysis table"
+  >
+
+    <div
+      class="aa-vertical-scroll"
+      id="aaVerticalScroll"
+    >
+
+      <div class="aa-split">
+
+        <!-- =============================================
+             LEFT PLAYER TABLE
+        ============================================== -->
+
+        <div
+          class="aa-left-shell"
+          id="aaLeftShell"
+        >
+
+          <table
+            class="aa-table aa-left-table"
+            aria-label="Player analysis"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th class="aa-col-index">
+                  #
+                </th>
+
+                <th class="aa-col-id">
+                  ID
+                </th>
+
+                <th class="aa-col-name">
+                  Name
+                </th>
+
+                <th class="aa-col-alliance">
+                  Alliance
+                </th>
+
+                <th
+                  class="aa-col-note"
+                  title="Red triangle: left during a season. Gold star: manual Owner/Admin note."
+                >
+                  Note
+                </th>
+
+                <th class="aa-col-status">
+                  Server<br>Status
+                </th>
+
+                <th class="aa-col-tier">
+                  T4/T5
+                </th>
+
+                <th class="aa-col-power aa-power-group-start">
+                  Start<br>Power
+                </th>
+
+                <th class="aa-col-power">
+                  Historical<br>Power
+                </th>
+
+                <th class="aa-col-power aa-power-group-end">
+                  Power<br>Growth
+                </th>
+
+                <th class="aa-col-top-merits">
+                  Top<br>Merits
+                </th>
+
+                <th class="aa-col-average aa-average-group-start">
+                  Average<br>Merits<br>(V)
+                </th>
+
+                <th class="aa-col-average aa-average-group-end">
+                  Average<br>Merits<br>(%)
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="aaLeftTableBody">
+
+              <tr>
+
+                <td
+                  colspan="13"
+                  class="aa-empty"
+                >
+                  Loading Active &amp; Average data...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- =============================================
+             RIGHT SEASON TABLE
+        ============================================== -->
+
+        <div
+          class="aa-right-shell"
+          id="aaRightShell"
+        >
+
+          <table
+            class="aa-table aa-right-table"
+            aria-label="Archived season performance"
+          >
+
+            <thead id="aaRightTableHead">
+
+              <tr>
+
+                <th
+                  colspan="3"
+                  class="aa-season-placeholder"
+                >
+                  Seasons will appear after archived season data is loaded.
+                </th>
+
+              </tr>
+
+              <tr>
+
+                <th class="aa-season-column">
+                  Merits
+                </th>
+
+                <th class="aa-season-column">
+                  Power
+                </th>
+
+                <th class="aa-season-column">
+                  M-P (%)
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="aaRightTableBody">
+
+              <tr>
+
+                <td
+                  colspan="3"
+                  class="aa-empty"
+                >
+                  No archived season data found.
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</section>

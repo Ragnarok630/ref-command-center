@@ -1,0 +1,710 @@
+/* =========================================================
+   KINGDOM 630 – DATA PLATFORM V2
+   File: assets/css/k630-v2-admin.css
+   Version: 630.2.0
+
+   Admin Center V2 controls
+========================================================= */
+
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+.k630-v2-admin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(68, 210, 255, 0.34);
+  box-shadow:
+    0 0 0 1px rgba(68, 210, 255, 0.05),
+    0 18px 55px rgba(0, 0, 0, 0.28),
+    0 0 32px rgba(68, 210, 255, 0.08);
+}
+
+.k630-v2-admin::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(68, 210, 255, 0.3),
+      rgba(68, 210, 255, 0.95),
+      rgba(124, 92, 255, 0.9),
+      rgba(68, 210, 255, 0.3),
+      transparent
+    );
+}
+
+.k630-v2-admin[data-busy="true"] {
+  cursor: progress;
+}
+
+
+/* =========================================================
+   MAIN HEADER
+========================================================= */
+
+.k630-v2-admin > .admin-detail-header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#k630V2SystemStatus {
+  min-width: 132px;
+  text-align: center;
+}
+
+#k630V2SystemStatus[data-status="initializing"],
+#k630V2SystemStatus[data-status="running"] {
+  color: #ffd86b;
+  border-color: rgba(255, 216, 107, 0.45);
+  background: rgba(255, 216, 107, 0.1);
+}
+
+#k630V2SystemStatus[data-status="ready"] {
+  color: #61f5a1;
+  border-color: rgba(97, 245, 161, 0.45);
+  background: rgba(97, 245, 161, 0.1);
+}
+
+#k630V2SystemStatus[data-status="error"] {
+  color: #ff6c82;
+  border-color: rgba(255, 108, 130, 0.48);
+  background: rgba(255, 108, 130, 0.1);
+}
+
+#k630V2SystemStatus[data-status="neutral"] {
+  color: #b9c4d6;
+  border-color: rgba(185, 196, 214, 0.3);
+  background: rgba(185, 196, 214, 0.07);
+}
+
+
+/* =========================================================
+   CONTROL SECTIONS
+========================================================= */
+
+.k630-v2-control-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.012)
+    );
+}
+
+.k630-v2-control-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(68, 210, 255, 0.065),
+      transparent 38%
+    );
+}
+
+.k630-v2-control-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.k630-v2-control-section:hover {
+  border-color: rgba(68, 210, 255, 0.2);
+}
+
+.k630-v2-archive-section {
+  border-color: rgba(80, 231, 149, 0.24);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(80, 231, 149, 0.05),
+      rgba(255, 255, 255, 0.012)
+    );
+}
+
+
+/* =========================================================
+   SECTION HEADERS
+========================================================= */
+
+.k630-v2-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.k630-v2-section-header h4 {
+  margin: 4px 0 7px;
+  color: #f6f8ff;
+  font-size: 1.04rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.k630-v2-section-header p {
+  max-width: 820px;
+  margin: 0;
+  color: rgba(224, 231, 242, 0.72);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.k630-v2-section-icon {
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #61dcff;
+  border: 1px solid rgba(68, 210, 255, 0.24);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(68, 210, 255, 0.13),
+      rgba(68, 210, 255, 0.035)
+    );
+  box-shadow:
+    inset 0 0 18px rgba(68, 210, 255, 0.05),
+    0 0 18px rgba(68, 210, 255, 0.05);
+}
+
+.k630-v2-section-icon i {
+  font-size: 1rem;
+}
+
+
+/* =========================================================
+   INPUT AND ACTION LAYOUTS
+========================================================= */
+
+.k630-v2-input-action-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 320px) auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.k630-v2-season-week-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(160px, 260px)
+    minmax(160px, 260px)
+    auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.k630-v2-admin .admin-field {
+  min-width: 0;
+}
+
+.k630-v2-admin .admin-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(230, 236, 247, 0.78);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.k630-v2-admin .admin-field input,
+.k630-v2-admin .admin-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  color: #f3f7ff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  outline: none;
+  background: rgba(5, 11, 22, 0.72);
+  font: inherit;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.k630-v2-admin .admin-field input::placeholder {
+  color: rgba(190, 201, 219, 0.42);
+}
+
+.k630-v2-admin .admin-field input:focus,
+.k630-v2-admin .admin-field select:focus {
+  border-color: rgba(68, 210, 255, 0.55);
+  background: rgba(5, 11, 22, 0.9);
+  box-shadow:
+    0 0 0 3px rgba(68, 210, 255, 0.08),
+    0 0 18px rgba(68, 210, 255, 0.08);
+}
+
+.k630-v2-admin .admin-field select option {
+  color: #f3f7ff;
+  background: #101726;
+}
+
+.k630-v2-admin .admin-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 11px;
+}
+
+.k630-v2-admin .admin-btn {
+  min-height: 42px;
+}
+
+.k630-v2-input-action-grid > .admin-btn,
+.k630-v2-season-week-grid > .admin-btn {
+  min-width: 205px;
+}
+
+.k630-v2-admin button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  filter: grayscale(0.35);
+  transform: none;
+}
+
+.k630-v2-admin button[aria-busy="true"] i {
+  animation: k630-v2-spin 900ms linear infinite;
+}
+
+
+/* =========================================================
+   GENERATED FILES
+========================================================= */
+
+.k630-v2-generated-files {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.k630-v2-generated-files > div {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 10px;
+  background: rgba(4, 10, 21, 0.38);
+}
+
+.k630-v2-generated-files i {
+  grid-row: 1 / span 2;
+  align-self: center;
+  color: #61dcff;
+  font-size: 0.9rem;
+}
+
+.k630-v2-generated-files span {
+  overflow: hidden;
+  color: rgba(229, 235, 245, 0.76);
+  font-size: 0.73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.k630-v2-generated-files strong {
+  overflow: hidden;
+  margin-top: 3px;
+  color: #f4f7ff;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ARCHIVE TOOLS
+========================================================= */
+
+.k630-v2-archive-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.k630-v2-tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 12px;
+  background: rgba(4, 10, 21, 0.42);
+}
+
+.k630-v2-tool-card > div:first-child {
+  min-height: 70px;
+}
+
+.k630-v2-tool-card h5 {
+  margin: 0 0 6px;
+  color: #f4f7ff;
+  font-size: 0.88rem;
+}
+
+.k630-v2-tool-card p {
+  margin: 0;
+  color: rgba(220, 228, 240, 0.66);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.k630-v2-tool-card .admin-btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+
+/* =========================================================
+   VALIDATION BOX
+========================================================= */
+
+.k630-v2-admin .admin-validation-box {
+  margin: 0;
+}
+
+.k630-v2-admin .validation-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.k630-v2-admin .validation-state.warning {
+  color: #ffe08a;
+  border: 1px solid rgba(255, 208, 77, 0.22);
+  background: rgba(255, 208, 77, 0.07);
+}
+
+.k630-v2-admin .validation-state.warning i {
+  margin-top: 2px;
+  color: #ffd04d;
+}
+
+
+/* =========================================================
+   OUTPUT AREA
+========================================================= */
+
+.k630-v2-output-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.k630-v2-progress,
+.k630-v2-result {
+  min-height: 44px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.k630-v2-progress[data-status="running"] {
+  color: #88e7ff;
+  border: 1px solid rgba(68, 210, 255, 0.3);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(68, 210, 255, 0.08),
+      rgba(68, 210, 255, 0.03)
+    );
+}
+
+.k630-v2-progress[data-status="running"]::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 10px;
+  border: 2px solid rgba(68, 210, 255, 0.25);
+  border-top-color: #61dcff;
+  border-radius: 50%;
+  vertical-align: -1px;
+  animation: k630-v2-spin 800ms linear infinite;
+}
+
+.k630-v2-result[data-status="success"] {
+  color: #77f4ad;
+  border: 1px solid rgba(80, 231, 149, 0.3);
+  background: rgba(80, 231, 149, 0.08);
+}
+
+.k630-v2-result[data-status="warning"] {
+  color: #ffe08a;
+  border: 1px solid rgba(255, 208, 77, 0.3);
+  background: rgba(255, 208, 77, 0.08);
+}
+
+.k630-v2-result[data-status="error"] {
+  color: #ff8294;
+  border: 1px solid rgba(255, 92, 116, 0.32);
+  background: rgba(255, 92, 116, 0.08);
+}
+
+.k630-v2-result[data-status="neutral"] {
+  color: #c8d2e3;
+  border: 1px solid rgba(200, 210, 227, 0.18);
+  background: rgba(200, 210, 227, 0.05);
+}
+
+
+/* =========================================================
+   ENGINE LOG
+========================================================= */
+
+.k630-v2-log-panel {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 12px;
+  background: rgba(3, 8, 17, 0.44);
+}
+
+.k630-v2-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.k630-v2-log-header h4 {
+  margin: 3px 0 0;
+  color: #f5f7fc;
+  font-size: 0.92rem;
+}
+
+.k630-v2-log {
+  display: flex;
+  flex-direction: column;
+  max-height: 330px;
+  overflow-y: auto;
+}
+
+.k630-v2-log-entry {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.k630-v2-log-entry:last-child {
+  border-bottom: 0;
+}
+
+.k630-v2-log-entry[data-status="success"] {
+  border-left: 3px solid rgba(80, 231, 149, 0.75);
+}
+
+.k630-v2-log-entry[data-status="warning"] {
+  border-left: 3px solid rgba(255, 208, 77, 0.75);
+}
+
+.k630-v2-log-entry[data-status="error"] {
+  border-left: 3px solid rgba(255, 92, 116, 0.8);
+}
+
+.k630-v2-log-entry[data-status="running"] {
+  border-left: 3px solid rgba(68, 210, 255, 0.75);
+}
+
+.k630-v2-log-entry[data-status="info"] {
+  border-left: 3px solid rgba(150, 163, 184, 0.55);
+}
+
+.k630-v2-log-time {
+  color: rgba(181, 193, 212, 0.48);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.k630-v2-log-message {
+  color: rgba(230, 235, 245, 0.82);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.k630-v2-log-empty {
+  padding: 18px;
+  color: rgba(189, 200, 217, 0.52);
+  font-size: 0.77rem;
+  text-align: center;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.k630-v2-log {
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(68, 210, 255, 0.28)
+    rgba(255, 255, 255, 0.025);
+}
+
+.k630-v2-log::-webkit-scrollbar {
+  width: 8px;
+}
+
+.k630-v2-log::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.k630-v2-log::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(68, 210, 255, 0.28);
+  background-clip: padding-box;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes k630-v2-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1150px) {
+  .k630-v2-generated-files {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .k630-v2-archive-tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .k630-v2-tool-card > div:first-child {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .k630-v2-input-action-grid,
+  .k630-v2-season-week-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .k630-v2-input-action-grid > .admin-btn,
+  .k630-v2-season-week-grid > .admin-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .k630-v2-admin > .admin-detail-header {
+    align-items: flex-start;
+  }
+
+  #k630V2SystemStatus {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .k630-v2-admin {
+    gap: 15px;
+  }
+
+  .k630-v2-control-section {
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .k630-v2-section-header {
+    gap: 11px;
+  }
+
+  .k630-v2-section-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .k630-v2-generated-files {
+    grid-template-columns: 1fr;
+  }
+
+  .k630-v2-admin .admin-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .k630-v2-admin .admin-action-row .admin-btn {
+    width: 100%;
+  }
+
+  .k630-v2-log-entry {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .k630-v2-admin *,
+  .k630-v2-admin *::before,
+  .k630-v2-admin *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

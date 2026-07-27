@@ -1,0 +1,919 @@
+<!-- =========================================================
+     KINGDOM 630 – DRAGON COMMAND CENTER
+     Public AFK Service Page
+
+     File:
+     pages/afk-service.html
+
+     Version:
+     630.2.2
+========================================================= -->
+
+<section
+  class="afk-service-page"
+  id="afkServicePage"
+  aria-labelledby="afkServicePageTitle"
+>
+
+  <!-- =====================================================
+       AFK BANNER
+  ====================================================== -->
+
+    <header class="afk-service-banner">
+  <h1
+    class="afk-service-visually-hidden"
+    id="afkServicePageTitle"
+  >
+    Kingdom 630 AFK Service
+  </h1>
+
+  <img
+    class="afk-service-banner__image"
+    src="assets/images/banners/afk-banner.png"
+    alt="Kingdom 630 AFK Service"
+  >
+    </header>
+
+  <!-- =====================================================
+       IMPORTANT INFORMATION
+  ====================================================== -->
+
+  <section
+    class="afk-service-information"
+    aria-label="AFK request information"
+  >
+
+    <div class="afk-service-information__icon">
+      <i
+        class="fa-solid fa-circle-info"
+        aria-hidden="true"
+      ></i>
+    </div>
+
+    <div class="afk-service-information__content">
+
+      <strong class="afk-service-information__title">
+        Important
+      </strong>
+
+      <div class="afk-service-information__layout">
+
+        <div class="afk-service-information__rules">
+
+          <p>
+            <i
+              class="fa-solid fa-circle"
+              aria-hidden="true"
+            ></i>
+
+            Submit your AFK request before your absence.
+          </p>
+
+          <p>
+            <i
+              class="fa-solid fa-shield-halved"
+              aria-hidden="true"
+            ></i>
+
+            Approved AFK requests are exempt from the Season Merit Requirement.
+          </p>
+
+          <p>
+            <i
+              class="fa-solid fa-circle"
+              aria-hidden="true"
+            ></i>
+
+            Requests without approval must still meet all merit requirements. To speed up your request, contact an R4/ R5 in-game with a message.
+          </p>
+
+        </div>
+
+        <div class="afk-service-information__warning">
+
+          <i
+            class="fa-solid fa-fire"
+            aria-hidden="true"
+          ></i>
+
+          <div>
+
+            <strong>
+              No AFK request? No mercy.
+            </strong>
+
+            <span>
+              Your city may be burned at the end of the season.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       REQUEST FORM
+  ====================================================== -->
+
+  <section class="afk-service-panel">
+
+    <form
+      class="afk-service-form"
+      id="afkServiceForm"
+      autocomplete="off"
+      novalidate
+    >
+
+      <!-- =================================================
+           1. PLAYER
+      ================================================== -->
+
+      <fieldset
+        class="
+          afk-service-form-section
+          afk-service-form-section--player
+        "
+      >
+
+        <legend class="afk-service-form-section__header">
+
+          <span class="afk-service-form-section__number">
+            1
+          </span>
+
+          <span class="afk-service-form-section__heading">
+
+            <span class="afk-service-form-section__eyebrow">
+              Player
+            </span>
+
+            <span class="afk-service-form-section__title">
+              Select your player account
+            </span>
+
+          </span>
+
+        </legend>
+
+        <div class="afk-service-field">
+
+          <label
+            class="afk-service-label"
+            for="afkPlayerSearchInput"
+          >
+            Player ID or Player Name
+          </label>
+
+          <div class="afk-service-search">
+
+            <div class="afk-service-search__input-wrap">
+
+              <i
+                class="
+                  fa-solid
+                  fa-magnifying-glass
+                  afk-service-search__icon
+                "
+                aria-hidden="true"
+              ></i>
+
+              <input
+                class="
+                  afk-service-input
+                  afk-service-search__input
+                "
+                id="afkPlayerSearchInput"
+                name="playerSearch"
+                type="search"
+                inputmode="search"
+                placeholder="Enter Player ID or Player Name"
+                aria-describedby="
+                  afkPlayerSearchHelp
+                  afkPlayerSearchMessage
+                "
+                aria-controls="afkPlayerSearchResults"
+                aria-expanded="false"
+                aria-autocomplete="list"
+                required
+              >
+
+              <button
+                class="afk-service-search__clear"
+                id="afkPlayerSearchClearButton"
+                type="button"
+                title="Clear player selection"
+                aria-label="Clear player selection"
+                hidden
+              >
+                <i
+                  class="fa-solid fa-xmark"
+                  aria-hidden="true"
+                ></i>
+              </button>
+
+            </div>
+
+            <button
+              class="
+                afk-service-button
+                afk-service-button--search
+              "
+              id="afkPlayerSearchButton"
+              type="button"
+            >
+              <i
+                class="fa-solid fa-magnifying-glass"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Search
+              </span>
+            </button>
+
+          </div>
+
+          <p
+            class="afk-service-help"
+            id="afkPlayerSearchHelp"
+          >
+            Only players registered in the Kingdom 630 player data can be
+            selected.
+          </p>
+
+          <div
+            class="afk-service-search-results"
+            id="afkPlayerSearchResults"
+            role="listbox"
+            aria-label="Player search results"
+            hidden
+          ></div>
+
+          <div
+            class="afk-service-message"
+            id="afkPlayerSearchMessage"
+            role="status"
+            aria-live="polite"
+            hidden
+          ></div>
+
+        </div>
+
+        <article
+          class="afk-service-selected-player"
+          id="afkSelectedPlayer"
+          aria-live="polite"
+          hidden
+        >
+
+          <div class="afk-service-selected-player__icon">
+            <i
+              class="fa-solid fa-user-check"
+              aria-hidden="true"
+            ></i>
+          </div>
+
+          <div class="afk-service-selected-player__details">
+
+            <span class="afk-service-selected-player__label">
+              Selected Player
+            </span>
+
+            <strong
+              class="afk-service-selected-player__name"
+              id="afkSelectedPlayerName"
+            >
+              -
+            </strong>
+
+            <span
+              class="afk-service-selected-player__meta"
+              id="afkSelectedPlayerMeta"
+            >
+              -
+            </span>
+
+          </div>
+
+          <button
+            class="afk-service-selected-player__remove"
+            id="afkSelectedPlayerRemoveButton"
+            type="button"
+            title="Remove selected player"
+            aria-label="Remove selected player"
+          >
+            <i
+              class="fa-solid fa-xmark"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+        </article>
+
+      </fieldset>
+
+      <!-- =================================================
+           2. REASON
+      ================================================== -->
+
+      <fieldset
+        class="
+          afk-service-form-section
+          afk-service-form-section--reason
+        "
+      >
+
+        <legend class="afk-service-form-section__header">
+
+          <span class="afk-service-form-section__number">
+            2
+          </span>
+
+          <span class="afk-service-form-section__heading">
+
+            <span class="afk-service-form-section__eyebrow">
+              Reason
+            </span>
+
+            <span class="afk-service-form-section__title">
+              Select your reason
+            </span>
+
+          </span>
+
+        </legend>
+
+        <div
+          class="afk-service-reason-grid"
+          id="afkReasonGrid"
+        >
+
+          <label class="afk-service-choice">
+
+            <input
+              class="afk-service-choice__input"
+              type="radio"
+              name="afkReason"
+              value="vacation"
+              required
+            >
+
+            <span class="afk-service-choice__content">
+
+              <span class="afk-service-choice__check">
+                <i
+                  class="fa-solid fa-circle-check"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__icon">
+                <i
+                  class="fa-solid fa-plane"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__text">
+
+                <strong>
+                  Vacation
+                </strong>
+
+                <small>
+                  Holiday, travel or planned time away
+                </small>
+
+              </span>
+
+            </span>
+
+          </label>
+
+          <label class="afk-service-choice">
+
+            <input
+              class="afk-service-choice__input"
+              type="radio"
+              name="afkReason"
+              value="work"
+              required
+            >
+
+            <span class="afk-service-choice__content">
+
+              <span class="afk-service-choice__check">
+                <i
+                  class="fa-solid fa-circle-check"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__icon">
+                <i
+                  class="fa-solid fa-building"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__text">
+
+                <strong>
+                  Work
+                </strong>
+
+                <small>
+                  Work, study or another obligation
+                </small>
+
+              </span>
+
+            </span>
+
+          </label>
+
+          <label class="afk-service-choice">
+
+            <input
+              class="afk-service-choice__input"
+              type="radio"
+              name="afkReason"
+              value="private"
+              required
+            >
+
+            <span class="afk-service-choice__content">
+
+              <span class="afk-service-choice__check">
+                <i
+                  class="fa-solid fa-circle-check"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__icon">
+                <i
+                  class="fa-solid fa-user-shield"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+              <span class="afk-service-choice__text">
+
+                <strong>
+                  Private
+                </strong>
+
+                <small>
+                  Personal circumstances
+                </small>
+
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div
+          class="afk-service-message"
+          id="afkReasonMessage"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+      </fieldset>
+
+      <!-- =================================================
+           3. WEEKS
+      ================================================== -->
+
+      <fieldset
+        class="
+          afk-service-form-section
+          afk-service-form-section--weeks
+        "
+      >
+
+        <legend class="afk-service-form-section__header">
+
+          <span class="afk-service-form-section__number">
+            3
+          </span>
+
+          <span class="afk-service-form-section__heading">
+
+            <span class="afk-service-form-section__eyebrow">
+              Weeks
+            </span>
+
+            <span class="afk-service-form-section__title">
+              Select all AFK weeks
+            </span>
+
+          </span>
+
+        </legend>
+
+        <div
+          class="afk-service-week-grid"
+          id="afkWeekGrid"
+        >
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="0"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W0
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="1"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W1
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="2"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W2
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="3"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W3
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="4"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W4
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="5"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W5
+            </span>
+          </label>
+
+          <label class="afk-service-week">
+            <input
+              class="afk-service-week__input"
+              type="checkbox"
+              name="afkWeeks"
+              value="6"
+            >
+
+            <span class="afk-service-week__content">
+              <i
+                class="fa-solid fa-check"
+                aria-hidden="true"
+              ></i>
+
+              W6
+            </span>
+          </label>
+
+        </div>
+
+        <p class="afk-service-week-help">
+          <i
+            class="fa-solid fa-calendar-days"
+            aria-hidden="true"
+          ></i>
+
+          Select every week during which you expect to be unavailable.
+        </p>
+
+        <div
+          class="afk-service-message"
+          id="afkWeeksMessage"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+      </fieldset>
+
+      <!-- =================================================
+           4. NOTE
+      ================================================== -->
+
+      <fieldset
+        class="
+          afk-service-form-section
+          afk-service-form-section--note
+        "
+      >
+
+        <legend class="afk-service-form-section__header">
+
+          <span class="afk-service-form-section__number">
+            4
+          </span>
+
+          <span class="afk-service-form-section__heading">
+
+            <span class="afk-service-form-section__eyebrow">
+              Note · Optional
+            </span>
+
+            <span class="afk-service-form-section__title">
+              Add a note for the administrator
+            </span>
+
+          </span>
+
+        </legend>
+
+        <div class="afk-service-field">
+
+          <label
+            class="afk-service-visually-hidden"
+            for="afkNoteInput"
+          >
+            Add a note for the administrator
+          </label>
+
+          <textarea
+            class="afk-service-textarea"
+            id="afkNoteInput"
+            name="afkNote"
+            rows="3"
+            maxlength="500"
+            placeholder="Enter additional information here..."
+            aria-describedby="afkNoteCounter"
+          ></textarea>
+
+          <div class="afk-service-note-footer">
+
+            <span>
+              Maximum 500 characters
+            </span>
+
+            <span
+              class="afk-service-character-counter"
+              id="afkNoteCounter"
+            >
+              0 / 500
+            </span>
+
+          </div>
+
+        </div>
+
+      </fieldset>
+
+      <!-- =================================================
+           SPAM PROTECTION
+      ================================================== -->
+
+      <div
+        class="afk-service-honeypot"
+        aria-hidden="true"
+      >
+        <label for="afkWebsiteInput">
+          Website
+        </label>
+
+        <input
+          id="afkWebsiteInput"
+          name="website"
+          type="text"
+          tabindex="-1"
+          autocomplete="off"
+        >
+      </div>
+
+      <!-- =================================================
+           SUBMIT
+      ================================================== -->
+
+      <div class="afk-service-submit">
+
+  <div
+    class="afk-service-submit__message"
+    id="afkSubmitMessage"
+    role="status"
+    aria-live="polite"
+    hidden
+  ></div>
+
+  <button
+    class="afk-service-button afk-service-button--submit"
+    id="afkSubmitButton"
+    type="submit"
+    aria-label="Send AFK Request"
+  >
+    <span
+      class="afk-service-button__normal"
+      id="afkSubmitButtonNormal"
+    >
+      Send AFK Request
+    </span>
+
+    <span
+      class="afk-service-button__loading"
+      id="afkSubmitButtonLoading"
+      hidden
+    >
+      <i
+        class="fa-solid fa-spinner fa-spin"
+        aria-hidden="true"
+      ></i>
+
+      <span>
+        Sending request...
+      </span>
+    </span>
+  </button>
+
+</div>
+
+    </form>
+
+  </section>
+
+  <!-- =====================================================
+       SUCCESS PANEL
+  ====================================================== -->
+
+  <section
+    class="afk-service-success"
+    id="afkServiceSuccess"
+    aria-labelledby="afkServiceSuccessTitle"
+    hidden
+  >
+
+    <div class="afk-service-success__icon">
+      <i
+        class="fa-solid fa-circle-check"
+        aria-hidden="true"
+      ></i>
+    </div>
+
+    <div class="afk-service-success__content">
+
+      <span class="afk-service-success__eyebrow">
+        Request sent
+      </span>
+
+      <h2
+        class="afk-service-success__title"
+        id="afkServiceSuccessTitle"
+      >
+        Your AFK request is pending
+      </h2>
+
+      <p class="afk-service-success__description">
+        The Kingdom 630 administration has received your request.
+        An administrator must approve it before the merit exemption becomes
+        active.
+      </p>
+
+      <dl class="afk-service-success__summary">
+
+        <div>
+          <dt>
+            Player
+          </dt>
+
+          <dd id="afkSuccessPlayer">
+            -
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            Reason
+          </dt>
+
+          <dd id="afkSuccessReason">
+            -
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            Weeks
+          </dt>
+
+          <dd id="afkSuccessWeeks">
+            -
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            Request Number
+          </dt>
+
+          <dd id="afkSuccessRequestId">
+            -
+          </dd>
+        </div>
+
+      </dl>
+
+      <button
+        class="
+          afk-service-button
+          afk-service-button--new
+        "
+        id="afkNewRequestButton"
+        type="button"
+      >
+        <i
+          class="fa-solid fa-plus"
+          aria-hidden="true"
+        ></i>
+
+        <span>
+          Send another request
+        </span>
+      </button>
+
+    </div>
+
+  </section>
+
+</section>

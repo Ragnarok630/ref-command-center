@@ -1,0 +1,1288 @@
+<!-- =========================================================
+     K630-REF PLAYER ID INFO PAGE
+     File: pages/player-id-info.html
+     Version: 630.0.70
+     Sprint 6 - Player ID Info Final Compact Layout
+
+     Layout:
+     1. Header and banner
+     2. Compact search
+     3. Identity + Alliance + Kingdom + status blocks
+     4. Four compact information panels
+     5. Official Archives
+     6. Player Timeline
+
+     Important:
+     - No changes to topbar, sidebar or bottombar
+     - No page-level horizontal scrolling
+     - Season Archives scroll horizontally internally
+     - Player Timeline scrolls horizontally internally
+========================================================= -->
+
+<section
+  class="player-id-info-page"
+  id="playerIdInfoPage"
+  aria-labelledby="playerIdInfoPageTitle"
+>
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <header class="player-id-info-header">
+
+    <div class="player-id-info-header__title-row">
+
+      <div class="player-id-info-header__title-group">
+
+        <span class="player-id-info-header__eyebrow">
+          Kingdom 630
+        </span>
+
+        <h1
+          class="player-id-info-header__title"
+          id="playerIdInfoPageTitle"
+        >
+          Player ID Info
+        </h1>
+
+      </div>
+
+      <div
+        class="player-id-info-header__badge"
+        aria-label="Server 630 only"
+      >
+        <i
+          class="fa-solid fa-shield-halved"
+          aria-hidden="true"
+        ></i>
+
+        <span>Server 630 only</span>
+      </div>
+
+    </div>
+
+    <!-- ===================================================
+         REBELS OF FURY BANNER
+    ==================================================== -->
+
+    <section
+      class="player-id-hero"
+      aria-label="Rebels of Fury Kingdom 630 banner"
+    >
+
+      <div class="player-id-hero__image-wrap">
+
+        <img
+          class="player-id-hero__image"
+          src="assets/images/player-id-info-banner.png"
+          alt="Rebels of Fury - Kingdom 630"
+        >
+
+        <span
+          class="player-id-hero__glow"
+          aria-hidden="true"
+        ></span>
+
+        <section
+  class="player-id-hero"
+  aria-label="Rebels of Fury Kingdom 630 banner"
+ >
+
+  <div class="player-id-hero__image-wrap">
+
+    <img
+      class="player-id-hero__image"
+      src="assets/images/player-id-info-banner.png"
+      alt="Rebels of Fury - Kingdom 630"
+    >
+
+    <span
+      class="player-id-hero__glow"
+      aria-hidden="true"
+    ></span>
+
+  </div>
+
+ </section>
+
+      </div>
+
+    </section>
+
+  </header>
+
+  <!-- =====================================================
+       SEARCH
+  ====================================================== -->
+
+  <section
+    class="player-id-search-panel player-id-panel"
+    aria-labelledby="playerIdSearchTitle"
+  >
+
+    <form
+      class="player-id-search-form"
+      id="playerIdSearchForm"
+      autocomplete="off"
+      novalidate
+    >
+
+      <div class="player-id-search-form__heading">
+
+        <span class="player-id-search-form__icon">
+
+          <i
+            class="fa-solid fa-magnifying-glass"
+            aria-hidden="true"
+          ></i>
+
+        </span>
+
+        <div>
+
+          <span class="player-id-panel__eyebrow">
+            Player Search
+          </span>
+
+          <h2
+            class="player-id-panel__title"
+            id="playerIdSearchTitle"
+          >
+            Search ID or Name
+          </h2>
+
+        </div>
+
+      </div>
+
+      <div class="player-id-search-field">
+
+        <label
+          class="visually-hidden"
+          for="playerIdSearchInput"
+        >
+          Player ID or Player Name
+        </label>
+
+        <div class="player-id-search-field__control">
+
+          <span
+            class="player-id-search-field__icon"
+            aria-hidden="true"
+          >
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+
+          <input
+            class="player-id-search-field__input"
+            id="playerIdSearchInput"
+            name="playerSearch"
+            type="search"
+            inputmode="search"
+            placeholder="Player ID or Player Name"
+            aria-describedby="playerIdSearchMessage"
+            aria-controls="playerIdSearchSuggestions"
+            aria-autocomplete="list"
+            aria-expanded="false"
+          >
+
+          <button
+            class="player-id-search-field__clear"
+            id="playerIdSearchClearButton"
+            type="button"
+            title="Clear search"
+            aria-label="Clear search"
+            hidden
+          >
+            <i
+              class="fa-solid fa-xmark"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+        </div>
+
+        <div
+          class="player-id-search-suggestions"
+          id="playerIdSearchSuggestions"
+          role="listbox"
+          aria-label="Player search suggestions"
+          hidden
+        ></div>
+
+      </div>
+
+      <button
+        class="player-id-search-button"
+        id="playerIdSearchButton"
+        type="submit"
+      >
+        <i
+          class="fa-solid fa-magnifying-glass"
+          aria-hidden="true"
+        ></i>
+
+        <span>Search</span>
+      </button>
+
+      <div
+        class="player-id-search-panel__status"
+        id="playerIdEngineStatus"
+        data-status="idle"
+        aria-live="polite"
+      >
+        <span
+          class="player-id-search-panel__status-dot"
+          aria-hidden="true"
+        ></span>
+
+        <span id="playerIdEngineStatusText">
+          Ready
+        </span>
+      </div>
+
+    </form>
+
+    <div
+      class="player-id-search-message"
+      id="playerIdSearchMessage"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
+
+  </section>
+
+  <!-- =====================================================
+       INITIAL STATE
+  ====================================================== -->
+
+  <section
+    class="player-id-empty-state player-id-panel"
+    id="playerIdEmptyState"
+  >
+
+    <div class="player-id-empty-state__icon">
+
+      <i
+        class="fa-solid fa-address-card"
+        aria-hidden="true"
+      ></i>
+
+    </div>
+
+    <div class="player-id-empty-state__content">
+
+      <h2>Search for a Kingdom 630 player</h2>
+
+      <p>
+        Enter a Player ID or Player Name to open the complete
+        player profile.
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       LOADING STATE
+  ====================================================== -->
+
+  <section
+    class="player-id-loading-state player-id-panel"
+    id="playerIdLoadingState"
+    aria-live="polite"
+    hidden
+  >
+
+    <div
+      class="player-id-loading-state__spinner"
+      aria-hidden="true"
+    ></div>
+
+    <div class="player-id-loading-state__content">
+
+      <strong>Loading player information</strong>
+
+      <span>
+        Combining current, historical and official archive
+        data.
+      </span>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       NOT FOUND STATE
+  ====================================================== -->
+
+  <section
+    class="player-id-not-found player-id-panel"
+    id="playerIdNotFoundState"
+    hidden
+  >
+
+    <div class="player-id-not-found__icon">
+
+      <i
+        class="fa-solid fa-user-slash"
+        aria-hidden="true"
+      ></i>
+
+    </div>
+
+    <div class="player-id-not-found__content">
+
+      <h2>Player not found</h2>
+
+      <p id="playerIdNotFoundText">
+        No current or former Server 630 player matches this
+        search.
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       PLAYER RESULT
+  ====================================================== -->
+
+  <article
+    class="player-id-result"
+    id="playerIdResult"
+    aria-labelledby="playerIdResultName"
+    hidden
+  >
+
+    <!-- ===================================================
+         PLAYER IDENTITY AND STATUS
+    ==================================================== -->
+
+    <section class="player-id-summary player-id-panel">
+
+      <div class="player-id-summary__identity">
+
+        <div
+          class="player-id-summary__avatar"
+          aria-hidden="true"
+        >
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+
+        <div class="player-id-summary__identity-text">
+
+          <div class="player-id-summary__main-row">
+
+            <span class="player-id-summary__id-group">
+
+              <i
+                class="fa-solid fa-id-card"
+                aria-hidden="true"
+              ></i>
+
+              <span class="player-id-summary__id-label">
+                ID
+              </span>
+
+              <strong
+                class="player-id-summary__id"
+                id="playerIdSummaryId"
+              >
+                -
+              </strong>
+
+            </span>
+
+            <h2
+              class="player-id-summary__name"
+              id="playerIdResultName"
+            >
+              -
+            </h2>
+
+            <span
+              class="player-id-summary__membership"
+              id="playerIdMembershipStatus"
+              data-membership="unknown"
+            >
+              -
+            </span>
+
+            <span class="player-id-summary__inline-meta">
+
+              <i
+                class="fa-solid fa-people-group"
+                aria-hidden="true"
+              ></i>
+
+              <span class="player-id-summary__inline-label">
+                Alliance
+              </span>
+
+              <strong id="playerIdSummaryAlliance">-</strong>
+
+            </span>
+
+            <span class="player-id-summary__inline-meta">
+
+              <i
+                class="fa-solid fa-crown"
+                aria-hidden="true"
+              ></i>
+
+              <span class="player-id-summary__inline-label">
+                Kingdom
+              </span>
+
+              <strong>630</strong>
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="player-id-summary__badges">
+
+        <span
+          class="player-id-summary-badge"
+          id="playerIdSummaryServerStatus"
+          data-type="server-status"
+        >
+
+          <span class="player-id-summary-badge__icon">
+
+            <i
+              class="fa-solid fa-ranking-star"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <span class="player-id-summary-badge__content">
+
+            <span class="player-id-summary-badge__label">
+              Server Status
+            </span>
+
+            <strong>-</strong>
+
+          </span>
+
+        </span>
+
+        <span
+          class="player-id-summary-badge"
+          id="playerIdSummaryTroopTier"
+          data-type="troop-tier"
+        >
+
+          <span class="player-id-summary-badge__icon">
+
+            <i
+              class="fa-solid fa-shield-halved"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <span class="player-id-summary-badge__content">
+
+            <span class="player-id-summary-badge__label">
+              Troop Tier
+            </span>
+
+            <strong>-</strong>
+
+          </span>
+
+        </span>
+
+        <span
+          class="player-id-summary-badge"
+          id="playerIdSummaryPlayerType"
+          data-type="player-type"
+        >
+
+          <span class="player-id-summary-badge__icon">
+
+            <i
+              class="fa-solid fa-user-group"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <span class="player-id-summary-badge__content">
+
+            <span class="player-id-summary-badge__label">
+              Player Type
+            </span>
+
+            <strong>-</strong>
+
+          </span>
+
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================
+         FOUR MAIN INFORMATION PANELS
+    ==================================================== -->
+
+    <div class="player-id-info-grid">
+
+      <!-- PERFORMANCE -->
+
+      <section
+        class="player-id-info-card player-id-panel"
+        aria-labelledby="playerIdPlayerInfoTitle"
+      >
+
+        <div class="player-id-card-header">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--purple">
+
+            <i
+              class="fa-solid fa-chart-line"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Performance
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdPlayerInfoTitle"
+            >
+              Player Info
+            </h2>
+
+          </div>
+
+        </div>
+
+        <dl class="player-id-data-list">
+
+          <div class="player-id-data-row player-id-data-row--highlight">
+
+            <dt>
+              <i
+                class="fa-solid fa-bolt"
+                aria-hidden="true"
+              ></i>
+
+              Current Power
+            </dt>
+
+            <dd id="playerIdPlayerCurrentPower">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-arrow-trend-up"
+                aria-hidden="true"
+              ></i>
+
+              Top Power
+            </dt>
+
+            <dd id="playerIdPlayerTopPower">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row player-id-data-row--highlight">
+
+            <dt>
+              <i
+                class="fa-solid fa-medal"
+                aria-hidden="true"
+              ></i>
+
+              Top Merits
+            </dt>
+
+            <dd id="playerIdPlayerTopMerits">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-skull"
+                aria-hidden="true"
+              ></i>
+
+              Units Dead
+            </dt>
+
+            <dd id="playerIdPlayerUnitsDead">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-crosshairs"
+                aria-hidden="true"
+              ></i>
+
+              Units Killed
+            </dt>
+
+            <dd id="playerIdPlayerUnitsKilled">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-kit-medical"
+                aria-hidden="true"
+              ></i>
+
+              Units Healed
+            </dt>
+
+            <dd id="playerIdPlayerUnitsHealed">-</dd>
+
+          </div>
+
+        </dl>
+
+      </section>
+
+      <!-- GATHERING -->
+
+      <section
+        class="player-id-info-card player-id-panel"
+        aria-labelledby="playerIdResourcesInfoTitle"
+      >
+
+        <div class="player-id-card-header">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--gold">
+
+            <i
+              class="fa-solid fa-gem"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Gathering
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdResourcesInfoTitle"
+            >
+              Resources Info
+            </h2>
+
+          </div>
+
+        </div>
+
+        <dl class="player-id-data-list">
+
+          <div class="player-id-data-row player-id-data-row--highlight">
+
+            <dt>
+              <i
+                class="fa-solid fa-boxes-stacked"
+                aria-hidden="true"
+              ></i>
+
+              Resources Gathered
+            </dt>
+
+            <dd id="playerIdResourcesTotal">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-coins"
+                aria-hidden="true"
+              ></i>
+
+              Gold Gathered
+            </dt>
+
+            <dd id="playerIdResourcesGold">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-tree"
+                aria-hidden="true"
+              ></i>
+
+              Wood Gathered
+            </dt>
+
+            <dd id="playerIdResourcesWood">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-mountain"
+                aria-hidden="true"
+              ></i>
+
+              Ore Gathered
+            </dt>
+
+            <dd id="playerIdResourcesOre">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-wand-magic-sparkles"
+                aria-hidden="true"
+              ></i>
+
+              Mana Gathered
+            </dt>
+
+            <dd id="playerIdResourcesMana">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-gem"
+                aria-hidden="true"
+              ></i>
+
+              Gems Gathered
+            </dt>
+
+            <dd id="playerIdResourcesGems">-</dd>
+
+          </div>
+
+        </dl>
+
+      </section>
+
+      <!-- DEVELOPMENT -->
+
+      <section
+        class="player-id-info-card player-id-panel"
+        aria-labelledby="playerIdPowerInfoTitle"
+      >
+
+        <div class="player-id-card-header">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--purple">
+
+            <i
+              class="fa-solid fa-bolt"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Development
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdPowerInfoTitle"
+            >
+              Power Info
+            </h2>
+
+          </div>
+
+        </div>
+
+        <dl class="player-id-data-list">
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-shield-halved"
+                aria-hidden="true"
+              ></i>
+
+              Troop Power
+            </dt>
+
+            <dd id="playerIdPowerTroop">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-building"
+                aria-hidden="true"
+              ></i>
+
+              Building Power
+            </dt>
+
+            <dd id="playerIdPowerBuilding">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row player-id-data-row--highlight">
+
+            <dt>
+              <i
+                class="fa-solid fa-flask"
+                aria-hidden="true"
+              ></i>
+
+              Tech Power
+            </dt>
+
+            <dd id="playerIdPowerTech">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-user-ninja"
+                aria-hidden="true"
+              ></i>
+
+              Hero Power
+            </dt>
+
+            <dd id="playerIdPowerHero">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-chess-rook"
+                aria-hidden="true"
+              ></i>
+
+              Castle Level
+            </dt>
+
+            <dd id="playerIdPowerCastle">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-flag"
+                aria-hidden="true"
+              ></i>
+
+              Faction
+            </dt>
+
+            <dd id="playerIdPowerFaction">-</dd>
+
+          </div>
+
+        </dl>
+
+      </section>
+
+      <!-- MEMBERSHIP -->
+
+      <section
+        class="player-id-info-card player-id-panel"
+        aria-labelledby="playerIdMembershipInfoTitle"
+      >
+
+        <div class="player-id-card-header">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--gold">
+
+            <i
+              class="fa-solid fa-user-shield"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Membership
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdMembershipInfoTitle"
+            >
+              Server Info
+            </h2>
+
+          </div>
+
+        </div>
+
+        <dl class="player-id-data-list">
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-user-check"
+                aria-hidden="true"
+              ></i>
+
+              Membership Status
+            </dt>
+
+            <dd id="playerIdMembershipPanelStatus">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-right-to-bracket"
+                aria-hidden="true"
+              ></i>
+
+              Join 630
+            </dt>
+
+            <dd id="playerIdServerJoin">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-right-from-bracket"
+                aria-hidden="true"
+              ></i>
+
+              Leave 630
+            </dt>
+
+            <dd id="playerIdServerLeave">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row">
+
+            <dt>
+              <i
+                class="fa-solid fa-rotate-left"
+                aria-hidden="true"
+              ></i>
+
+              Rejoin 630
+            </dt>
+
+            <dd id="playerIdServerRejoin">-</dd>
+
+          </div>
+
+          <div class="player-id-data-row player-id-data-row--note">
+
+            <dt>
+              <i
+                class="fa-solid fa-note-sticky"
+                aria-hidden="true"
+              ></i>
+
+              Note
+            </dt>
+
+            <dd id="playerIdStatusNote">-</dd>
+
+          </div>
+
+        </dl>
+
+      </section>
+
+    </div>
+
+    <!-- ===================================================
+         OFFICIAL SEASON ARCHIVES
+    ==================================================== -->
+
+    <section
+      class="player-id-season-panel player-id-panel"
+      aria-labelledby="playerIdSeasonInfoTitle"
+    >
+
+      <div class="player-id-wide-panel-header">
+
+        <div class="player-id-wide-panel-header__title">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--gold">
+
+            <i
+              class="fa-solid fa-box-archive"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Official Archives
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdSeasonInfoTitle"
+            >
+              Season Info
+            </h2>
+
+          </div>
+
+        </div>
+
+        <span class="player-id-wide-panel-header__badge">
+
+          <i
+            class="fa-solid fa-circle-check"
+            aria-hidden="true"
+          ></i>
+
+          Saved seasons only
+
+        </span>
+
+      </div>
+
+      <div
+        class="player-id-season-empty"
+        id="playerIdSeasonEmpty"
+        hidden
+      >
+        No official season results are available for this
+        player.
+      </div>
+
+      <div
+        class="player-id-season-scroll"
+        id="playerIdSeasonScroll"
+        tabindex="0"
+        aria-label="Official season results"
+      >
+
+        <table class="player-id-season-table">
+
+          <thead id="playerIdSeasonTableHead">
+
+            <tr>
+
+              <th
+                class="player-id-season-table__metric"
+                scope="col"
+              >
+                Metric
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="playerIdSeasonTableBody">
+
+            <tr data-season-metric="power">
+
+              <th scope="row">
+
+                <i
+                  class="fa-solid fa-bolt"
+                  aria-hidden="true"
+                ></i>
+
+                Power
+
+              </th>
+
+            </tr>
+
+            <tr data-season-metric="merits">
+
+              <th scope="row">
+
+                <i
+                  class="fa-solid fa-medal"
+                  aria-hidden="true"
+                ></i>
+
+                Merits Value
+
+              </th>
+
+            </tr>
+
+            <tr data-season-metric="meritPercent">
+
+              <th scope="row">
+
+                <i
+                  class="fa-solid fa-percent"
+                  aria-hidden="true"
+                ></i>
+
+                Merits %
+
+              </th>
+
+            </tr>
+
+            <tr data-season-metric="rank">
+
+              <th scope="row">
+
+                <i
+                  class="fa-solid fa-ranking-star"
+                  aria-hidden="true"
+                ></i>
+
+                Rank
+
+              </th>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================
+         PLAYER TIMELINE
+    ==================================================== -->
+
+    <section
+      class="player-id-timeline-panel player-id-panel"
+      aria-labelledby="playerIdTimelineTitle"
+    >
+
+      <div class="player-id-wide-panel-header">
+
+        <div class="player-id-wide-panel-header__title">
+
+          <span class="player-id-card-header__icon player-id-card-header__icon--purple">
+
+            <i
+              class="fa-solid fa-clock-rotate-left"
+              aria-hidden="true"
+            ></i>
+
+          </span>
+
+          <div>
+
+            <span class="player-id-panel__eyebrow">
+              Player History
+            </span>
+
+            <h2
+              class="player-id-panel__title"
+              id="playerIdTimelineTitle"
+            >
+              Player Timeline
+            </h2>
+
+          </div>
+
+        </div>
+
+        <span class="player-id-wide-panel-header__badge">
+
+          <i
+            class="fa-solid fa-route"
+            aria-hidden="true"
+          ></i>
+
+          Migration and season events
+
+        </span>
+
+      </div>
+
+      <div
+        class="player-id-timeline-empty"
+        id="playerIdTimelineEmpty"
+        hidden
+      >
+        No player history is currently available.
+      </div>
+
+      <div
+        class="player-id-timeline-scroll"
+        id="playerIdTimelineScroll"
+        tabindex="0"
+        aria-label="Player history timeline"
+      >
+
+        <div
+          class="player-id-timeline"
+          id="playerIdTimeline"
+          role="list"
+        ></div>
+
+      </div>
+
+    </section>
+
+  </article>
+
+</section>

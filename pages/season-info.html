@@ -1,0 +1,1432 @@
+<!-- =========================================================
+     K630-REF SEASON INFO PAGE
+
+     File:
+     pages/season-info.html
+
+     Version:
+     630.1.0 Gold Master
+
+     Structure:
+     - Compact page header
+     - Player type filters above the fixed base table
+     - Weekly sorting filters above the weekly table
+     - Fixed player information on the left
+     - Week 0 through Week 6 on the right
+     - Note between T4/T5 and Historical Power
+     - One shared vertical scrollbar
+     - One synchronized horizontal scrollbar for weeks
+========================================================= -->
+
+<section
+  id="seasonInfoPage"
+  class="season-info-page"
+>
+
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
+
+  <header class="si-header">
+
+    <div class="si-header-copy">
+
+      <span class="si-header-kicker">
+        Kingdom 630
+      </span>
+
+      <h1>
+        Season Info
+      </h1>
+
+      <p id="siSeasonDescription">
+        Official participants from Server 630 Week 0.
+      </p>
+
+    </div>
+
+    <div
+      id="siPlayerCount"
+      class="si-player-count"
+    >
+      0 players
+    </div>
+
+  </header>
+
+  <!-- =====================================================
+       FILTER BAR
+  ====================================================== -->
+
+  <section
+    class="si-filter-bar"
+    aria-label="Season information filters"
+  >
+
+    <!-- =================================================
+         FIXED BASE FILTERS
+    ================================================== -->
+
+    <div class="si-base-filter-area">
+
+      <div
+        class="si-player-type-filters"
+        role="group"
+        aria-label="Player type"
+      >
+
+        <button
+          type="button"
+          class="si-filter-btn active"
+          data-filter="all"
+          aria-pressed="true"
+        >
+          All 630 IDs
+        </button>
+
+        <button
+          type="button"
+          class="si-filter-btn"
+          data-filter="warriors"
+          aria-pressed="false"
+        >
+          Warriors
+        </button>
+
+        <button
+          type="button"
+          class="si-filter-btn"
+          data-filter="farmers"
+          aria-pressed="false"
+        >
+          Farmers
+        </button>
+
+      </div>
+
+      <div
+        id="siFilterSummary"
+        class="si-filter-summary"
+      >
+        Showing all official participants
+      </div>
+
+    </div>
+
+    <!-- =================================================
+         WEEK FILTER VIEWPORT
+    ================================================== -->
+
+    <div class="si-week-filter-area">
+
+      <div
+        id="siWeekFilterShell"
+        class="si-week-filter-shell"
+      >
+
+        <div class="si-week-filter-track">
+
+          <!-- =============================================
+               WEEK 0
+          ============================================== -->
+
+          <section
+            class="
+              si-week-sort-group
+              si-week-sort-group--zero
+            "
+            aria-label="Week 0 sorting"
+          >
+
+            <h2>
+              Week 0
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="0"
+                data-metric="merits"
+                aria-label="Sort Week 0 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="0"
+                data-metric="power"
+                aria-label="Sort Week 0 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 1
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 1 sorting"
+          >
+
+            <h2>
+              Week 1
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="1"
+                data-metric="merits"
+                aria-label="Sort Week 1 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="1"
+                data-metric="percent"
+                aria-label="Sort Week 1 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="1"
+                data-metric="power"
+                aria-label="Sort Week 1 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="1"
+                data-metric="rank"
+                aria-label="Sort Week 1 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 2
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 2 sorting"
+          >
+
+            <h2>
+              Week 2
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="2"
+                data-metric="merits"
+                aria-label="Sort Week 2 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="2"
+                data-metric="percent"
+                aria-label="Sort Week 2 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="2"
+                data-metric="power"
+                aria-label="Sort Week 2 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="2"
+                data-metric="rank"
+                aria-label="Sort Week 2 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 3
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 3 sorting"
+          >
+
+            <h2>
+              Week 3
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="3"
+                data-metric="merits"
+                aria-label="Sort Week 3 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="3"
+                data-metric="percent"
+                aria-label="Sort Week 3 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="3"
+                data-metric="power"
+                aria-label="Sort Week 3 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="3"
+                data-metric="rank"
+                aria-label="Sort Week 3 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 4
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 4 sorting"
+          >
+
+            <h2>
+              Week 4
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="4"
+                data-metric="merits"
+                aria-label="Sort Week 4 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="4"
+                data-metric="percent"
+                aria-label="Sort Week 4 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="4"
+                data-metric="power"
+                aria-label="Sort Week 4 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="4"
+                data-metric="rank"
+                aria-label="Sort Week 4 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 5
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 5 sorting"
+          >
+
+            <h2>
+              Week 5
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="5"
+                data-metric="merits"
+                aria-label="Sort Week 5 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="5"
+                data-metric="percent"
+                aria-label="Sort Week 5 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="5"
+                data-metric="power"
+                aria-label="Sort Week 5 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="5"
+                data-metric="rank"
+                aria-label="Sort Week 5 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+          <!-- =============================================
+               WEEK 6
+          ============================================== -->
+
+          <section
+            class="si-week-sort-group"
+            aria-label="Week 6 sorting"
+          >
+
+            <h2>
+              Week 6
+            </h2>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="6"
+                data-metric="merits"
+                aria-label="Sort Week 6 merits"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Merits %
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="6"
+                data-metric="percent"
+                aria-label="Sort Week 6 merits percentage"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Current Power
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="6"
+                data-metric="power"
+                aria-label="Sort Week 6 current power"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+            <label class="si-week-sort-control">
+
+              <span>
+                Rank
+              </span>
+
+              <select
+                class="si-week-sort-select"
+                data-week="6"
+                data-metric="rank"
+                aria-label="Sort Week 6 rank"
+              >
+
+                <option value="">
+                  Default
+                </option>
+
+                <option value="desc">
+                  High
+                </option>
+
+                <option value="asc">
+                  Low
+                </option>
+
+              </select>
+
+            </label>
+
+          </section>
+
+        </div>
+
+      </div>
+
+      <!-- =============================================
+           SYNCHRONIZED TOP SCROLLBAR
+      ============================================== -->
+
+      <div
+        id="siTopHorizontalScroll"
+        class="si-top-horizontal-scroll"
+        aria-label="Scroll through Season weeks"
+      >
+
+        <div class="si-top-horizontal-scroll-content"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- =====================================================
+       TABLE WORKSPACE
+  ====================================================== -->
+
+  <section class="si-workspace">
+
+    <div
+      id="siVerticalScroll"
+      class="si-vertical-scroll"
+    >
+
+      <div class="si-table-split">
+
+        <!-- =============================================
+             FIXED PLAYER TABLE
+        ============================================== -->
+
+        <div
+          id="siBaseShell"
+          class="si-base-shell"
+        >
+
+          <table
+            class="
+              si-table
+              si-base-table
+            "
+            aria-label="Season player information"
+          >
+
+            <colgroup>
+
+              <col class="si-base-col-index">
+
+              <col class="si-base-col-id">
+
+              <col class="si-base-col-name">
+
+              <col class="si-base-col-alliance">
+
+              <col class="si-base-col-tier">
+
+              <col class="si-base-col-note">
+
+              <col class="si-base-col-historical">
+
+            </colgroup>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  #
+                </th>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Name
+                </th>
+
+                <th>
+                  Alliance
+                </th>
+
+                <th>
+                  T4/T5
+                </th>
+
+                <th>
+                  Note
+                </th>
+
+                <th>
+                  Historical<br>
+                  Power
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="siBaseBody">
+
+              <tr>
+
+                <td
+                  colspan="7"
+                  class="si-empty"
+                >
+                  Loading season data...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- =============================================
+             WEEK TABLE
+        ============================================== -->
+
+        <div
+          id="siWeeksShell"
+          class="si-weeks-shell"
+        >
+
+          <table
+            class="
+              si-table
+              si-weeks-table
+            "
+            aria-label="Season weekly information"
+          >
+
+            <colgroup>
+
+              <!-- WEEK 0 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-power">
+
+              <!-- WEEK 1 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+              <!-- WEEK 2 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+              <!-- WEEK 3 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+              <!-- WEEK 4 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+              <!-- WEEK 5 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+              <!-- WEEK 6 -->
+
+              <col class="si-data-col-merits">
+
+              <col class="si-data-col-percent">
+
+              <col class="si-data-col-power">
+
+              <col class="si-data-col-rank">
+
+            </colgroup>
+
+            <thead>
+
+              <!-- =========================================
+                   WEEK TITLES
+              ========================================== -->
+
+              <tr>
+
+                <th
+                  colspan="2"
+                  class="
+                    si-week-title
+                    si-week-title--zero
+                  "
+                >
+                  Week 0
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 1
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 2
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 3
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 4
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 5
+                </th>
+
+                <th
+                  colspan="4"
+                  class="si-week-title"
+                >
+                  Week 6
+                </th>
+
+              </tr>
+
+              <!-- =========================================
+                   WEEK COLUMNS
+              ========================================== -->
+
+              <tr>
+
+                <!-- WEEK 0 -->
+
+                <th class="si-week-zero-column">
+                  Merits
+                </th>
+
+                <th class="si-week-zero-column">
+                  Current<br>
+                  Power
+                </th>
+
+                <!-- WEEK 1 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+                <!-- WEEK 2 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+                <!-- WEEK 3 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+                <!-- WEEK 4 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+                <!-- WEEK 5 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+                <!-- WEEK 6 -->
+
+                <th>
+                  Merits
+                </th>
+
+                <th>
+                  Merits<br>
+                  %
+                </th>
+
+                <th>
+                  Current<br>
+                  Power
+                </th>
+
+                <th>
+                  Rank
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="siWeeksBody">
+
+              <tr>
+
+                <td
+                  colspan="26"
+                  class="si-empty"
+                >
+                  Loading weekly season data...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</section>

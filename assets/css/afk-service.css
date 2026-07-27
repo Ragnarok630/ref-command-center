@@ -1,0 +1,1378 @@
+/* =========================================================
+   KINGDOM 630 – DRAGON COMMAND CENTER
+   Public AFK Service Styling
+
+   File:
+   assets/css/afk-service.css
+
+   Version:
+   630.2.4
+========================================================= */
+
+.afk-service-page {
+  --afk-gold: #ffc62f;
+  --afk-purple: #a548ff;
+  --afk-purple-light: #dc78ff;
+  --afk-green: #49df91;
+  --afk-blue: #6bbcff;
+  --afk-border: rgba(180, 118, 239, 0.3);
+
+  width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 14px 14px 28px;
+  color: #f8f3ff;
+}
+
+.afk-service-page[hidden],
+.afk-service-page [hidden] {
+  display: none !important;
+}
+
+.afk-service-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   AFK BANNER
+========================================================= */
+
+.afk-service-banner {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  height: 260px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.afk-service-banner::before,
+.afk-service-banner::after {
+  display: none !important;
+  content: none !important;
+}
+
+.afk-service-banner__image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 260px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid rgba(189, 70, 255, 0.85);
+  border-radius: 16px;
+  object-fit: contain;
+  object-position: center;
+  box-shadow:
+    0 0 4px rgba(211, 89, 255, 0.85),
+    0 0 11px rgba(171, 48, 234, 0.48),
+    0 0 20px rgba(115, 27, 174, 0.25);
+  animation: afkBannerGlow 3.2s ease-in-out infinite;
+}
+
+@keyframes afkBannerGlow {
+  0%,
+  100% {
+    border-color: rgba(189, 70, 255, 0.85);
+
+    box-shadow:
+      0 0 4px rgba(211, 89, 255, 0.85),
+      0 0 11px rgba(171, 48, 234, 0.48),
+      0 0 20px rgba(115, 27, 174, 0.25);
+  }
+
+  50% {
+    border-color: rgba(255, 194, 43, 0.9);
+
+    box-shadow:
+      0 0 5px rgba(255, 207, 74, 0.8),
+      0 0 13px rgba(212, 83, 255, 0.55),
+      0 0 23px rgba(144, 35, 216, 0.3);
+  }
+}
+
+/* =========================================================
+   INFORMATION
+========================================================= */
+
+.afk-service-information {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 10px;
+  padding: 11px 15px;
+  border: 1px solid rgba(72, 158, 245, 0.35);
+  border-radius: 11px;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(8, 31, 56, 0.96),
+      rgba(8, 17, 32, 0.96)
+    );
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.afk-service-information__icon {
+  flex: 0 0 auto;
+  padding-top: 2px;
+  color: var(--afk-blue);
+  font-size: 20px;
+}
+
+.afk-service-information__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.afk-service-information__title {
+  display: block;
+  margin-bottom: 5px;
+  color: #ddf1ff;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.afk-service-information__layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(300px, 0.75fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.afk-service-information__rules {
+  display: grid;
+  gap: 3px;
+}
+
+.afk-service-information__rules p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #d7e5f2;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.afk-service-information__rules p i {
+  width: 12px;
+  color: var(--afk-purple);
+  font-size: 8px;
+  text-align: center;
+}
+
+.afk-service-information__rules p:nth-child(2) i {
+  color: #b95cff;
+  font-size: 10px;
+}
+
+.afk-service-information__rules p:nth-child(3) i {
+  color: var(--afk-gold);
+}
+
+.afk-service-information__warning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding-left: 20px;
+  border-left: 1px solid rgba(207, 216, 229, 0.35);
+}
+
+.afk-service-information__warning > i {
+  flex: 0 0 auto;
+  color: #ff671f;
+  font-size: 30px;
+  filter: drop-shadow(0 0 7px rgba(255, 82, 20, 0.45));
+}
+
+.afk-service-information__warning div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.afk-service-information__warning strong {
+  color: #ff681f;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.afk-service-information__warning span {
+  color: #d1d6df;
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.afk-service-panel {
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.afk-service-form {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(0, 1.05fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.afk-service-form-section {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 17px 15px;
+  border: 1px solid var(--afk-border);
+  border-radius: 11px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24, 19, 39, 0.98),
+      rgba(11, 9, 20, 0.98)
+    );
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.27),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.afk-service-form-section--player,
+.afk-service-form-section--reason {
+  min-height: 215px;
+}
+
+.afk-service-form-section--weeks,
+.afk-service-form-section--note {
+  min-height: 145px;
+}
+
+.afk-service-form-section__header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 11px;
+  padding: 0;
+}
+
+.afk-service-form-section__number {
+  display: grid;
+  flex: 0 0 33px;
+  width: 33px;
+  height: 33px;
+  place-items: center;
+  border: 1px solid rgba(205, 139, 255, 0.45);
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(111, 44, 177, 0.66),
+      rgba(45, 16, 77, 0.88)
+    );
+  color: #f2e1ff;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow:
+    inset 0 0 12px rgba(194, 107, 255, 0.12),
+    0 0 11px rgba(125, 43, 202, 0.18);
+}
+
+.afk-service-form-section__heading {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.afk-service-form-section__eyebrow {
+  color: #c994eb;
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.afk-service-form-section__title {
+  color: #faf5ff;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+/* =========================================================
+   FIELDS
+========================================================= */
+
+.afk-service-field {
+  position: relative;
+}
+
+.afk-service-label {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 6px;
+  color: #e6deed;
+  font-size: 10.5px;
+  font-weight: 750;
+}
+
+.afk-service-input,
+.afk-service-textarea {
+  width: 100%;
+  border: 1px solid rgba(179, 144, 213, 0.3);
+  border-radius: 8px;
+  outline: 0;
+  background: rgba(6, 5, 12, 0.8);
+  color: #ffffff;
+  font: inherit;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.afk-service-input {
+  min-height: 39px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+}
+
+.afk-service-textarea {
+  min-height: 73px;
+  max-height: 100px;
+  padding: 10px 11px;
+  resize: vertical;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.afk-service-input::placeholder,
+.afk-service-textarea::placeholder {
+  color: #756d80;
+}
+
+.afk-service-input:focus,
+.afk-service-textarea:focus {
+  border-color: rgba(200, 111, 255, 0.82);
+  background: rgba(12, 9, 20, 0.96);
+  box-shadow:
+    0 0 0 2px rgba(157, 65, 231, 0.14),
+    0 0 14px rgba(137, 45, 209, 0.13);
+}
+
+.afk-service-help {
+  margin: 5px 0 0;
+  color: #91899b;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.afk-service-note-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5px;
+  color: #91899a;
+  font-size: 9px;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.afk-service-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.afk-service-search__input-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.afk-service-search__icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  z-index: 1;
+  color: #a58db1;
+  font-size: 11px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.afk-service-search__input {
+  padding-right: 38px;
+  padding-left: 34px;
+}
+
+.afk-service-search__clear {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #b8aabd;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.afk-service-search__clear:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.afk-service-search-results {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 5px);
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  border: 1px solid rgba(191, 132, 241, 0.44);
+  border-radius: 9px;
+  background: #130e1d;
+  box-shadow:
+    0 15px 36px rgba(0, 0, 0, 0.58),
+    0 0 18px rgba(113, 37, 181, 0.18);
+}
+
+.afk-service-search-result {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(176, 144, 213, 0.13);
+  background: transparent;
+  color: #f4eefb;
+  text-align: left;
+  cursor: pointer;
+}
+
+.afk-service-search-result:last-child {
+  border-bottom: 0;
+}
+
+.afk-service-search-result:hover,
+.afk-service-search-result:focus-visible {
+  outline: 0;
+  background: rgba(137, 79, 199, 0.25);
+}
+
+.afk-service-search-result__main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.afk-service-search-result__name {
+  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afk-service-search-result__meta {
+  margin-top: 2px;
+  color: #9e94a9;
+  font-size: 8.5px;
+}
+
+.afk-service-search-result__select {
+  flex: 0 0 auto;
+  color: #d1a6ff;
+  font-size: 9.5px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   SELECTED PLAYER
+========================================================= */
+
+.afk-service-selected-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+  padding: 8px 11px;
+  border: 1px solid rgba(71, 215, 141, 0.31);
+  border-radius: 9px;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(22, 91, 61, 0.34),
+      rgba(16, 54, 42, 0.29)
+    );
+}
+
+.afk-service-selected-player__icon {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(52, 198, 120, 0.18);
+  color: #65e69e;
+  font-size: 14px;
+}
+
+.afk-service-selected-player__details {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.afk-service-selected-player__label {
+  color: #6ae49d;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.afk-service-selected-player__name {
+  overflow: hidden;
+  color: #f0fff6;
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afk-service-selected-player__meta {
+  overflow: hidden;
+  margin-top: 1px;
+  color: #91d2ad;
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afk-service-selected-player__remove {
+  display: grid;
+  flex: 0 0 29px;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #c8d7ce;
+  cursor: pointer;
+}
+
+.afk-service-selected-player__remove:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+/* =========================================================
+   REASONS
+========================================================= */
+
+.afk-service-reason-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.afk-service-choice {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.afk-service-choice__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.afk-service-choice__content {
+  position: relative;
+  display: flex;
+  min-height: 116px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 8px;
+  border: 1px solid rgba(178, 151, 213, 0.28);
+  border-radius: 9px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(10, 8, 17, 0.82),
+      rgba(15, 11, 24, 0.78)
+    );
+  text-align: center;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.afk-service-choice:hover .afk-service-choice__content {
+  border-color: rgba(202, 139, 255, 0.53);
+  background: rgba(78, 35, 115, 0.23);
+  transform: translateY(-2px);
+}
+
+.afk-service-choice__input:focus-visible +
+.afk-service-choice__content {
+  outline: 2px solid rgba(202, 139, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.afk-service-choice__input:checked +
+.afk-service-choice__content {
+  border-color: rgba(255, 191, 35, 0.88);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(137, 50, 205, 0.37),
+      transparent 66%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(73, 29, 108, 0.57),
+      rgba(25, 14, 42, 0.9)
+    );
+  box-shadow:
+    inset 0 0 18px rgba(169, 73, 239, 0.12),
+    0 0 0 1px rgba(157, 67, 220, 0.2),
+    0 0 15px rgba(133, 41, 201, 0.23);
+}
+
+.afk-service-choice__check {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: none;
+  color: var(--afk-gold);
+  font-size: 14px;
+}
+
+.afk-service-choice__input:checked +
+.afk-service-choice__content
+.afk-service-choice__check {
+  display: block;
+}
+
+.afk-service-choice__icon {
+  color: #f4eef7;
+  font-size: 25px;
+}
+
+.afk-service-choice__text {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+}
+
+.afk-service-choice__text strong {
+  color: #fbf8ff;
+  font-size: 11.5px;
+}
+
+.afk-service-choice__text small {
+  max-width: 125px;
+  margin-top: 4px;
+  color: #aaa0b3;
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   WEEKS
+========================================================= */
+
+.afk-service-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(45px, 1fr));
+  gap: 6px;
+}
+
+.afk-service-week {
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.afk-service-week__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.afk-service-week__content {
+  position: relative;
+  display: grid;
+  min-height: 53px;
+  place-items: center;
+  border: 1px solid rgba(178, 151, 213, 0.28);
+  border-radius: 8px;
+  background: rgba(7, 6, 13, 0.72);
+  color: #d9d0df;
+  font-size: 10.5px;
+  font-weight: 900;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.afk-service-week__content i {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: none;
+  color: var(--afk-gold);
+  font-size: 8px;
+}
+
+.afk-service-week:hover .afk-service-week__content {
+  border-color: rgba(202, 139, 255, 0.53);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.afk-service-week__input:focus-visible +
+.afk-service-week__content {
+  outline: 2px solid rgba(202, 139, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.afk-service-week__input:checked +
+.afk-service-week__content {
+  border-color: rgba(255, 190, 31, 0.82);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(107, 40, 163, 0.9),
+      rgba(52, 20, 84, 0.92)
+    );
+  color: #ffffff;
+  box-shadow:
+    inset 0 0 14px rgba(220, 136, 255, 0.17),
+    0 0 11px rgba(135, 40, 210, 0.28);
+}
+
+.afk-service-week__input:checked +
+.afk-service-week__content i {
+  display: block;
+}
+
+.afk-service-week-help {
+  margin: 7px 0 0;
+  color: #93899d;
+  font-size: 8.5px;
+}
+
+.afk-service-week-help i {
+  margin-right: 4px;
+  color: #cb67ff;
+}
+
+/* =========================================================
+   GENERAL BUTTONS
+========================================================= */
+
+.afk-service-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    filter 150ms ease,
+    transform 150ms ease,
+    opacity 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.afk-service-button:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.afk-service-button--search {
+  min-width: 100px;
+  min-height: 39px;
+  padding: 0 15px;
+  border-color: rgba(152, 83, 224, 0.52);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      145deg,
+      #762fc0,
+      #4a207e
+    );
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 900;
+}
+
+.afk-service-button--search:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   AFK SUBMIT AREA
+========================================================= */
+
+.afk-service-submit {
+  position: relative;
+  isolation: isolate;
+  grid-column: 1 / -1;
+  display: flex;
+  min-height: 145px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 0;
+  padding: 8px 20px;
+  border: 1px solid rgba(170, 89, 233, 0.3);
+  border-radius: 12px;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(119, 31, 184, 0.22) 0%,
+      rgba(60, 18, 91, 0.12) 38%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(14, 8, 23, 0.99),
+      rgba(8, 5, 14, 0.99)
+    );
+  box-shadow:
+    inset 0 0 28px rgba(126, 38, 194, 0.1),
+    0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+/*
+   Compact magical side glows.
+   No long horizontal lines.
+*/
+
+.afk-service-submit::before,
+.afk-service-submit::after {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  width: clamp(110px, 14vw, 190px);
+  height: 18px;
+  content: "";
+  pointer-events: none;
+  transform: translateY(-50%);
+  filter: none;
+  animation: none;
+}
+
+.afk-service-submit::before {
+  left: 14%;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(128, 42, 205, 0.25) 20%,
+      rgba(192, 74, 255, 0.85) 62%,
+      rgba(255, 204, 68, 0.9) 100%
+    );
+  box-shadow:
+    0 0 5px rgba(185, 68, 255, 0.75),
+    0 0 12px rgba(137, 38, 214, 0.42);
+}
+
+.afk-service-submit::after {
+  right: 14%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 204, 68, 0.9) 0%,
+      rgba(192, 74, 255, 0.85) 38%,
+      rgba(128, 42, 205, 0.25) 80%,
+      transparent 100%
+    );
+  box-shadow:
+    0 0 5px rgba(185, 68, 255, 0.75),
+    0 0 12px rgba(137, 38, 214, 0.42);
+}
+
+
+/* =========================================================
+   IMAGE SUBMIT BUTTON
+========================================================= */
+
+.afk-service-button--submit {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  width: min(760px, 96%);
+  height: 130px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 22px;
+  background-color: transparent;
+  background-image:
+    url("../images/buttons/afk-button.png");
+  background-position: center 53%;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  color: transparent;
+  cursor: pointer;
+  font-size: 0;
+  box-shadow:
+    0 0 8px rgba(225, 95, 255, 0.58),
+    0 0 22px rgba(148, 42, 231, 0.38);
+  transition:
+    filter 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.afk-service-button--submit:hover:not(:disabled) {
+  filter:
+    brightness(1.13)
+    saturate(1.08)
+    drop-shadow(0 0 8px rgba(255, 206, 68, 0.82))
+    drop-shadow(0 0 14px rgba(192, 73, 255, 0.72));
+  transform:
+    translateY(-2px)
+    scale(1.018);
+  box-shadow:
+    0 0 12px rgba(240, 125, 255, 0.9),
+    0 0 32px rgba(162, 50, 245, 0.7);
+}
+
+.afk-service-button--submit:active:not(:disabled) {
+  filter: brightness(0.95);
+  transform:
+    translateY(1px)
+    scale(0.986);
+}
+
+.afk-service-button--submit:focus-visible {
+  outline: 3px solid #ffd245;
+  outline-offset: 4px;
+}
+
+.afk-service-button--submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.afk-service-button__normal {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+}
+
+.afk-service-button__loading {
+  position: absolute;
+  z-index: 5;
+  inset: 12px 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgba(215, 120, 255, 0.7);
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(89, 26, 135, 0.97),
+      rgba(37, 10, 61, 0.97)
+    );
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow:
+    0 0 15px rgba(214, 80, 255, 0.7),
+    inset 0 0 18px rgba(208, 102, 255, 0.12);
+}
+
+.afk-service-button__loading[hidden] {
+  display: none !important;
+}
+
+.afk-service-submit__message {
+  position: relative;
+  z-index: 6;
+  width: min(700px, 100%);
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.afk-service-button--new {
+  min-height: 41px;
+  margin-top: 15px;
+  padding: 0 18px;
+  border-color: rgba(83, 213, 151, 0.42);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      145deg,
+      #2a9762,
+      #1e6545
+    );
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 900;
+}
+
+.afk-service-button--new:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.afk-service-message,
+.afk-service-submit__message {
+  margin-top: 7px;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 9.5px;
+  line-height: 1.35;
+}
+
+.afk-service-message[data-type="error"],
+.afk-service-submit__message[data-type="error"] {
+  border-color: rgba(244, 94, 94, 0.36);
+  background: rgba(135, 37, 37, 0.22);
+  color: #ffb4b4;
+}
+
+.afk-service-message[data-type="info"],
+.afk-service-submit__message[data-type="info"] {
+  border-color: rgba(85, 162, 236, 0.34);
+  background: rgba(34, 85, 132, 0.22);
+  color: #b8dcff;
+}
+
+/* =========================================================
+   SUCCESS
+========================================================= */
+
+.afk-service-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-top: 10px;
+  padding: 21px;
+  border: 1px solid rgba(72, 207, 143, 0.38);
+  border-radius: 13px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(26, 91, 62, 0.48),
+      rgba(12, 30, 23, 0.96)
+    );
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(47, 188, 119, 0.08);
+}
+
+.afk-service-success__icon {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(62, 211, 139, 0.17);
+  color: #63e2a5;
+  font-size: 26px;
+}
+
+.afk-service-success__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.afk-service-success__eyebrow {
+  color: #7bd8aa;
+  font-size: 9.5px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.afk-service-success__title {
+  margin: 3px 0 6px;
+  color: #effff6;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.afk-service-success__description {
+  max-width: 760px;
+  margin: 0;
+  color: #afd1bf;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.afk-service-success__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.afk-service-success__summary div {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(99, 213, 156, 0.18);
+  border-radius: 8px;
+  background: rgba(5, 20, 14, 0.25);
+}
+
+.afk-service-success__summary dt {
+  color: #81aa93;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.afk-service-success__summary dd {
+  overflow-wrap: anywhere;
+  margin: 2px 0 0;
+  color: #ecfff4;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   HONEYPOT
+========================================================= */
+
+.afk-service-honeypot {
+  position: absolute !important;
+  left: -99999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1180px) {
+  .afk-service-banner,
+  .afk-service-banner__image {
+    height: 230px;
+  }
+
+  .afk-service-form {
+    grid-template-columns: 1fr;
+  }
+
+  .afk-service-form-section--player,
+  .afk-service-form-section--reason,
+  .afk-service-form-section--weeks,
+  .afk-service-form-section--note {
+    min-height: 0;
+  }
+
+  .afk-service-button--submit {
+    width: min(700px, 96%);
+    height: 120px;
+  }
+}
+
+@media (max-width: 850px) {
+  .afk-service-banner,
+  .afk-service-banner__image {
+    height: 200px;
+  }
+
+  .afk-service-information__layout {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .afk-service-information__warning {
+    padding-top: 9px;
+    padding-left: 0;
+    border-top: 1px solid rgba(207, 216, 229, 0.25);
+    border-left: 0;
+  }
+
+  .afk-service-reason-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .afk-service-choice__content {
+    min-height: 70px;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 10px 13px;
+    text-align: left;
+  }
+
+  .afk-service-choice__text {
+    align-items: flex-start;
+  }
+
+  .afk-service-choice__text small {
+    max-width: none;
+  }
+
+  .afk-service-week-grid {
+    grid-template-columns: repeat(4, minmax(48px, 1fr));
+  }
+
+  .afk-service-submit {
+    min-height: 125px;
+  }
+
+  .afk-service-submit::before,
+  .afk-service-submit::after {
+    width: 120px;
+  }
+
+  .afk-service-button--submit {
+    width: 100%;
+    height: 105px;
+  }
+}
+
+@media (max-width: 600px) {
+  .afk-service-page {
+    padding: 10px;
+  }
+
+  .afk-service-banner,
+  .afk-service-banner__image {
+    width: 100%;
+    height: auto;
+  }
+
+  .afk-service-information {
+    padding: 10px 12px;
+  }
+
+  .afk-service-form-section {
+    padding: 13px;
+  }
+
+  .afk-service-search {
+    grid-template-columns: 1fr;
+  }
+
+  .afk-service-button--search {
+    width: 100%;
+  }
+
+  .afk-service-week-grid {
+    grid-template-columns: repeat(3, minmax(48px, 1fr));
+  }
+
+  .afk-service-submit {
+    min-height: 105px;
+    padding: 4px 8px;
+  }
+
+  .afk-service-submit::before,
+  .afk-service-submit::after {
+    display: none;
+  }
+
+  .afk-service-button--submit {
+    width: 100%;
+    height: 88px;
+  }
+
+  .afk-service-button__loading {
+    inset: 10px 30px;
+    font-size: 13px;
+  }
+
+  .afk-service-success {
+    flex-direction: column;
+    padding: 17px 14px;
+  }
+
+  .afk-service-success__summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .afk-service-banner__image,
+  .afk-service-submit::before,
+  .afk-service-submit::after {
+    animation: none !important;
+  }
+}

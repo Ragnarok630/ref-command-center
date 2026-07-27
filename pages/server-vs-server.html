@@ -1,0 +1,855 @@
+<!-- =========================================================
+     K630-REF SERVER VS SERVER PAGE
+     File: pages/server-vs-server.html
+     Version: 630.0.59
+     Sprint 6 - Final Metric Controls
+
+     Public data source:
+     assets/data/derived/current/server-vs-server.json
+
+     Rules:
+     - No heavy processing when opening this page
+     - No external player datasets
+     - No repeated fetch or polling
+     - Four charts in a 2 x 2 layout
+     - Maximum 20 server colours
+     - Interactive server legend
+     - Large metric selection buttons
+     - High / Low sorting controls for W0 through W6
+     - Server 630 displays Home Kingdom
+     - Full metric table below the charts
+     - Central page content scrolls vertically
+========================================================= -->
+
+<section
+  id="serverVsServerPage"
+  class="server-vs-server-page"
+  data-page-content="server-vs-server"
+  aria-label="Server vs Server"
+>
+
+  <div id="k630ServerVsServerRoot">
+
+    <div class="svs-page-content">
+
+      <!-- =================================================
+           PAGE HEADER
+      ================================================== -->
+
+      <header class="svs-header">
+
+        <div class="svs-header-copy">
+
+          <span class="svs-header-kicker">
+            Kingdom Comparison
+          </span>
+
+          <h1>
+            Server vs Server
+          </h1>
+
+          <p id="svsPageDescription">
+            Weekly comparison of all participating servers in the active season.
+          </p>
+
+        </div>
+
+        <div class="svs-header-status">
+
+          <div
+            class="svs-status-badge"
+            id="svsDataStatus"
+          >
+
+            <i
+              class="fa-solid fa-circle"
+              aria-hidden="true"
+            ></i>
+
+            <span>
+              Loading summary
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <!-- =================================================
+           SUMMARY CARDS
+      ================================================== -->
+
+      <section
+        class="svs-summary-grid"
+        aria-label="Server versus server summary"
+      >
+
+        <article class="svs-summary-card">
+
+          <span class="svs-summary-card-label">
+            Active Season
+          </span>
+
+          <strong
+            class="svs-summary-card-value"
+            id="svsSummarySeason"
+          >
+            -
+          </strong>
+
+          <span
+            class="svs-summary-card-meta"
+            id="svsSummarySeasonMeta"
+          >
+            Waiting for derived summary
+          </span>
+
+        </article>
+
+        <article class="svs-summary-card">
+
+          <span class="svs-summary-card-label">
+            Participating Servers
+          </span>
+
+          <strong
+            class="svs-summary-card-value"
+            id="svsSummaryServers"
+          >
+            0
+          </strong>
+
+          <span class="svs-summary-card-meta">
+            Maximum 20 servers
+          </span>
+
+        </article>
+
+        <article class="svs-summary-card">
+
+          <span class="svs-summary-card-label">
+            Available Weeks
+          </span>
+
+          <strong
+            class="svs-summary-card-value"
+            id="svsSummaryWeeks"
+          >
+            W0
+          </strong>
+
+          <span
+            class="svs-summary-card-meta"
+            id="svsSummaryWeeksMeta"
+          >
+            No processed week data
+          </span>
+
+        </article>
+
+        <article class="svs-summary-card">
+
+          <span class="svs-summary-card-label">
+            Summary Generated
+          </span>
+
+          <strong
+            class="svs-summary-card-value"
+            id="svsSummaryGenerated"
+          >
+            -
+          </strong>
+
+          <span
+            class="svs-summary-card-meta"
+            id="svsSummaryGeneratedMeta"
+          >
+            Compact public dataset
+          </span>
+
+        </article>
+
+      </section>
+
+      <!-- =================================================
+           SERVER LEGEND
+      ================================================== -->
+
+      <section
+        class="svs-legend-panel"
+        aria-label="Participating server legend"
+      >
+
+        <div class="svs-panel-title-row">
+
+          <h2 class="svs-panel-title">
+            Participating Servers
+          </h2>
+
+          <span class="svs-panel-help">
+            Click a server to show or hide it in all charts
+          </span>
+
+        </div>
+
+        <div
+          class="svs-server-legend"
+          id="svsServerLegend"
+        >
+
+          <div class="svs-state-message">
+            Server colours will appear after the summary is loaded.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =================================================
+           CHARTS
+      ================================================== -->
+
+      <section
+        class="svs-chart-grid"
+        aria-label="Server comparison charts"
+      >
+
+        <!-- TOTAL MERITS -->
+
+        <article class="svs-chart-card">
+
+          <header class="svs-chart-header">
+
+            <h2 class="svs-chart-title">
+              Total Merits
+            </h2>
+
+            <span class="svs-chart-subtitle">
+              Growth since Week 0
+            </span>
+
+          </header>
+
+          <div class="svs-chart-canvas-wrap">
+
+            <canvas
+              id="svsMeritsChart"
+              role="img"
+              aria-label="Total Merits per server by week"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <!-- TOTAL SERVER KILLS -->
+
+        <article class="svs-chart-card">
+
+          <header class="svs-chart-header">
+
+            <h2 class="svs-chart-title">
+              Total Server Kills
+            </h2>
+
+            <span class="svs-chart-subtitle">
+              Growth since Week 0
+            </span>
+
+          </header>
+
+          <div class="svs-chart-canvas-wrap">
+
+            <canvas
+              id="svsKillsChart"
+              role="img"
+              aria-label="Total server kills per server by week"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <!-- TOTAL POWER -->
+
+        <article class="svs-chart-card">
+
+          <header class="svs-chart-header">
+
+            <h2 class="svs-chart-title">
+              Total Power
+            </h2>
+
+            <span class="svs-chart-subtitle">
+              Absolute weekly server power
+            </span>
+
+          </header>
+
+          <div class="svs-chart-canvas-wrap">
+
+            <canvas
+              id="svsPowerChart"
+              role="img"
+              aria-label="Total power per server by week"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <!-- TOTAL DEAD -->
+
+        <article class="svs-chart-card">
+
+          <header class="svs-chart-header">
+
+            <h2 class="svs-chart-title">
+              Total Dead
+            </h2>
+
+            <span class="svs-chart-subtitle">
+              Growth since Week 0
+            </span>
+
+          </header>
+
+          <div class="svs-chart-canvas-wrap">
+
+            <canvas
+              id="svsDeadChart"
+              role="img"
+              aria-label="Total dead units per server by week"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+      </section>
+
+      <!-- =================================================
+           METRIC TABLE
+      ================================================== -->
+
+      <section
+        class="svs-metric-panel"
+        aria-label="Weekly server metric table"
+      >
+
+        <!-- =============================================
+             LARGE METRIC BUTTONS
+        ============================================== -->
+
+        <div class="svs-metric-toolbar">
+
+          <div
+            class="svs-metric-tabs"
+            id="svsMetricTabs"
+            role="group"
+            aria-label="Select table metric"
+          >
+
+            <button
+              type="button"
+              class="
+                svs-metric-button
+                svs-metric-button-merits
+                is-active
+              "
+              data-metric="merits"
+              aria-pressed="true"
+            >
+
+              <i
+                class="fa-solid fa-star"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Merits
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="
+                svs-metric-button
+                svs-metric-button-power
+              "
+              data-metric="power"
+              aria-pressed="false"
+            >
+
+              <i
+                class="fa-solid fa-bolt"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Power
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="
+                svs-metric-button
+                svs-metric-button-kills
+              "
+              data-metric="kills"
+              aria-pressed="false"
+            >
+
+              <i
+                class="fa-solid fa-skull-crossbones"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Kills
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="
+                svs-metric-button
+                svs-metric-button-dead
+              "
+              data-metric="dead"
+              aria-pressed="false"
+            >
+
+              <i
+                class="fa-solid fa-skull"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Dead
+              </span>
+
+            </button>
+
+            <button
+              type="button"
+              class="
+                svs-metric-button
+                svs-metric-button-healed
+              "
+              data-metric="healed"
+              aria-pressed="false"
+            >
+
+              <i
+                class="fa-solid fa-heart"
+                aria-hidden="true"
+              ></i>
+
+              <span>
+                Healed
+              </span>
+
+            </button>
+
+          </div>
+
+          <div
+            class="svs-metric-summary"
+            id="svsMetricSummary"
+          >
+            Metric: Total Merits
+          </div>
+
+        </div>
+
+        <!-- =============================================
+             METRIC TABLE
+        ============================================== -->
+
+        <div class="svs-table-shell">
+
+          <table
+            class="svs-metric-table"
+            aria-label="Server versus server weekly values"
+          >
+
+            <colgroup>
+
+              <col class="svs-col-server">
+
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+              <col class="svs-col-week">
+
+            </colgroup>
+
+            <thead>
+
+              <tr id="svsMetricTableHead">
+
+                <th>
+                  Server
+                </th>
+
+                <!-- W0 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W0
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="0"
+                        data-direction="desc"
+                        aria-label="Sort Week 0 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="0"
+                        data-direction="asc"
+                        aria-label="Sort Week 0 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W1 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W1
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="1"
+                        data-direction="desc"
+                        aria-label="Sort Week 1 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="1"
+                        data-direction="asc"
+                        aria-label="Sort Week 1 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W2 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W2
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="2"
+                        data-direction="desc"
+                        aria-label="Sort Week 2 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="2"
+                        data-direction="asc"
+                        aria-label="Sort Week 2 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W3 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W3
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="3"
+                        data-direction="desc"
+                        aria-label="Sort Week 3 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="3"
+                        data-direction="asc"
+                        aria-label="Sort Week 3 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W4 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W4
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="4"
+                        data-direction="desc"
+                        aria-label="Sort Week 4 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="4"
+                        data-direction="asc"
+                        aria-label="Sort Week 4 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W5 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W5
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="5"
+                        data-direction="desc"
+                        aria-label="Sort Week 5 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="5"
+                        data-direction="asc"
+                        aria-label="Sort Week 5 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+                <!-- W6 -->
+
+                <th>
+
+                  <div class="svs-week-heading">
+
+                    <span class="svs-week-heading-label">
+                      W6
+                    </span>
+
+                    <span class="svs-week-sort-controls">
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="6"
+                        data-direction="desc"
+                        aria-label="Sort Week 6 high to low"
+                        title="High to Low"
+                      >
+                        <i
+                          class="fa-solid fa-caret-up"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="svs-week-sort-button"
+                        data-week-index="6"
+                        data-direction="asc"
+                        aria-label="Sort Week 6 low to high"
+                        title="Low to High"
+                      >
+                        <i
+                          class="fa-solid fa-caret-down"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+
+                    </span>
+
+                  </div>
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="svsMetricTableBody">
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  class="svs-table-empty"
+                >
+                  Loading derived Server vs Server summary...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+</section>

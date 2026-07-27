@@ -1,0 +1,1520 @@
+/* =========================================================
+   K630-REF ADMIN CENTER LAYOUT
+   File: assets/css/admin-layout-fix.css
+   Version: 630.0.32
+   Sprint 6 - Compact Admin Workflow Layout
+
+   Responsibilities:
+   - Internal Admin Center scrolling
+   - Compact workflow presentation
+   - Step 3A, 3B and 3C side by side
+   - Step 3D full width
+   - Maximum 10 servers per row
+   - Maximum 2 rows for 20 servers
+   - Compact normal typography
+   - Neutral Player Administration panels
+========================================================= */
+
+/* =========================================================
+   ADMIN PAGE SCROLL CONTAINER
+========================================================= */
+
+#app-content > .admin-page,
+#app-content .admin-page {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  margin: 0 !important;
+
+  padding:
+    clamp(12px, 1.2vw, 20px)
+    clamp(12px, 1.4vw, 24px)
+    clamp(26px, 2vw, 40px) !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(157, 78, 221, 0.82)
+    rgba(255, 255, 255, 0.035);
+}
+
+/* =========================================================
+   WEBKIT SCROLLBAR
+========================================================= */
+
+#app-content > .admin-page::-webkit-scrollbar,
+#app-content .admin-page::-webkit-scrollbar {
+  width: 10px;
+}
+
+#app-content > .admin-page::-webkit-scrollbar-track,
+#app-content .admin-page::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+#app-content > .admin-page::-webkit-scrollbar-thumb,
+#app-content .admin-page::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(184, 51, 255, 0.96),
+      rgba(100, 23, 201, 0.96)
+    );
+
+  border: 2px solid #090a0e;
+  border-radius: 999px;
+}
+
+#app-content > .admin-page::-webkit-scrollbar-thumb:hover,
+#app-content .admin-page::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(205, 103, 255, 1),
+      rgba(123, 47, 247, 1)
+    );
+}
+
+#app-content > .admin-page::-webkit-scrollbar-corner,
+#app-content .admin-page::-webkit-scrollbar-corner {
+  background: #090a0e;
+}
+
+/* =========================================================
+   GENERAL CHILD PROTECTION
+========================================================= */
+
+#app-content .admin-page > *,
+#app-content .admin-page section,
+#app-content .admin-page article,
+#app-content .admin-page div {
+  min-width: 0;
+}
+
+#app-content .admin-page > * {
+  max-width: 100%;
+}
+
+#app-content .admin-page .admin-table-wrapper,
+#app-content .admin-page .admin-table-scroll,
+#app-content .admin-page .table-responsive,
+#app-content .admin-page .server-participation-wrapper,
+#app-content .admin-page .server-overview-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* =========================================================
+   COMPACT NORMAL TYPOGRAPHY
+========================================================= */
+
+#app-content .admin-page {
+  font-size: 14px;
+}
+
+#app-content .admin-page h1,
+#app-content .admin-page h2,
+#app-content .admin-page h3,
+#app-content .admin-page h4,
+#app-content .admin-page p {
+  line-height: 1.35;
+}
+
+#app-content .admin-page .section-kicker {
+  font-size: 0.61rem;
+}
+
+#app-content .admin-page h2 {
+  font-size: 0.9rem;
+}
+
+#app-content .admin-page h3 {
+  font-size: 0.8rem;
+}
+
+#app-content .admin-page p {
+  font-size: 0.64rem;
+}
+
+#app-content .admin-page label {
+  font-size: 0.57rem;
+}
+
+#app-content .admin-page input,
+#app-content .admin-page select,
+#app-content .admin-page textarea,
+#app-content .admin-page button {
+  font-size: 0.64rem;
+}
+
+/* =========================================================
+   STICKY ADMIN HEADERS
+========================================================= */
+
+#app-content .admin-page .admin-sticky-header,
+#app-content .admin-page .admin-page-header.is-sticky {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 50;
+}
+
+/* =========================================================
+   REMOVE OLD DUPLICATE OVERVIEW AREA
+========================================================= */
+
+#app-content .admin-page
+.admin-management-overview {
+  display: none !important;
+}
+
+/* =========================================================
+   COMPACT STORAGE PANEL
+========================================================= */
+
+#adminStoragePanel,
+.k630-admin-storage-panel,
+.admin-storage-panel {
+  margin-bottom: 10px !important;
+  padding: 10px 12px !important;
+}
+
+.admin-storage-header {
+  margin-bottom: 8px !important;
+}
+
+.admin-storage-grid,
+.admin-storage-cards {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(130px, 0.55fr)
+    minmax(130px, 0.55fr)
+    minmax(280px, 1.4fr)
+    auto !important;
+
+  align-items: stretch !important;
+
+  gap: 8px !important;
+}
+
+.admin-storage-card {
+  min-height: 0 !important;
+  padding: 9px 10px !important;
+}
+
+.admin-storage-card-title p,
+.admin-storage-card-description {
+  display: none !important;
+}
+
+.admin-storage-card-icon {
+  width: 30px !important;
+  height: 30px !important;
+  flex-basis: 30px !important;
+}
+
+.admin-storage-card h3 {
+  margin: 1px 0 !important;
+  font-size: 0.68rem !important;
+}
+
+.admin-storage-details {
+  gap: 5px !important;
+}
+
+.admin-storage-detail {
+  padding: 6px 7px !important;
+}
+
+.admin-storage-notice {
+  min-height: 28px !important;
+  padding: 5px 7px !important;
+  font-size: 0.57rem !important;
+}
+
+.admin-storage-actions {
+  margin-top: 6px !important;
+}
+
+/* =========================================================
+   STEP 1 FOUNDATION
+========================================================= */
+
+.admin-foundation-warning-panel {
+  min-height: 0 !important;
+
+  margin-bottom: 10px !important;
+  padding: 10px 12px !important;
+
+  grid-template-columns:
+    42px
+    minmax(260px, 1.6fr)
+    minmax(110px, 0.45fr)
+    minmax(90px, 0.35fr)
+    minmax(110px, 0.45fr)
+    auto !important;
+
+  gap: 9px !important;
+}
+
+.foundation-warning-icon {
+  width: 38px !important;
+  height: 38px !important;
+
+  font-size: 0.95rem !important;
+}
+
+.foundation-warning-content h2 {
+  margin: 2px 0 !important;
+
+  font-size: 0.76rem !important;
+}
+
+.foundation-warning-content p {
+  max-width: 760px !important;
+
+  font-size: 0.59rem !important;
+}
+
+.foundation-warning-stat {
+  padding: 6px 8px !important;
+}
+
+.foundation-warning-stat span {
+  font-size: 0.49rem !important;
+}
+
+.foundation-warning-stat strong {
+  font-size: 0.66rem !important;
+}
+
+/* =========================================================
+   WORKFLOW MONITOR
+========================================================= */
+
+.admin-cycle-monitor {
+  margin-bottom: 10px !important;
+  padding: 11px !important;
+}
+
+.admin-cycle-monitor-header {
+  margin-bottom: 9px !important;
+}
+
+.admin-cycle-step {
+  min-height: 56px !important;
+  padding: 7px !important;
+}
+
+.cycle-step-content strong {
+  font-size: 0.6rem !important;
+}
+
+.cycle-step-content small {
+  font-size: 0.51rem !important;
+}
+
+.admin-cycle-monitor-details {
+  margin-top: 8px !important;
+}
+
+.admin-cycle-monitor-details > div {
+  padding: 6px 8px !important;
+}
+
+/* =========================================================
+   DETAILED WORKFLOW PANELS
+========================================================= */
+
+.admin-detail-workspace,
+.workflow-module-mount,
+.admin-detail-workspace-group {
+  margin-bottom: 10px !important;
+}
+
+.admin-detail-workspace {
+  padding: 11px !important;
+}
+
+.admin-detail-header {
+  margin-bottom: 8px !important;
+}
+
+.admin-detail-header h3 {
+  margin: 2px 0 !important;
+
+  font-size: 0.77rem !important;
+}
+
+.admin-detail-header p {
+  font-size: 0.59rem !important;
+}
+
+/* =========================================================
+   STEP 2 MIGRATION
+========================================================= */
+
+#adminMigrationMount,
+#k630AdminMigrationPanel {
+  width: 100%;
+}
+
+#k630AdminMigrationPanel {
+  margin-bottom: 10px !important;
+}
+
+.k630-admin-migration-panel,
+.k630-migration-panel {
+  min-height: 0 !important;
+}
+
+.k630-migration-header {
+  padding: 10px 12px !important;
+}
+
+.k630-migration-body {
+  padding: 10px 12px !important;
+}
+
+.k630-migration-form,
+.k630-migration-input-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(90px, 0.4fr)
+    minmax(130px, 0.55fr)
+    minmax(280px, 1.4fr)
+    auto !important;
+
+  align-items: end !important;
+
+  gap: 8px !important;
+}
+
+.k630-migration-summary,
+.k630-migration-preview-summary {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr)) !important;
+
+  gap: 6px !important;
+
+  margin-top: 8px !important;
+}
+
+.k630-migration-summary-card,
+.k630-migration-preview-card {
+  min-height: 0 !important;
+  padding: 7px 8px !important;
+}
+
+.k630-migration-player-lists {
+  max-height: 280px !important;
+
+  overflow-y: auto !important;
+}
+
+/* =========================================================
+   STEP 3 COMPLETE ORANGE THEME
+========================================================= */
+
+#seasonSetupWorkspace,
+#serverParticipationPanel {
+  --theme-color: var(--season-color) !important;
+  --theme-rgb: var(--season-rgb) !important;
+}
+
+.workflow-theme-servers {
+  --theme-color: var(--season-color) !important;
+  --theme-rgb: var(--season-rgb) !important;
+}
+
+#serverParticipationPanel {
+  border-color: var(--season-color) !important;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(var(--season-rgb), 0.14),
+      transparent 39%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(var(--season-rgb), 0.095),
+      rgba(7, 9, 14, 0.985)
+    ) !important;
+}
+
+#serverParticipationPanel .section-kicker {
+  color: var(--season-color) !important;
+}
+
+/* =========================================================
+   STEP 3 MASTER GRID
+
+   Required HTML structure:
+   - #seasonSetupPanel       = 3A
+   - #seasonStatusPanel      = 3B
+   - #meritConfigurationPanel = 3C
+========================================================= */
+
+#seasonSetupWorkspace {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(230px, 0.9fr)
+    minmax(230px, 0.9fr)
+    minmax(430px, 1.65fr) !important;
+
+  align-items: stretch !important;
+
+  gap: 8px !important;
+
+  width: 100% !important;
+}
+
+#seasonSetupWorkspace > .dashboard-panel {
+  height: 100%;
+  margin-bottom: 0 !important;
+}
+
+#seasonSetupPanel {
+  grid-column: 1;
+}
+
+#seasonStatusPanel {
+  grid-column: 2;
+}
+
+#meritConfigurationPanel {
+  grid-column: 3;
+}
+
+/* =========================================================
+   STEP 3A SEASON LIBRARY
+========================================================= */
+
+#seasonSetupPanel .admin-form-grid.four {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr)) !important;
+
+  gap: 7px !important;
+}
+
+#seasonSetupPanel .admin-table {
+  min-width: 440px !important;
+}
+
+/* =========================================================
+   STEP 3B WEBSITE STATUS
+========================================================= */
+
+#seasonStatusPanel .season-status-grid {
+  display: grid;
+
+  grid-template-columns: 1fr !important;
+
+  gap: 8px !important;
+}
+
+#seasonStatusPanel .admin-status-preview {
+  min-height: 70px;
+
+  padding: 9px;
+
+  border:
+    1px solid
+    rgba(var(--season-rgb), 0.24);
+
+  border-radius: 7px;
+
+  background:
+    rgba(var(--season-rgb), 0.035);
+}
+
+#seasonStatusPanel .admin-status-preview span,
+#seasonStatusPanel .admin-status-preview strong {
+  display: block;
+}
+
+#seasonStatusPanel .admin-status-preview span {
+  margin-bottom: 4px;
+
+  color: #969baa;
+
+  font-size: 0.52rem;
+  font-weight: 900;
+
+  text-transform: uppercase;
+}
+
+#seasonStatusPanel .admin-status-preview strong {
+  color: #58df8a;
+
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   STEP 3C MERIT CONFIGURATION
+========================================================= */
+
+#meritConfigurationPanel {
+  padding: 11px !important;
+
+  border-color: var(--season-color) !important;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(var(--season-rgb), 0.14),
+      transparent 39%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(var(--season-rgb), 0.095),
+      rgba(7, 9, 14, 0.985)
+    ) !important;
+}
+
+.merit-configuration-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  border:
+    1px solid
+    rgba(var(--season-rgb), 0.2);
+
+  border-radius: 7px;
+}
+
+.merit-configuration-table {
+  width: 100%;
+  min-width: 520px;
+
+  border-collapse: collapse;
+}
+
+.merit-configuration-table th,
+.merit-configuration-table td {
+  height: 27px;
+
+  padding: 4px 5px;
+
+  border-right:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  text-align: center;
+}
+
+.merit-configuration-table th {
+  color: #aeb2c0;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  font-size: 0.52rem;
+  font-weight: 900;
+
+  text-transform: uppercase;
+}
+
+.merit-configuration-table td {
+  color: #e9eaf0;
+
+  font-size: 0.58rem;
+}
+
+.merit-configuration-table
+.merit-group-t5 {
+  color: #ffd000;
+}
+
+.merit-configuration-table
+.merit-group-t4 {
+  color: #bd70ff;
+}
+
+.merit-configuration-table input {
+  width: 58px;
+  min-height: 25px;
+
+  padding: 3px 4px;
+
+  border:
+    1px solid
+    rgba(var(--season-rgb), 0.28);
+
+  border-radius: 5px;
+
+  color: #ffffff;
+  background: #080a0f;
+
+  font-size: 0.58rem;
+
+  text-align: center;
+}
+
+.merit-configuration-table
+tr:not([data-merit-week="6"])
+input {
+  color: #9ba0af;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  pointer-events: none;
+}
+
+.merit-configuration-targets {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 7px;
+
+  margin-top: 8px;
+}
+
+.merit-configuration-targets > div {
+  padding: 7px 8px;
+
+  border:
+    1px dashed
+    rgba(var(--season-rgb), 0.26);
+
+  border-radius: 7px;
+
+  background:
+    rgba(var(--season-rgb), 0.025);
+}
+
+.merit-configuration-targets span,
+.merit-configuration-targets strong {
+  display: block;
+}
+
+.merit-configuration-targets span {
+  color: #9196a7;
+
+  font-size: 0.5rem;
+  font-weight: 900;
+
+  text-transform: uppercase;
+}
+
+.merit-configuration-targets strong {
+  margin-top: 3px;
+
+  font-size: 0.62rem;
+}
+
+.merit-configuration-targets
+.merit-target-t5 strong {
+  color: #ffd000;
+}
+
+.merit-configuration-targets
+.merit-target-t4 strong {
+  color: #bd70ff;
+}
+
+.merit-configuration-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  min-height: 31px;
+
+  margin-top: 8px;
+  padding: 6px 8px;
+
+  border:
+    1px solid
+    rgba(var(--season-rgb), 0.22);
+
+  border-radius: 7px;
+
+  color: #e3e4e9;
+  background:
+    rgba(var(--season-rgb), 0.03);
+
+  font-size: 0.57rem;
+}
+
+.merit-configuration-status.is-pending {
+  color: #ffd000;
+
+  border-color:
+    rgba(255, 208, 0, 0.36);
+
+  background:
+    rgba(255, 208, 0, 0.045);
+}
+
+/* =========================================================
+   STEP 3D PARTICIPATING SERVERS
+========================================================= */
+
+#serverParticipationPanel {
+  width: 100% !important;
+
+  margin-bottom: 10px !important;
+  padding: 11px !important;
+}
+
+#serverParticipationPanel
+.admin-detail-header {
+  align-items: center !important;
+}
+
+.server-participation-summary {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr)) !important;
+
+  gap: 6px !important;
+
+  margin-bottom: 8px !important;
+}
+
+.server-participation-summary > div {
+  padding: 6px 8px !important;
+
+  border-color:
+    rgba(var(--season-rgb), 0.22) !important;
+
+  background:
+    rgba(var(--season-rgb), 0.025) !important;
+}
+
+/* =========================================================
+   TEN SERVERS PER ROW
+
+   Fewer than 10 servers remain compact and do not stretch
+   across the complete width.
+========================================================= */
+
+.server-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(
+      10,
+      minmax(82px, 1fr)
+    ) !important;
+
+  align-items: start !important;
+
+  gap: 6px !important;
+
+  width: 100% !important;
+}
+
+.server-card {
+  min-width: 0 !important;
+  min-height: 150px !important;
+
+  padding: 7px 5px 5px !important;
+
+  border-color:
+    rgba(var(--season-rgb), 0.27) !important;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(var(--season-rgb), 0.07),
+      transparent 42%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(17, 22, 31, 0.98),
+      rgba(8, 10, 14, 0.98)
+    ) !important;
+}
+
+.server-card h4 {
+  margin: 0 0 5px !important;
+
+  color: var(--season-color) !important;
+
+  font-size: 0.64rem !important;
+}
+
+.server-delete-btn {
+  top: -4px !important;
+  right: -4px !important;
+
+  width: 17px !important;
+  height: 17px !important;
+
+  font-size: 0.47rem !important;
+}
+
+.server-week-list {
+  gap: 2px !important;
+}
+
+.server-week-row {
+  min-height: 16px !important;
+
+  padding: 2px 3px !important;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.035);
+
+  background:
+    rgba(255, 255, 255, 0.025) !important;
+}
+
+.server-week-row span,
+.server-week-row strong {
+  font-size: 0.48rem !important;
+}
+
+.server-week-row span {
+  color: #cfd2da !important;
+}
+
+.server-week-row strong {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.server-week-row.status-valid,
+.server-week-row.is-valid {
+  border-color:
+    rgba(85, 255, 117, 0.19);
+
+  background:
+    rgba(85, 255, 117, 0.035) !important;
+}
+
+.server-week-row.status-empty,
+.server-week-row.is-empty {
+  border-color:
+    rgba(255, 208, 0, 0.18);
+
+  background:
+    rgba(255, 208, 0, 0.03) !important;
+}
+
+.server-week-row.status-failed,
+.server-week-row.is-failed {
+  border-color:
+    rgba(255, 82, 119, 0.22);
+
+  background:
+    rgba(255, 82, 119, 0.04) !important;
+}
+
+.status-valid,
+.is-valid strong {
+  color: #55ff75 !important;
+}
+
+.status-empty,
+.is-empty strong {
+  color: #ffd000 !important;
+}
+
+.status-failed,
+.is-failed strong {
+  color: #ff5277 !important;
+}
+
+/*
+  Empty placeholders must not be shown. Only registered
+  servers should occupy grid positions.
+*/
+
+.server-empty-slot {
+  display: none !important;
+}
+
+/* =========================================================
+   STEP 4 SEASON WEEK UPLOAD
+========================================================= */
+
+#adminSeasonUploadMount,
+#k630AdminSeasonUploadPanel {
+  width: 100%;
+}
+
+.k630-season-upload-panel {
+  margin-bottom: 10px !important;
+
+  border-color:
+    rgba(var(--weeks-rgb), 0.5) !important;
+
+  border-radius: 11px !important;
+}
+
+.k630-season-upload-header {
+  padding: 10px 12px !important;
+}
+
+.k630-season-upload-icon {
+  width: 32px !important;
+  height: 32px !important;
+  flex-basis: 32px !important;
+
+  border-radius: 8px !important;
+}
+
+.k630-season-upload-title h2 {
+  margin-bottom: 2px !important;
+
+  font-size: 0.75rem !important;
+}
+
+.k630-season-upload-title p {
+  font-size: 0.58rem !important;
+}
+
+.k630-season-upload-body {
+  display: block !important;
+}
+
+.k630-season-upload-section {
+  padding: 10px 12px !important;
+}
+
+.k630-season-upload-section +
+.k630-season-upload-section {
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.065) !important;
+
+  border-left: 0 !important;
+}
+
+.k630-season-upload-box {
+  padding: 9px !important;
+}
+
+.k630-season-upload-box p {
+  margin-bottom: 7px !important;
+
+  font-size: 0.58rem !important;
+}
+
+.k630-season-upload-stats {
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr)) !important;
+
+  gap: 6px !important;
+
+  margin-top: 8px !important;
+}
+
+.k630-season-upload-actions {
+  display: flex !important;
+
+  flex-wrap: wrap !important;
+
+  gap: 6px !important;
+}
+
+.k630-season-upload-results,
+.k630-season-upload-file-list {
+  max-height: 240px !important;
+
+  overflow-y: auto !important;
+}
+
+/* =========================================================
+   STEP 5 AND STEP 6
+========================================================= */
+
+#seasonProcessingPanel,
+#seasonArchivePanel {
+  padding: 10px 11px !important;
+}
+
+.season-processing-card {
+  padding: 7px !important;
+}
+
+.archive-control-grid {
+  grid-template-columns:
+    minmax(190px, 0.55fr)
+    minmax(260px, 1.45fr) !important;
+}
+
+/* =========================================================
+   SYSTEM TOOLS
+========================================================= */
+
+.admin-home-summary-panel {
+  width: 100%;
+
+  margin: 0 0 10px;
+  padding: 11px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 15, 29, 0.97),
+      rgba(8, 9, 13, 0.97)
+    );
+
+  border:
+    1px solid
+    rgba(157, 78, 221, 0.38);
+
+  border-radius: 11px;
+
+  box-shadow:
+    0 0 14px
+    rgba(157, 78, 221, 0.07);
+}
+
+.admin-home-summary-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.admin-home-summary-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+.admin-home-summary-icon {
+  display: grid;
+
+  place-items: center;
+
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+
+  color: #e2c3ff;
+
+  background:
+    rgba(157, 78, 221, 0.12);
+
+  border:
+    1px solid
+    rgba(184, 51, 255, 0.36);
+
+  border-radius: 8px;
+}
+
+.admin-home-summary-kicker {
+  display: block;
+
+  color: #b833ff;
+
+  font-size: 0.56rem;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.admin-home-summary-title h3 {
+  margin: 2px 0 0;
+
+  color: #ffffff;
+
+  font-size: 0.76rem;
+}
+
+.admin-home-summary-title p {
+  margin: 2px 0 0;
+
+  color: #9891a5;
+
+  font-size: 0.57rem;
+}
+
+.admin-home-summary-button {
+  flex: none;
+
+  min-height: 31px;
+
+  padding: 6px 10px;
+
+  color: #121015;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffd000,
+      #e2a900
+    );
+
+  border: 0;
+  border-radius: 7px;
+
+  font-size: 0.61rem;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.admin-home-summary-button:disabled {
+  opacity: 0.62;
+  cursor: wait;
+}
+
+.admin-home-summary-body {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 0.7fr)
+    minmax(380px, 2fr);
+
+  gap: 8px;
+
+  margin-top: 8px;
+}
+
+.admin-home-summary-status {
+  display: flex;
+
+  align-items: center;
+
+  min-height: 38px;
+
+  padding: 7px 9px;
+
+  border-radius: 7px;
+
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.admin-home-summary-status.idle {
+  color: #b6aebf;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.admin-home-summary-status.working {
+  color: #ead8ff;
+  background: rgba(157, 78, 221, 0.12);
+}
+
+.admin-home-summary-status.success {
+  color: #7eff9a;
+  background: rgba(55, 210, 103, 0.1);
+}
+
+.admin-home-summary-status.warning {
+  color: #ffe48a;
+  background: rgba(255, 208, 0, 0.08);
+}
+
+.admin-home-summary-status.error {
+  color: #ff8e9a;
+  background: rgba(255, 70, 90, 0.1);
+}
+
+.admin-home-summary-details {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 6px;
+}
+
+.admin-home-summary-details span {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  padding: 6px 8px;
+
+  background:
+    rgba(255, 255, 255, 0.03);
+
+  border:
+    1px solid
+    rgba(157, 78, 221, 0.14);
+
+  border-radius: 7px;
+}
+
+.admin-home-summary-details small {
+  color: #8f879d;
+
+  font-size: 0.49rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+.admin-home-summary-details strong {
+  overflow: hidden;
+
+  margin-top: 3px;
+
+  color: #ffd000;
+
+  font-size: 0.61rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PLAYER ADMINISTRATION
+========================================================= */
+
+.admin-player-management,
+#manualPlayerStatusPanel,
+#playerStarManagementPanel,
+#blacklistManagementPanel,
+#adminUserManagementPanel {
+  --theme-color: #e5e7ec !important;
+  --theme-rgb: 229, 231, 236 !important;
+
+  border-color:
+    rgba(229, 231, 236, 0.5) !important;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.055),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(18, 20, 26, 0.985),
+      rgba(7, 9, 14, 0.985)
+    ) !important;
+
+  box-shadow:
+    0 0 14px rgba(255, 255, 255, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025) !important;
+}
+
+.admin-player-management .section-kicker,
+#manualPlayerStatusPanel .section-kicker,
+#playerStarManagementPanel .section-kicker {
+  color: #e5e7ec !important;
+}
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+.admin-table {
+  margin-top: 6px !important;
+}
+
+.admin-table th {
+  height: 27px !important;
+
+  padding: 4px 6px !important;
+
+  font-size: 0.5rem !important;
+}
+
+.admin-table td {
+  height: 28px !important;
+
+  padding: 4px 6px !important;
+
+  font-size: 0.57rem !important;
+}
+
+/* =========================================================
+   SHORT LAPTOP SCREENS
+========================================================= */
+
+@media (max-height: 820px) {
+  #app-content > .admin-page,
+  #app-content .admin-page {
+    padding:
+      10px
+      12px
+      26px !important;
+  }
+
+  .server-card {
+    min-height: 140px !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE 1500
+========================================================= */
+
+@media (max-width: 1500px) {
+  #seasonSetupWorkspace {
+    grid-template-columns:
+      minmax(210px, 0.8fr)
+      minmax(210px, 0.8fr)
+      minmax(390px, 1.5fr) !important;
+  }
+
+  .server-grid {
+    grid-template-columns:
+      repeat(8, minmax(82px, 1fr)) !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE 1280
+========================================================= */
+
+@media (max-width: 1280px) {
+  #seasonSetupWorkspace {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #seasonSetupPanel {
+    grid-column: 1;
+  }
+
+  #seasonStatusPanel {
+    grid-column: 2;
+  }
+
+  #meritConfigurationPanel {
+    grid-column: 1 / -1;
+  }
+
+  .server-grid {
+    grid-template-columns:
+      repeat(6, minmax(82px, 1fr)) !important;
+  }
+
+  .admin-storage-grid,
+  .admin-storage-cards {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE 1000
+========================================================= */
+
+@media (max-width: 1000px) {
+  #seasonSetupWorkspace {
+    grid-template-columns: 1fr !important;
+  }
+
+  #seasonSetupPanel,
+  #seasonStatusPanel,
+  #meritConfigurationPanel {
+    grid-column: 1;
+  }
+
+  .server-grid {
+    grid-template-columns:
+      repeat(4, minmax(82px, 1fr)) !important;
+  }
+
+  .k630-migration-form,
+  .k630-migration-input-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .k630-migration-summary,
+  .k630-migration-preview-summary {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .admin-home-summary-body {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE 700
+========================================================= */
+
+@media (max-width: 700px) {
+  #app-content > .admin-page,
+  #app-content .admin-page {
+    padding: 9px !important;
+  }
+
+  .admin-foundation-warning-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .foundation-warning-icon {
+    display: none !important;
+  }
+
+  .server-participation-summary,
+  .admin-home-summary-details {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .server-grid {
+    grid-template-columns:
+      repeat(2, minmax(82px, 1fr)) !important;
+  }
+
+  .k630-season-upload-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .k630-migration-form,
+  .k630-migration-input-grid,
+  .k630-migration-summary,
+  .k630-migration-preview-summary {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-home-summary-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-home-summary-button {
+    width: 100%;
+  }
+}

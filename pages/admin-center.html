@@ -4,662 +4,290 @@
 >
 
   <!-- =====================================================
-       GITHUB CONNECTION & SYSTEM STATUS
-       Dynamically rendered by admin-storage.js
-  ====================================================== -->
-
-  <!-- =====================================================
-       OFFICIAL K630 V2 WORKFLOW
-  ====================================================== -->
-
-  <!-- =====================================================
-       K630 DATA PLATFORM V2
+       ADMIN CENTER HEADER
   ====================================================== -->
 
   <section
-    class="dashboard-panel admin-detail-workspace k630-v2-admin"
-    id="k630V2Admin"
+    class="dashboard-panel admin-center-hero"
+    id="adminCenterHeader"
   >
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Data Platform V2
+          Kingdom 630 Administration
         </span>
 
-        <h3>
-          K630 V2 Engine Control
-        </h3>
+        <h2>
+          REF Command Center
+        </h2>
 
         <p>
-          Rebuild generated page data, validate the V2 platform and
-          manage official Season archives.
+          Manage the permanent Foundation, Matchmaking data, Season
+          configuration, official uploads, public website updates and
+          completed Season archives.
         </p>
       </div>
 
       <span
         class="management-status-badge"
-        id="k630V2SystemStatus"
+        id="adminCenterSystemStatus"
         data-status="initializing"
       >
-        V2 initializing
+        Initializing
       </span>
     </div>
 
-
-    <!-- ===================================================
-         FOUNDATION
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Step 1
-          </span>
-
-          <h4>
-            Foundation
-          </h4>
-
-          <p>
-            Rebuild the permanent Kingdom 630 baseline and create all
-            required generated V2 documents.
-          </p>
-        </div>
+    <div class="admin-workflow-overview">
+      <div class="admin-workflow-step">
+        <span>1</span>
+        <strong>GitHub</strong>
       </div>
 
-      <div class="admin-action-row">
-        <button
-          class="admin-btn confirm"
-          id="k630V2FoundationRebuildBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-rotate"></i>
-          Rebuild Foundation
-        </button>
-      </div>
-    </section>
+      <i class="fa-solid fa-arrow-right"></i>
 
-
-    <!-- ===================================================
-         MATCHMAKING
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-right-left"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Step 2
-          </span>
-
-          <h4>
-            Matchmaking
-          </h4>
-
-          <p>
-            Update Active &amp; Average, move departed players to Old
-            Players and return existing players automatically.
-          </p>
-        </div>
+      <div class="admin-workflow-step">
+        <span>2</span>
+        <strong>Foundation</strong>
       </div>
 
-      <div class="k630-v2-input-action-grid">
-        <div class="admin-field">
-          <label for="k630V2MatchmakingNumber">
-            Matchmaking Number
-          </label>
+      <i class="fa-solid fa-arrow-right"></i>
 
-          <input
-            id="k630V2MatchmakingNumber"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="1"
-          >
-        </div>
-
-        <button
-          class="admin-btn confirm"
-          id="k630V2MatchmakingRebuildBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-rotate"></i>
-          Rebuild Matchmaking
-        </button>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         SEASON WEEK
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-calendar-week"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Step 3
-          </span>
-
-          <h4>
-            Season Week
-          </h4>
-
-          <p>
-            Discover all participating kingdoms dynamically and rebuild
-            the selected Week for Season Info and Server vs Server.
-          </p>
-        </div>
+      <div class="admin-workflow-step">
+        <span>3</span>
+        <strong>Matchmaking</strong>
       </div>
 
-      <div class="k630-v2-season-week-grid">
-        <div class="admin-field">
-          <label for="k630V2SeasonNumber">
-            Season Number
-          </label>
+      <i class="fa-solid fa-arrow-right"></i>
 
-          <input
-            id="k630V2SeasonNumber"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="1"
-          >
-        </div>
-
-        <div class="admin-field">
-          <label for="k630V2WeekNumber">
-            Week
-          </label>
-
-          <select id="k630V2WeekNumber">
-            <option value="">
-              Select Week
-            </option>
-
-            <option value="0">
-              Week 0
-            </option>
-
-            <option value="1">
-              Week 1
-            </option>
-
-            <option value="2">
-              Week 2
-            </option>
-
-            <option value="3">
-              Week 3
-            </option>
-
-            <option value="4">
-              Week 4
-            </option>
-
-            <option value="5">
-              Week 5
-            </option>
-
-            <option value="6">
-              Week 6
-            </option>
-          </select>
-        </div>
-
-        <button
-          class="admin-btn confirm"
-          id="k630V2SeasonWeekRebuildBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-rotate"></i>
-          Rebuild Season Week
-        </button>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         CURRENT GENERATED DATA
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-database"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Recovery
-          </span>
-
-          <h4>
-            Current Generated Data
-          </h4>
-
-          <p>
-            Rebuild the current workflow or force a complete update of
-            every generated current-page document.
-          </p>
-        </div>
+      <div class="admin-workflow-step">
+        <span>4</span>
+        <strong>Season</strong>
       </div>
 
-      <div class="admin-action-row">
-        <button
-          class="admin-btn"
-          id="k630V2RebuildCurrentBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-arrows-rotate"></i>
-          Rebuild Current Workflow
-        </button>
+      <i class="fa-solid fa-arrow-right"></i>
 
-        <button
-          class="admin-btn confirm"
-          id="k630V2UpdateAllCurrentBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-layer-group"></i>
-          Update All Current Pages
-        </button>
+      <div class="admin-workflow-step">
+        <span>5</span>
+        <strong>Upload</strong>
       </div>
 
-      <div class="k630-v2-generated-files">
-        <div>
-          <i class="fa-solid fa-house"></i>
+      <i class="fa-solid fa-arrow-right"></i>
 
-          <span>
-            Home
-          </span>
-
-          <strong>
-            home.json
-          </strong>
-        </div>
-
-        <div>
-          <i class="fa-solid fa-chart-column"></i>
-
-          <span>
-            Active &amp; Average
-          </span>
-
-          <strong>
-            active-average.json
-          </strong>
-        </div>
-
-        <div>
-          <i class="fa-solid fa-user-clock"></i>
-
-          <span>
-            Old Players
-          </span>
-
-          <strong>
-            old-players.json
-          </strong>
-        </div>
-
-        <div>
-          <i class="fa-solid fa-calendar-days"></i>
-
-          <span>
-            Season Info
-          </span>
-
-          <strong>
-            season-info.json
-          </strong>
-        </div>
-
-        <div>
-          <i class="fa-solid fa-scale-balanced"></i>
-
-          <span>
-            Server vs Server
-          </span>
-
-          <strong>
-            server-vs-server.json
-          </strong>
-        </div>
-
-        <div>
-          <i class="fa-solid fa-signal"></i>
-
-          <span>
-            Season Status
-          </span>
-
-          <strong>
-            season-status.json
-          </strong>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         SAVE SEASON ARCHIVE
-    ==================================================== -->
-
-    <section class="k630-v2-control-section k630-v2-archive-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-box-archive"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Step 4
-          </span>
-
-          <h4>
-            Save Season Archive
-          </h4>
-
-          <p>
-            Validate Week 0 through Week 6, create the official archive,
-            update Old Seasons and clear only current Season data.
-          </p>
-        </div>
+      <div class="admin-workflow-step">
+        <span>6</span>
+        <strong>Update</strong>
       </div>
 
-      <div class="k630-v2-input-action-grid">
-        <div class="admin-field">
-          <label for="k630V2SaveSeasonNumber">
-            Season Number
-          </label>
+      <i class="fa-solid fa-arrow-right"></i>
 
-          <input
-            id="k630V2SaveSeasonNumber"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="Current Season"
-          >
-        </div>
-
-        <button
-          class="admin-btn confirm"
-          id="k630V2SaveSeasonBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-box-archive"></i>
-          Save Season
-        </button>
+      <div class="admin-workflow-step">
+        <span>7</span>
+        <strong>Archive</strong>
       </div>
-
-      <div class="admin-validation-box">
-        <div class="validation-state warning">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-
-          <span>
-            Save Season requires complete Week 0 through Week 6 data.
-            Active &amp; Average and Old Players remain preserved.
-          </span>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         ARCHIVE RECOVERY
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-screwdriver-wrench"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Archive Recovery
-          </span>
-
-          <h4>
-            Inspect and Rebuild Archives
-          </h4>
-
-          <p>
-            Inspect an archive, rebuild an archive from current Season
-            data or reconstruct the Old Seasons index.
-          </p>
-        </div>
-      </div>
-
-      <div class="k630-v2-archive-tools-grid">
-        <article class="k630-v2-tool-card">
-          <div>
-            <h5>
-              Inspect Archive
-            </h5>
-
-            <p>
-              Check whether all required archive files exist.
-            </p>
-          </div>
-
-          <div class="admin-field">
-            <label for="k630V2InspectArchiveNumber">
-              Season
-            </label>
-
-            <input
-              id="k630V2InspectArchiveNumber"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="1"
-            >
-          </div>
-
-          <button
-            class="admin-btn"
-            id="k630V2InspectArchiveBtn"
-            type="button"
-          >
-            <i class="fa-solid fa-magnifying-glass"></i>
-            Inspect
-          </button>
-        </article>
-
-        <article class="k630-v2-tool-card">
-          <div>
-            <h5>
-              Rebuild Archive
-            </h5>
-
-            <p>
-              Overwrite an archive using complete current Season data.
-            </p>
-          </div>
-
-          <div class="admin-field">
-            <label for="k630V2RebuildArchiveNumber">
-              Season
-            </label>
-
-            <input
-              id="k630V2RebuildArchiveNumber"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="1"
-            >
-          </div>
-
-          <button
-            class="admin-btn confirm"
-            id="k630V2RebuildArchiveBtn"
-            type="button"
-          >
-            <i class="fa-solid fa-rotate"></i>
-            Rebuild Archive
-          </button>
-        </article>
-
-        <article class="k630-v2-tool-card">
-          <div>
-            <h5>
-              Old Seasons Index
-            </h5>
-
-            <p>
-              Enter Season numbers separated by commas or spaces.
-            </p>
-          </div>
-
-          <div class="admin-field">
-            <label for="k630V2IndexSeasons">
-              Archived Seasons
-            </label>
-
-            <input
-              id="k630V2IndexSeasons"
-              type="text"
-              inputmode="numeric"
-              placeholder="1, 2, 3"
-            >
-          </div>
-
-          <button
-            class="admin-btn confirm"
-            id="k630V2RebuildIndexBtn"
-            type="button"
-          >
-            <i class="fa-solid fa-list"></i>
-            Rebuild Index
-          </button>
-        </article>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         SYSTEM STATUS
-    ==================================================== -->
-
-    <section class="k630-v2-control-section">
-      <div class="k630-v2-section-header">
-        <div class="k630-v2-section-icon">
-          <i class="fa-solid fa-stethoscope"></i>
-        </div>
-
-        <div>
-          <span class="section-kicker">
-            V2 Diagnostics
-          </span>
-
-          <h4>
-            System Status
-          </h4>
-
-          <p>
-            Check all V2 engine modules and verify that the generated
-            current documents are available.
-          </p>
-        </div>
-      </div>
-
-      <div class="admin-action-row">
-        <button
-          class="admin-btn"
-          id="k630V2LoadStatusBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-gauge-high"></i>
-          Load V2 Status
-        </button>
-
-        <button
-          class="admin-btn confirm"
-          id="k630V2SystemCheckBtn"
-          type="button"
-        >
-          <i class="fa-solid fa-list-check"></i>
-          Run System Check
-        </button>
-      </div>
-    </section>
-
-
-    <!-- ===================================================
-         PROGRESS AND RESULTS
-    ==================================================== -->
-
-    <section class="k630-v2-output-section">
-      <div
-        class="k630-v2-progress"
-        id="k630V2Progress"
-        data-status="idle"
-        hidden
-      ></div>
-
-      <div
-        class="k630-v2-result"
-        id="k630V2Result"
-        data-status="neutral"
-        hidden
-      ></div>
-
-      <div class="k630-v2-log-panel">
-        <div class="k630-v2-log-header">
-          <div>
-            <span class="section-kicker">
-              V2 Activity
-            </span>
-
-            <h4>
-              Engine Log
-            </h4>
-          </div>
-        </div>
-
-        <div
-          class="k630-v2-log"
-          id="k630V2Log"
-        >
-          <div class="k630-v2-log-empty">
-            No V2 activity yet.
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
   </section>
 
-  <!-- =====================================================
-       SOURCE UPLOAD & ADMINISTRATION
-       Upload/configuration only; processing is handled by V2.
-  ====================================================== -->
 
   <!-- =====================================================
-       STEP 1 — DETAILED FOUNDATION MANAGEMENT
+       STEP 1 — GITHUB CONNECTION
   ====================================================== -->
 
   <section
-    class="dashboard-panel admin-detail-workspace workflow-theme-foundation"
-    id="foundationDetailedManagement"
+    class="dashboard-panel admin-detail-workspace workflow-theme-github"
+    id="githubConnectionPanel"
   >
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Step 1 | Foundation Management
+          Step 1 | GitHub Connection
+        </span>
+
+        <h3>
+          Repository Connection
+        </h3>
+
+        <p>
+          Verify permanent read and write access for the application
+          repository and the public Kingdom data repository.
+        </p>
+      </div>
+
+      <span
+        class="management-status-badge"
+        id="githubConnectionStatus"
+        data-status="checking"
+      >
+        Checking
+      </span>
+    </div>
+
+    <div class="admin-repository-grid">
+      <article class="admin-repository-card">
+        <div class="admin-repository-card-header">
+          <div class="admin-repository-icon">
+            <i class="fa-brands fa-github"></i>
+          </div>
+
+          <div>
+            <span>
+              Application Repository
+            </span>
+
+            <strong>
+              ref-command-center
+            </strong>
+          </div>
+        </div>
+
+        <div class="admin-repository-status-grid">
+          <div>
+            <span>Read Access</span>
+
+            <strong
+              id="appRepositoryReadStatus"
+              data-status="checking"
+            >
+              Checking
+            </strong>
+          </div>
+
+          <div>
+            <span>Write Access</span>
+
+            <strong
+              id="appRepositoryWriteStatus"
+              data-status="checking"
+            >
+              Checking
+            </strong>
+          </div>
+
+          <div>
+            <span>Branch</span>
+
+            <strong id="appRepositoryBranch">
+              main
+            </strong>
+          </div>
+
+          <div>
+            <span>Last Sync</span>
+
+            <strong id="appRepositoryLastSync">
+              -
+            </strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="admin-repository-card">
+        <div class="admin-repository-card-header">
+          <div class="admin-repository-icon">
+            <i class="fa-solid fa-database"></i>
+          </div>
+
+          <div>
+            <span>
+              Public Data Repository
+            </span>
+
+            <strong>
+              k630-public-data
+            </strong>
+          </div>
+        </div>
+
+        <div class="admin-repository-status-grid">
+          <div>
+            <span>Read Access</span>
+
+            <strong
+              id="dataRepositoryReadStatus"
+              data-status="checking"
+            >
+              Checking
+            </strong>
+          </div>
+
+          <div>
+            <span>Write Access</span>
+
+            <strong
+              id="dataRepositoryWriteStatus"
+              data-status="checking"
+            >
+              Checking
+            </strong>
+          </div>
+
+          <div>
+            <span>Branch</span>
+
+            <strong id="dataRepositoryBranch">
+              main
+            </strong>
+          </div>
+
+          <div>
+            <span>Last Sync</span>
+
+            <strong id="dataRepositoryLastSync">
+              -
+            </strong>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="admin-action-row">
+      <button
+        class="admin-btn"
+        id="checkGithubConnectionBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-plug-circle-check"></i>
+        Check Connection
+      </button>
+
+      <button
+        class="admin-btn confirm"
+        id="testGithubWriteBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-pen-to-square"></i>
+        Test Write Access
+      </button>
+    </div>
+
+    <div
+      class="admin-validation-box"
+      id="githubConnectionValidationBox"
+    >
+      <div class="validation-state idle">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <span>
+          Both repositories require read access. Uploads, website
+          updates and archives also require write access to
+          k630-public-data.
+        </span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       STEP 2 — FOUNDATION MANAGEMENT
+  ====================================================== -->
+
+  <section
+    class="dashboard-panel admin-detail-workspace workflow-theme-foundation"
+    id="foundationManagementPanel"
+  >
+    <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          Step 2 | Foundation Management
         </span>
 
         <h3>
@@ -667,17 +295,18 @@
         </h3>
 
         <p>
-          This is the permanent starting point for all Kingdom 630
-          calculations. Do not replace this dataset unless the
-          complete baseline must be rebuilt.
+          The Foundation is the permanent Kingdom 630 baseline.
+          Replacing it is an Owner-only action and is never part of
+          normal weekly Season uploads.
         </p>
       </div>
 
       <span
         class="management-status-badge"
-        id="foundationWorkflowStatus"
+        id="foundationStatusBadge"
+        data-status="checking"
       >
-        Required Once
+        Checking
       </span>
     </div>
 
@@ -687,17 +316,17 @@
           Active Foundation
         </span>
 
-        <strong id="baselineFilename">
+        <strong id="foundationFilename">
           assets/data/foundation/630-foundation.json
         </strong>
       </div>
 
       <div class="foundation-warning-stat">
         <span>
-          Foundation Date
+          Official Date
         </span>
 
-        <strong id="baselineDateLabel">
+        <strong id="foundationDateLabel">
           27-03-2026
         </strong>
       </div>
@@ -707,65 +336,72 @@
           Players
         </span>
 
-        <strong id="baselinePlayerCount">
+        <strong id="foundationPlayerCount">
           -
         </strong>
       </div>
 
       <div class="foundation-warning-stat">
         <span>
-          Status
+          Validation
         </span>
 
-        <strong
-          class="foundation-active-status"
-          id="baselineStatus"
-        >
-          Checking
+        <strong id="foundationValidationStatus">
+          Not checked
         </strong>
       </div>
     </div>
 
-    <div class="foundation-detail-grid">
+    <div class="admin-form-grid">
       <div class="admin-field">
-        <label for="baselineStartDate">
-          Foundation Effective Date
+        <label for="foundationOfficialDate">
+          Foundation Official Date
         </label>
 
         <input
-          id="baselineStartDate"
+          id="foundationOfficialDate"
           type="date"
           value="2026-03-27"
         >
       </div>
 
       <div class="admin-field">
-        <label for="baselineJsonInput">
-          Replacement Foundation JSON
+        <label for="foundationFileInput">
+          Foundation JSON File
         </label>
 
         <input
-          id="baselineJsonInput"
+          id="foundationFileInput"
           type="file"
           accept=".json,application/json"
         >
       </div>
     </div>
 
+    <div
+      class="admin-selected-files"
+      id="foundationSelectedFiles"
+    >
+      <div class="admin-selected-files-empty">
+        No Foundation file selected.
+      </div>
+    </div>
+
     <div class="admin-action-row">
       <button
-        class="admin-btn upload"
-        id="uploadBaselineBtn"
+        class="admin-btn"
+        id="validateFoundationBtn"
         type="button"
       >
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Validate Replacement
+        <i class="fa-solid fa-list-check"></i>
+        Validate Foundation
       </button>
 
       <button
         class="admin-btn confirm"
-        id="saveBaselineBtn"
+        id="saveFoundationBtn"
         type="button"
+        disabled
       >
         <i class="fa-solid fa-floppy-disk"></i>
         Save Foundation
@@ -777,7 +413,7 @@
         type="button"
       >
         <i class="fa-solid fa-rotate"></i>
-        Recheck Foundation
+        Recheck Current Foundation
       </button>
     </div>
 
@@ -789,8 +425,8 @@
         <i class="fa-solid fa-triangle-exclamation"></i>
 
         <span>
-          Do not replace Foundation unless the complete permanent
-          Kingdom 630 baseline must be rebuilt.
+          Saving a new Foundation replaces the permanent baseline in
+          k630-public-data.
         </span>
       </div>
     </div>
@@ -798,50 +434,213 @@
 
 
   <!-- =====================================================
-       STEP 2 — MIGRATION DYNAMIC MODULE
+       STEP 3 — MATCHMAKING
   ====================================================== -->
 
   <section
-    class="admin-module-mount workflow-module-mount workflow-theme-migration"
-    id="adminMigrationMount"
-    data-admin-module-mount="migration"
+    class="dashboard-panel admin-detail-workspace workflow-theme-matchmaking"
+    id="matchmakingManagementPanel"
   >
-    <div class="dashboard-panel admin-module-loading-panel">
-      <span class="section-kicker">
-        Step 2 | Migration
+    <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          Step 3 | Matchmaking
+        </span>
+
+        <h3>
+          Upload Official Matchmaking Data
+        </h3>
+
+        <p>
+          Upload the official Matchmaking document for the selected
+          Season. Matchmaking establishes the Season starting roster
+          before Week 0 is activated.
+        </p>
+      </div>
+
+      <span
+        class="management-status-badge"
+        id="matchmakingStatusBadge"
+        data-status="waiting"
+      >
+        Waiting
+      </span>
+    </div>
+
+    <div class="admin-form-grid">
+      <div class="admin-field">
+        <label for="matchmakingSeasonNumber">
+          Season Number
+        </label>
+
+        <input
+          id="matchmakingSeasonNumber"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="1"
+        >
+      </div>
+
+      <div class="admin-field">
+        <label for="matchmakingOfficialDate">
+          Matchmaking Official Date
+        </label>
+
+        <input
+          id="matchmakingOfficialDate"
+          type="date"
+        >
+      </div>
+
+      <div class="admin-field">
+        <label for="matchmakingFileInput">
+          Matchmaking JSON File
+        </label>
+
+        <input
+          id="matchmakingFileInput"
+          type="file"
+          accept=".json,application/json"
+        >
+      </div>
+    </div>
+
+    <div class="admin-upload-destination">
+      <span>
+        Automatic Destination
       </span>
 
-      <h3>
-        Loading Migration Management
-      </h3>
+      <strong id="matchmakingDestinationPreview">
+        assets/data/matchmaking/season-[number]/matchmaking.json
+      </strong>
+    </div>
+
+    <div
+      class="admin-selected-files"
+      id="matchmakingSelectedFiles"
+    >
+      <div class="admin-selected-files-empty">
+        No Matchmaking file selected.
+      </div>
+    </div>
+
+    <div class="admin-action-row">
+      <button
+        class="admin-btn"
+        id="validateMatchmakingBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-list-check"></i>
+        Validate Matchmaking
+      </button>
+
+      <button
+        class="admin-btn upload"
+        id="uploadMatchmakingBtn"
+        type="button"
+        disabled
+      >
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Matchmaking
+      </button>
+
+      <button
+        class="admin-btn"
+        id="recheckMatchmakingBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-rotate"></i>
+        Recheck Current Matchmaking
+      </button>
+    </div>
+
+    <div
+      class="admin-validation-box"
+      id="matchmakingValidationBox"
+    >
+      <div class="validation-state idle">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <span>
+          Matchmaking may be uploaded before Season activation.
+          Weekly files remain locked until Season Configuration is
+          complete.
+        </span>
+      </div>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="ranking-table admin-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Season</th>
+            <th>File</th>
+            <th>Players</th>
+            <th>Uploaded By</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="matchmakingHistoryTable">
+          <tr>
+            <td colspan="6">
+              No Matchmaking uploads recorded.
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
 
   <!-- =====================================================
-       STEP 3 — SEASON SETUP WORKSPACE
+       STEP 4 — SEASON CONFIGURATION
   ====================================================== -->
 
   <section
-    class="admin-detail-workspace-group workflow-theme-season"
-    id="seasonSetupWorkspace"
+    class="dashboard-panel admin-detail-workspace workflow-theme-season"
+    id="seasonConfigurationPanel"
   >
+    <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          Step 4 | Season Configuration
+        </span>
 
-    <!-- STEP 3A — SEASON LIBRARY -->
+        <h3>
+          Configure and Activate Season
+        </h3>
+
+        <p>
+          Create or select the Season, configure its public status,
+          register participating servers and activate Week 0.
+        </p>
+      </div>
+
+      <span
+        class="management-status-badge"
+        id="seasonConfigurationStatus"
+        data-status="not-configured"
+      >
+        Not Configured
+      </span>
+    </div>
 
     <section
-      class="dashboard-panel admin-detail-workspace"
-      id="seasonSetupPanel"
+      class="admin-inner-panel"
+      id="seasonLibraryPanel"
     >
-      <div class="admin-detail-header">
+      <div class="admin-inner-panel-header">
         <div>
           <span class="section-kicker">
-            Step 3A | Season Library
+            Season Library
           </span>
 
-          <h3>
-            Create and Select Season
-          </h3>
+          <h4>
+            Create or Select Season
+          </h4>
         </div>
       </div>
 
@@ -855,32 +654,35 @@
             id="seasonYear"
             type="number"
             min="2026"
+            step="1"
             placeholder="2026"
           >
         </div>
 
         <div class="admin-field">
           <label for="seasonNumber">
-            Season Nr
+            Season Number
           </label>
 
           <input
             id="seasonNumber"
             type="number"
             min="1"
+            step="1"
             placeholder="1"
           >
         </div>
 
         <div class="admin-field">
           <label for="sosNumber">
-            SoS Nr
+            SoS Number
           </label>
 
           <input
             id="sosNumber"
             type="number"
             min="1"
+            step="1"
             placeholder="4"
           >
         </div>
@@ -913,7 +715,9 @@
         <table class="ranking-table admin-table">
           <thead>
             <tr>
-              <th>Season Label</th>
+              <th>Season</th>
+              <th>Year</th>
+              <th>SoS</th>
               <th>Status</th>
               <th>Selection</th>
               <th>Action</th>
@@ -922,8 +726,8 @@
 
           <tbody id="seasonLibraryTable">
             <tr>
-              <td colspan="4">
-                No seasons added yet.
+              <td colspan="6">
+                No Seasons loaded.
               </td>
             </tr>
           </tbody>
@@ -931,45 +735,42 @@
       </div>
     </section>
 
-
-    <!-- STEP 3B — WEBSITE STATUS -->
-
     <section
-      class="dashboard-panel admin-detail-workspace"
-      id="seasonStatusPanel"
+      class="admin-inner-panel"
+      id="websiteStatusPanel"
     >
-      <div class="admin-detail-header">
+      <div class="admin-inner-panel-header">
         <div>
           <span class="section-kicker">
-            Step 3B | Website Status
+            Website Status
           </span>
 
-          <h3>
-            Website and Topbar Status
-          </h3>
+          <h4>
+            Public Home and Topbar Status
+          </h4>
         </div>
       </div>
 
       <div class="season-status-grid">
         <div class="admin-field">
-          <label for="topbarStatusSelect">
-            Current Kingdom / Season Status
+          <label for="websiteStatusSelect">
+            Current Website Status
           </label>
 
-          <select id="topbarStatusSelect">
-            <option value="Home Kingdom - Farming - Migration Open">
+          <select id="websiteStatusSelect">
+            <option value="home-farming-migration-open">
               Home Kingdom - Farming - Migration Open
             </option>
 
-            <option value="Home Kingdom - Matchmaking - Migration Closed">
+            <option value="home-matchmaking-migration-closed">
               Home Kingdom - Matchmaking - Migration Closed
             </option>
 
-            <option value="In Season - Migration Open">
+            <option value="in-season-migration-open">
               In Season - Migration Open
             </option>
 
-            <option value="In Season - Migration Closed">
+            <option value="in-season-migration-closed">
               In Season - Migration Closed
             </option>
           </select>
@@ -977,10 +778,10 @@
 
         <div class="admin-status-preview">
           <span>
-            Topbar Preview
+            Public Status Preview
           </span>
 
-          <strong id="topbarStatusPreview">
+          <strong id="websiteStatusPreview">
             Home Kingdom - Farming - Migration Open
           </strong>
         </div>
@@ -989,7 +790,7 @@
       <div class="admin-action-row">
         <button
           class="admin-btn confirm"
-          id="saveTopbarStatusBtn"
+          id="saveWebsiteStatusBtn"
           type="button"
         >
           <i class="fa-solid fa-floppy-disk"></i>
@@ -999,148 +800,781 @@
 
       <div
         class="admin-validation-box"
-        id="topbarStatusValidationBox"
+        id="websiteStatusValidationBox"
       >
         <div class="validation-state idle">
           <i class="fa-solid fa-circle-info"></i>
 
           <span>
-            In Season automatically includes the selected Season
-            Library label in the topbar.
+            The public Home page and Topbar read this shared website
+            status configuration.
           </span>
         </div>
       </div>
     </section>
 
+    <section
+      class="admin-inner-panel"
+      id="participatingServersPanel"
+    >
+      <div class="admin-inner-panel-header">
+        <div>
+          <span class="section-kicker">
+            Participating Servers
+          </span>
+
+          <h4>
+            Register Season Servers
+          </h4>
+
+          <p>
+            Register every participating server before activating the
+            Season. A maximum of twenty servers is supported.
+          </p>
+        </div>
+
+        <button
+          class="admin-btn add"
+          id="addParticipatingServerBtn"
+          type="button"
+        >
+          <i class="fa-solid fa-plus"></i>
+          Add Server
+        </button>
+      </div>
+
+      <div class="server-participation-summary">
+        <div>
+          <span>
+            Registered
+          </span>
+
+          <strong id="registeredServerCount">
+            0
+          </strong>
+        </div>
+
+        <div>
+          <span>
+            Maximum
+          </span>
+
+          <strong>
+            20
+          </strong>
+        </div>
+
+        <div>
+          <span>
+            Complete
+          </span>
+
+          <strong id="completeServerCount">
+            0
+          </strong>
+        </div>
+
+        <div>
+          <span>
+            Missing
+          </span>
+
+          <strong id="missingServerCount">
+            0
+          </strong>
+        </div>
+      </div>
+
+      <div
+        class="server-grid"
+        id="participatingServersGrid"
+      >
+        <div class="admin-selected-files-empty">
+          No participating servers registered.
+        </div>
+      </div>
+
+      <div class="admin-action-row">
+        <button
+          class="admin-btn confirm"
+          id="saveParticipatingServersBtn"
+          type="button"
+        >
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Participating Servers
+        </button>
+      </div>
+    </section>
+
+    <section
+      class="admin-inner-panel admin-season-activation-panel"
+      id="seasonActivationPanel"
+    >
+      <div class="admin-inner-panel-header">
+        <div>
+          <span class="section-kicker">
+            Season Activation
+          </span>
+
+          <h4>
+            Lock Configuration and Unlock Week 0
+          </h4>
+
+          <p>
+            Week 0 remains locked until Matchmaking, Season status and
+            participating servers are available.
+          </p>
+        </div>
+
+        <span
+          class="management-status-badge"
+          id="seasonActivationBadge"
+          data-status="locked"
+        >
+          W0 Locked
+        </span>
+      </div>
+
+      <div class="admin-action-row">
+        <button
+          class="admin-btn confirm"
+          id="activateSeasonBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-lock-open"></i>
+          Activate Season
+        </button>
+
+        <button
+          class="admin-btn delete"
+          id="deactivateSeasonBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-lock"></i>
+          Deactivate Season
+        </button>
+      </div>
+
+      <div
+        class="admin-validation-box"
+        id="seasonActivationValidationBox"
+      >
+        <div class="validation-state warning">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+
+          <span>
+            Complete Matchmaking and all Season Configuration sections
+            before activating the Season.
+          </span>
+        </div>
+      </div>
+    </section>
   </section>
 
 
   <!-- =====================================================
-       STEP 3D — PARTICIPATING SERVERS
+       STEP 5 — DATA UPLOAD
   ====================================================== -->
 
   <section
-    class="dashboard-panel admin-detail-workspace workflow-theme-servers"
-    id="serverParticipationPanel"
+    class="dashboard-panel admin-detail-workspace workflow-theme-upload"
+    id="dataUploadPanel"
   >
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Step 3D | Participating Servers
+          Step 5 | Data Upload
         </span>
 
         <h3>
-          Server Participation Overview
+          Upload Official Weekly Data
         </h3>
 
         <p>
-          Add a maximum of twenty participating servers and monitor
-          Week 0 through Week 6.
+          Upload official Week 0 through Week 6 source files. The
+          destination in k630-public-data is selected automatically.
         </p>
       </div>
 
+      <span
+        class="management-status-badge"
+        id="dataUploadStatus"
+        data-status="waiting"
+      >
+        Waiting
+      </span>
+    </div>
+
+    <div class="admin-form-grid four">
+      <div class="admin-field">
+        <label for="uploadSeasonNumber">
+          Season Number
+        </label>
+
+        <input
+          id="uploadSeasonNumber"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="1"
+        >
+      </div>
+
+      <div class="admin-field">
+        <label for="uploadTypeSelect">
+          Week
+        </label>
+
+        <select id="uploadTypeSelect">
+          <option value="">
+            Select Week
+          </option>
+
+          <option value="w0">
+            Season Week 0
+          </option>
+
+          <option value="w1">
+            Season Week 1
+          </option>
+
+          <option value="w2">
+            Season Week 2
+          </option>
+
+          <option value="w3">
+            Season Week 3
+          </option>
+
+          <option value="w4">
+            Season Week 4
+          </option>
+
+          <option value="w5">
+            Season Week 5
+          </option>
+
+          <option value="w6">
+            Season Week 6
+          </option>
+        </select>
+      </div>
+
+      <div class="admin-field">
+        <label for="uploadOfficialDate">
+          Official Date
+        </label>
+
+        <input
+          id="uploadOfficialDate"
+          type="date"
+        >
+      </div>
+
+      <div class="admin-field">
+        <label for="seasonDataFileInput">
+          Server Source Files
+        </label>
+
+        <input
+          id="seasonDataFileInput"
+          type="file"
+          accept=".json,application/json"
+          multiple
+        >
+      </div>
+    </div>
+
+    <div class="admin-upload-destination">
+      <span>
+        Automatic Destination
+      </span>
+
+      <strong id="uploadDestinationPreview">
+        Select a Season and week.
+      </strong>
+    </div>
+
+    <div
+      class="admin-selected-files"
+      id="seasonUploadSelectedFiles"
+    >
+      <div class="admin-selected-files-empty">
+        No source files selected.
+      </div>
+    </div>
+
+    <div class="admin-action-row">
       <button
-        class="admin-btn add"
-        id="addServerBtn"
+        class="admin-btn"
+        id="validateSeasonUploadBtn"
         type="button"
       >
-        <i class="fa-solid fa-plus"></i>
-        Add Server
+        <i class="fa-solid fa-list-check"></i>
+        Validate Files
+      </button>
+
+      <button
+        class="admin-btn upload"
+        id="uploadSeasonDataBtn"
+        type="button"
+        disabled
+      >
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Week Data
       </button>
     </div>
 
-    <div class="server-participation-summary">
-      <div>
+    <div
+      class="admin-validation-box"
+      id="seasonUploadValidationBox"
+    >
+      <div class="validation-state idle">
+        <i class="fa-solid fa-circle-info"></i>
+
         <span>
-          Registered
+          Week 0 through Week 6 require an active Season. Every upload
+          is stored only in k630-public-data.
+        </span>
+      </div>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="ranking-table admin-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Season</th>
+            <th>Week</th>
+            <th>Files</th>
+            <th>Uploaded By</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="uploadHistoryTable">
+          <tr>
+            <td colspan="6">
+              No weekly uploads recorded.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       STEP 6 — WEBSITE UPDATE
+  ====================================================== -->
+
+  <section
+    class="dashboard-panel admin-detail-workspace workflow-theme-update"
+    id="websiteUpdatePanel"
+  >
+    <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          Step 6 | Website Update
         </span>
 
-        <strong id="registeredServerCountDetail">
-          0
+        <h3>
+          Rebuild Public Website Data
+        </h3>
+
+        <p>
+          Generate the current public JSON documents from the latest
+          official source data in k630-public-data.
+        </p>
+      </div>
+
+      <span
+        class="management-status-badge"
+        id="websiteUpdateStatus"
+        data-status="locked"
+      >
+        Locked
+      </span>
+    </div>
+
+    <div class="admin-page-update-grid">
+      <article class="admin-page-update-card">
+        <div class="admin-page-update-icon">
+          <i class="fa-solid fa-house"></i>
+        </div>
+
+        <div>
+          <h4>
+            Home
+          </h4>
+
+          <p>
+            Rebuild current Home dashboard data.
+          </p>
+
+          <strong>
+            generated/home/current.json
+          </strong>
+        </div>
+
+        <button
+          class="admin-btn"
+          id="rebuildHomeBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Rebuild
+        </button>
+      </article>
+
+      <article class="admin-page-update-card">
+        <div class="admin-page-update-icon">
+          <i class="fa-solid fa-chart-column"></i>
+        </div>
+
+        <div>
+          <h4>
+            Active &amp; Average
+          </h4>
+
+          <p>
+            Rebuild current player activity and average data.
+          </p>
+
+          <strong>
+            generated/active-average/current.json
+          </strong>
+        </div>
+
+        <button
+          class="admin-btn"
+          id="rebuildActiveAverageBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Rebuild
+        </button>
+      </article>
+
+      <article class="admin-page-update-card">
+        <div class="admin-page-update-icon">
+          <i class="fa-solid fa-calendar-days"></i>
+        </div>
+
+        <div>
+          <h4>
+            Season Info
+          </h4>
+
+          <p>
+            Rebuild current Season player and week data.
+          </p>
+
+          <strong>
+            generated/season-info/current.json
+          </strong>
+        </div>
+
+        <button
+          class="admin-btn"
+          id="rebuildSeasonInfoBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Rebuild
+        </button>
+      </article>
+
+      <article class="admin-page-update-card">
+        <div class="admin-page-update-icon">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+
+        <div>
+          <h4>
+            Server vs Server
+          </h4>
+
+          <p>
+            Rebuild current participating-server comparison data.
+          </p>
+
+          <strong>
+            generated/server-vs-server/current.json
+          </strong>
+        </div>
+
+        <button
+          class="admin-btn"
+          id="rebuildServerVsServerBtn"
+          type="button"
+          disabled
+        >
+          <i class="fa-solid fa-rotate"></i>
+          Rebuild
+        </button>
+      </article>
+    </div>
+
+    <div class="admin-action-row">
+      <button
+        class="admin-btn confirm"
+        id="rebuildAllWebsiteDataBtn"
+        type="button"
+        disabled
+      >
+        <i class="fa-solid fa-layer-group"></i>
+        Rebuild All
+      </button>
+    </div>
+
+    <div
+      class="admin-progress-panel"
+      id="websiteUpdateProgressPanel"
+      hidden
+    >
+      <div class="admin-progress-header">
+        <span id="websiteUpdateProgressLabel">
+          Preparing website update...
+        </span>
+
+        <strong id="websiteUpdateProgressValue">
+          0%
         </strong>
       </div>
 
-      <div>
-        <span>
-          Maximum
-        </span>
-
-        <strong>
-          20
-        </strong>
-      </div>
-
-      <div>
-        <span>
-          Complete Servers
-        </span>
-
-        <strong id="completeServerCountDetail">
-          0
-        </strong>
-      </div>
-
-      <div>
-        <span>
-          Missing Files
-        </span>
-
-        <strong id="missingServerFileCountDetail">
-          0
-        </strong>
+      <div class="admin-progress-track">
+        <div
+          class="admin-progress-bar"
+          id="websiteUpdateProgressBar"
+          style="width: 0%;"
+        ></div>
       </div>
     </div>
 
     <div
-      class="server-grid"
-      id="serverParticipationGrid"
-    ></div>
-  </section>
+      class="admin-validation-box"
+      id="websiteUpdateValidationBox"
+    >
+      <div class="validation-state warning">
+        <i class="fa-solid fa-lock"></i>
 
-
-  <!-- =====================================================
-       STEP 4A — SEASON BULK UPLOAD
-  ====================================================== -->
-
-  <section
-    class="admin-module-mount workflow-module-mount workflow-theme-weeks"
-    id="adminSeasonUploadMount"
-    data-admin-module-mount="season-upload"
-  >
-    <div class="dashboard-panel admin-module-loading-panel">
-      <span class="section-kicker">
-        Step 4A | Season Bulk Upload
-      </span>
-
-      <h3>
-        Loading Season Bulk Upload
-      </h3>
-
-      <p>
-        Every successful upload automatically updates the current
-        Home, Active &amp; Average, Season Info and Server vs Server
-        data.
-      </p>
+        <span>
+          Website Update unlocks after GitHub, Foundation,
+          Matchmaking, Season Configuration and uploaded Season data
+          are ready.
+        </span>
+      </div>
     </div>
   </section>
 
+
   <!-- =====================================================
-       PLAYER SERVER STATUS
+       STEP 7 — SAVE ARCHIVE
   ====================================================== -->
 
   <section
-    class="dashboard-panel admin-detail-workspace admin-player-management"
-    id="manualPlayerStatusPanel"
+    class="dashboard-panel admin-detail-workspace workflow-theme-archive"
+    id="saveArchivePanel"
   >
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Player Administration
+          Step 7 | Save Archive
         </span>
 
         <h3>
-          Manual Server Status Adjustment
+          Save Official Season Archive
         </h3>
+
+        <p>
+          Validate the completed Season and permanently archive Season
+          Info and Server vs Server data.
+        </p>
+      </div>
+
+      <span
+        class="management-status-badge"
+        id="saveArchiveStatus"
+        data-status="locked"
+      >
+        Locked
+      </span>
+    </div>
+
+    <div class="admin-form-grid">
+      <div class="admin-field">
+        <label for="archiveSeasonNumber">
+          Season Number
+        </label>
+
+        <input
+          id="archiveSeasonNumber"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="Current Season"
+        >
+      </div>
+
+      <div class="admin-field">
+        <label for="archiveOfficialDate">
+          Archive Official Date
+        </label>
+
+        <input
+          id="archiveOfficialDate"
+          type="date"
+        >
+      </div>
+    </div>
+
+    <div class="admin-archive-checklist">
+      <div
+        class="admin-archive-check"
+        id="archiveCheckMatchmaking"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Matchmaking</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW0"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 0</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW1"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 1</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW2"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 2</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW3"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 3</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW4"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 4</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW5"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 5</span>
+        <strong>Waiting</strong>
+      </div>
+
+      <div
+        class="admin-archive-check"
+        id="archiveCheckW6"
+        data-status="waiting"
+      >
+        <i class="fa-solid fa-circle"></i>
+        <span>Week 6</span>
+        <strong>Waiting</strong>
+      </div>
+    </div>
+
+    <div class="admin-action-row">
+      <button
+        class="admin-btn"
+        id="validateSeasonArchiveBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-list-check"></i>
+        Validate Season
+      </button>
+
+      <button
+        class="admin-btn confirm"
+        id="saveSeasonArchiveBtn"
+        type="button"
+        disabled
+      >
+        <i class="fa-solid fa-box-archive"></i>
+        Save Season Archive
+      </button>
+    </div>
+
+    <div
+      class="admin-validation-box"
+      id="saveArchiveValidationBox"
+    >
+      <div class="validation-state warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <span>
+          Save Archive requires Matchmaking, complete Week 0 through
+          Week 6 data and a successful public website rebuild.
+        </span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       PLAYER ALLIANCE STATUS
+  ====================================================== -->
+
+  <section
+    class="dashboard-panel admin-detail-workspace admin-player-management"
+    id="playerAllianceStatusPanel"
+  >
+    <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          Player Alliance Status
+        </span>
+
+        <h3>
+          Manual Alliance Status Correction
+        </h3>
+
+        <p>
+          Search a player and apply an approved manual alliance-status
+          correction.
+        </p>
       </div>
     </div>
 
@@ -1267,33 +1701,38 @@
 
 
   <!-- =====================================================
-       PLAYER STAR / NOTE
+       PLAYER NOTE MANAGEMENT
   ====================================================== -->
 
   <section
     class="dashboard-panel admin-detail-workspace admin-player-management"
-    id="playerStarManagementPanel"
+    id="playerNoteManagementPanel"
   >
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Player Administration
+          Player Note Management
         </span>
 
         <h3>
-          Player Star &amp; Note Management
+          Official Player Note Flags
         </h3>
+
+        <p>
+          Manage official player-note flags used by Active &amp;
+          Average, Season Info and Player ID.
+        </p>
       </div>
     </div>
 
-    <div class="admin-form-grid player-star-grid">
+    <div class="admin-form-grid four">
       <div class="admin-field">
-        <label for="playerStarPlayerId">
+        <label for="playerNotePlayerId">
           Player ID
         </label>
 
         <input
-          id="playerStarPlayerId"
+          id="playerNotePlayerId"
           type="text"
           inputmode="numeric"
           placeholder="Enter Player ID"
@@ -1301,12 +1740,12 @@
       </div>
 
       <div class="admin-field">
-        <label for="playerStarPlayerName">
+        <label for="playerNotePlayerName">
           Player
         </label>
 
         <input
-          id="playerStarPlayerName"
+          id="playerNotePlayerName"
           type="text"
           value="-"
           readonly
@@ -1314,25 +1753,44 @@
       </div>
 
       <div class="admin-field">
-        <label for="playerStarCurrentStatus">
-          Current Star
+        <label for="playerNoteType">
+          Note Type
         </label>
 
-        <input
-          id="playerStarCurrentStatus"
-          type="text"
-          value="No Star"
-          readonly
-        >
+        <select id="playerNoteType">
+          <option value="">
+            Select Note
+          </option>
+
+          <option value="leftDuringSeason">
+            Left During Season
+          </option>
+
+          <option value="afkApproved">
+            AFK Approved
+          </option>
+
+          <option value="newPlayer">
+            New Player
+          </option>
+
+          <option value="reserve1">
+            Reserve 1
+          </option>
+
+          <option value="reserve2">
+            Reserve 2
+          </option>
+        </select>
       </div>
 
       <div class="admin-field">
-        <label for="playerStarReason">
+        <label for="playerNoteReason">
           Reason
         </label>
 
         <input
-          id="playerStarReason"
+          id="playerNoteReason"
           type="text"
           placeholder="Required reason"
         >
@@ -1342,7 +1800,7 @@
     <div class="admin-action-row">
       <button
         class="admin-btn"
-        id="searchPlayerStarBtn"
+        id="searchPlayerNoteBtn"
         type="button"
       >
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -1351,33 +1809,33 @@
 
       <button
         class="admin-btn confirm"
-        id="addPlayerStarBtn"
+        id="addPlayerNoteBtn"
         type="button"
       >
-        <i class="fa-solid fa-star"></i>
-        Add Star
+        <i class="fa-solid fa-note-sticky"></i>
+        Add Note
       </button>
 
       <button
         class="admin-btn delete"
-        id="removePlayerStarBtn"
+        id="removePlayerNoteBtn"
         type="button"
       >
-        <i class="fa-regular fa-star"></i>
-        Remove Star
+        <i class="fa-solid fa-eraser"></i>
+        Remove Note
       </button>
     </div>
 
     <div
       class="admin-validation-box"
-      id="playerStarValidationBox"
+      id="playerNoteValidationBox"
     >
       <div class="validation-state idle">
         <i class="fa-solid fa-circle-info"></i>
 
         <span>
-          The star is visible in Active &amp; Average. Its reason
-          remains visible only in Admin Center.
+          Player notes are centrally managed and displayed consistently
+          across supported public pages.
         </span>
       </div>
     </div>
@@ -1389,16 +1847,17 @@
             <th>Date</th>
             <th>ID</th>
             <th>Player</th>
+            <th>Note</th>
             <th>Action</th>
             <th>Reason</th>
             <th>Changed By</th>
           </tr>
         </thead>
 
-        <tbody id="playerStarLogTable">
+        <tbody id="playerNoteLogTable">
           <tr>
-            <td colspan="6">
-              No player-star changes recorded.
+            <td colspan="7">
+              No player-note changes recorded.
             </td>
           </tr>
         </tbody>
@@ -1408,120 +1867,90 @@
 
 
   <!-- =====================================================
-     AFK REQUEST MANAGEMENT
-====================================================== -->
+       AFK MANAGEMENT
+  ====================================================== -->
 
-<section
+  <section
     class="dashboard-panel admin-detail-workspace admin-afk-page"
     id="adminAfkPanel"
->
-
+  >
     <div class="admin-detail-header">
+      <div>
+        <span class="section-kicker">
+          AFK Service Management
+        </span>
 
-        <div>
+        <h3>
+          AFK Request Management
+        </h3>
 
-            <span class="section-kicker">
-                AFK Service
-            </span>
-
-            <h3>
-                AFK Request Management
-            </h3>
-
-            <p>
-                Review all submitted AFK requests.
-            </p>
-
-        </div>
-
+        <p>
+          Review submitted AFK requests and approve or reject each
+          request.
+        </p>
+      </div>
     </div>
-
 
     <div class="admin-afk-toolbar">
+      <select id="afkFilter">
+        <option value="all">
+          All Requests
+        </option>
 
-        <select id="afkFilter">
+        <option value="pending">
+          Pending
+        </option>
 
-            <option value="all">
-                All Requests
-            </option>
+        <option value="approved">
+          Approved
+        </option>
 
-            <option value="pending">
-                Pending
-            </option>
+        <option value="rejected">
+          Rejected
+        </option>
+      </select>
 
-            <option value="approved">
-                Approved
-            </option>
-
-            <option value="rejected">
-                Rejected
-            </option>
-
-        </select>
-
-
-        <button
-            id="afkRefreshBtn"
-            class="admin-btn"
-            type="button"
-        >
-            <i class="fa-solid fa-rotate"></i>
-            Refresh
-        </button>
-
+      <button
+        id="afkRefreshBtn"
+        class="admin-btn"
+        type="button"
+      >
+        <i class="fa-solid fa-rotate"></i>
+        Refresh
+      </button>
     </div>
-
 
     <div class="admin-table-wrapper">
+      <table
+        class="ranking-table admin-table"
+        id="afkRequestTable"
+      >
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Player</th>
+            <th>ID</th>
+            <th>Reason</th>
+            <th>Weeks</th>
+            <th>Status</th>
+            <th>Management</th>
+          </tr>
+        </thead>
 
-        <table
-            class="ranking-table admin-table"
-            id="afkRequestTable"
-        >
-
-            <thead>
-
-                <tr>
-
-                    <th>Date</th>
-
-                    <th>Player</th>
-
-                    <th>ID</th>
-
-                    <th>Reason</th>
-
-                    <th>Weeks</th>
-
-                    <th>Status</th>
-
-                    <th>Management</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr>
-
-                    <td colspan="7">
-                        Loading AFK requests...
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
+        <tbody>
+          <tr>
+            <td colspan="7">
+              Loading AFK requests...
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-</section>
+  </section>
 
 
   <!-- =====================================================
-       BLACKLIST
+       BLACKLIST MANAGEMENT
   ====================================================== -->
 
   <section
@@ -1531,12 +1960,17 @@
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker red">
-          Blacklist Manager
+          Blacklist Management
         </span>
 
         <h3>
           Manage Blacklisted Players
         </h3>
+
+        <p>
+          Add or remove players from the official Kingdom 630
+          blacklist.
+        </p>
       </div>
     </div>
 
@@ -1549,6 +1983,7 @@
         <input
           id="blacklistPlayerId"
           type="text"
+          inputmode="numeric"
           placeholder="Enter Player ID"
         >
       </div>
@@ -1584,7 +2019,7 @@
         id="addBlacklistBtn"
         type="button"
       >
-        <i class="fa-solid fa-plus"></i>
+        <i class="fa-solid fa-user-slash"></i>
         Add to Blacklist
       </button>
     </div>
@@ -1605,7 +2040,7 @@
         <tbody id="blacklistAdminTable">
           <tr>
             <td colspan="6">
-              No blacklisted players yet.
+              No blacklisted players.
             </td>
           </tr>
         </tbody>
@@ -1615,7 +2050,7 @@
 
 
   <!-- =====================================================
-       ADMIN USERS
+       ADMIN ACCESS MANAGEMENT
   ====================================================== -->
 
   <section
@@ -1625,16 +2060,16 @@
     <div class="admin-detail-header">
       <div>
         <span class="section-kicker">
-          Access Management
+          Admin Access
         </span>
 
         <h3>
-          Admin User Manager
+          User and Role Management
         </h3>
 
         <p>
-          Officers may view Admin Center and logs, but cannot
-          change data.
+          Owners can add Admins and Officers. Officers may view Admin
+          Center and logs but cannot change official data.
         </p>
       </div>
     </div>
@@ -1654,12 +2089,13 @@
 
       <div class="admin-field">
         <label for="newAdminPassword">
-          Password
+          Temporary Password
         </label>
 
         <input
           id="newAdminPassword"
-          type="text"
+          type="password"
+          autocomplete="new-password"
           placeholder="Enter strong password"
         >
       </div>
@@ -1717,7 +2153,7 @@
 
 
   <!-- =====================================================
-       LOGS
+       ADMIN LOGS AND STATUS
   ====================================================== -->
 
   <section
@@ -1733,6 +2169,11 @@
         <h3>
           Admin Activity Log
         </h3>
+
+        <p>
+          Review repository operations, Matchmaking, weekly uploads,
+          website rebuilds, archives and administrative changes.
+        </p>
       </div>
 
       <button
@@ -1747,7 +2188,7 @@
     </div>
 
     <div class="admin-log-summary">
-      <div>
+      <div class="admin-log-summary-card">
         <span>
           GitHub Read
         </span>
@@ -1757,7 +2198,7 @@
         </strong>
       </div>
 
-      <div>
+      <div class="admin-log-summary-card">
         <span>
           GitHub Write
         </span>
@@ -1767,7 +2208,7 @@
         </strong>
       </div>
 
-      <div>
+      <div class="admin-log-summary-card is-success">
         <span>
           Last Success
         </span>
@@ -1777,7 +2218,7 @@
         </strong>
       </div>
 
-      <div>
+      <div class="admin-log-summary-card is-error">
         <span>
           Last Error
         </span>
@@ -1792,8 +2233,17 @@
       class="admin-log-list"
       id="adminActivityLog"
     >
-      <div class="admin-log-empty">
-        No admin activity recorded.
+      <div class="admin-empty-state">
+        <i class="fa-solid fa-clipboard-list"></i>
+
+        <strong>
+          No admin activity recorded
+        </strong>
+
+        <span>
+          Repository operations, uploads, rebuilds and management
+          changes will appear here.
+        </span>
       </div>
     </div>
   </section>

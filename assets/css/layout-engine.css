@@ -3840,3 +3840,602 @@ body > .footer > #topbarVersion {
 body.first-login-password-open {
   overflow: hidden;
 }
+
+/* =========================================================
+   ADMIN CENTER FINAL PAGE FLOW
+   Permanent expanded panels and vertical scrolling
+========================================================= */
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.layout {
+  min-height: calc(100vh - 72px);
+  height: auto;
+  overflow: visible;
+}
+
+.main,
+#app-content {
+  min-width: 0;
+  min-height: calc(100vh - 72px);
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+#adminCenter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+
+  padding: 18px 20px 60px;
+
+  overflow: visible;
+}
+
+#adminCenter > .dashboard-panel {
+  position: relative;
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  margin: 0;
+  overflow: visible;
+}
+
+#adminCenter .admin-detail-workspace,
+#adminCenter .admin-system-log-panel,
+#adminCenter .admin-center-hero {
+  position: relative;
+
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  overflow: visible;
+}
+
+#adminCenter .admin-detail-header {
+  position: relative;
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 0 0 18px;
+}
+
+#adminCenter .admin-detail-header > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#adminCenter .admin-detail-header h2,
+#adminCenter .admin-detail-header h3,
+#adminCenter .admin-detail-header h4 {
+  position: static;
+
+  margin: 6px 0;
+  padding: 0;
+
+  line-height: 1.25;
+}
+
+#adminCenter .admin-detail-header p {
+  position: static;
+
+  max-width: 900px;
+
+  margin: 0;
+  padding: 0;
+
+  line-height: 1.55;
+}
+
+#adminCenter .management-status-badge {
+  position: static;
+  flex: 0 0 auto;
+}
+
+#adminCenter .admin-inner-panel {
+  position: relative;
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  margin: 18px 0 0;
+  padding: 18px;
+
+  overflow: visible;
+}
+
+#adminCenter .admin-inner-panel-header {
+  position: relative;
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 0 0 16px;
+}
+
+#adminCenter .admin-form-grid,
+#adminCenter .admin-repository-grid,
+#adminCenter .foundation-detail-grid,
+#adminCenter .season-status-grid,
+#adminCenter .server-participation-summary,
+#adminCenter .server-grid,
+#adminCenter .admin-page-update-grid,
+#adminCenter .admin-archive-checklist,
+#adminCenter .admin-log-summary {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  max-height: none;
+
+  overflow: visible;
+}
+
+#adminCenter .admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#adminCenter .admin-form-grid.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#adminCenter .admin-repository-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+#adminCenter .foundation-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+#adminCenter .season-status-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
+  gap: 14px;
+}
+
+#adminCenter .server-participation-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#adminCenter .server-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+#adminCenter .admin-page-update-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#adminCenter .admin-archive-checklist {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+#adminCenter .admin-log-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#adminCenter .admin-action-row {
+  position: relative;
+  display: flex;
+
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+
+  margin-top: 16px;
+}
+
+#adminCenter .admin-validation-box,
+#adminCenter .admin-selected-files,
+#adminCenter .admin-upload-destination,
+#adminCenter .admin-progress-panel,
+#adminCenter .admin-log-list,
+#adminCenter .admin-afk-toolbar {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+
+  margin-top: 14px;
+
+  overflow: visible;
+}
+
+#adminCenter .admin-table-wrapper {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  margin-top: 16px;
+
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+#adminCenter .admin-table {
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+
+  margin: 0;
+}
+
+#adminCenter [hidden] {
+  display: none !important;
+}
+
+@media (max-width: 1200px) {
+  #adminCenter .admin-form-grid.four,
+  #adminCenter .foundation-detail-grid,
+  #adminCenter .server-grid,
+  #adminCenter .admin-archive-checklist,
+  #adminCenter .admin-log-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  #adminCenter {
+    padding: 14px 12px 50px;
+  }
+
+  #adminCenter .admin-detail-header,
+  #adminCenter .admin-inner-panel-header {
+    flex-direction: column;
+  }
+
+  #adminCenter .admin-form-grid,
+  #adminCenter .admin-form-grid.four,
+  #adminCenter .admin-repository-grid,
+  #adminCenter .foundation-detail-grid,
+  #adminCenter .season-status-grid,
+  #adminCenter .server-participation-summary,
+  #adminCenter .server-grid,
+  #adminCenter .admin-page-update-grid,
+  #adminCenter .admin-archive-checklist,
+  #adminCenter .admin-log-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   FINAL SCROLL FIX
+   Allow Admin Center to scroll below the fixed bars
+========================================================= */
+
+html {
+  height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  min-height: 100%;
+  height: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.layout {
+  min-height: calc(100vh - 72px) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.main,
+#app-content {
+  min-height: calc(100vh - 72px) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#adminCenter {
+  min-height: calc(100vh - 72px) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+
+  padding-bottom: 100px !important;
+}
+
+/* Fixed header and footer must not block the page flow */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+/* Keep content clear of fixed bars */
+.layout {
+  padding-top: 0;
+  padding-bottom: 44px;
+}
+
+/* =========================================================
+   ADMIN CENTER WORKFLOW — 7 STEPS ON ONE ROW
+========================================================= */
+
+#adminCenter .admin-workflow-overview {
+  display: grid !important;
+  grid-template-columns:
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr)
+    18px
+    minmax(110px, 1fr) !important;
+
+  align-items: center !important;
+  gap: 8px !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+
+  margin-top: 20px !important;
+}
+
+#adminCenter .admin-workflow-step {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 10px !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 46px !important;
+
+  padding: 8px 10px !important;
+  margin: 0 !important;
+
+  overflow: hidden !important;
+}
+
+#adminCenter .admin-workflow-step span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 26px !important;
+
+  width: 26px !important;
+  height: 26px !important;
+
+  margin: 0 !important;
+}
+
+#adminCenter .admin-workflow-step strong {
+  display: block !important;
+
+  min-width: 0 !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+}
+
+#adminCenter .admin-workflow-overview > i {
+  position: static !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 18px !important;
+  height: auto !important;
+
+  margin: 0 !important;
+
+  font-size: 10px !important;
+}
+
+@media (max-width: 1350px) {
+  #adminCenter .admin-workflow-overview {
+    grid-template-columns:
+      repeat(13, minmax(0, auto)) !important;
+    gap: 5px !important;
+  }
+
+  #adminCenter .admin-workflow-step {
+    padding: 7px 8px !important;
+  }
+
+  #adminCenter .admin-workflow-step strong {
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  #adminCenter .admin-workflow-overview {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  #adminCenter .admin-workflow-step {
+    flex: 1 1 180px !important;
+  }
+
+  #adminCenter .admin-workflow-overview > i {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   ADMIN CENTER — FOUNDATION PANEL REFINEMENT
+========================================================= */
+
+#foundationManagementPanel {
+  padding: 22px !important;
+}
+
+#foundationManagementPanel .foundation-detail-grid {
+  display: grid !important;
+  grid-template-columns:
+    minmax(320px, 2fr)
+    repeat(3, minmax(150px, 1fr)) !important;
+
+  align-items: stretch !important;
+  gap: 14px !important;
+
+  margin-top: 18px !important;
+  margin-bottom: 20px !important;
+}
+
+#foundationManagementPanel .foundation-current-file,
+#foundationManagementPanel .foundation-warning-stat {
+  position: relative !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+
+  min-width: 0 !important;
+  min-height: 82px !important;
+
+  padding: 14px 16px !important;
+  margin: 0 !important;
+
+  border-radius: 10px !important;
+
+  overflow: hidden !important;
+}
+
+#foundationManagementPanel .foundation-current-file span,
+#foundationManagementPanel .foundation-warning-stat span {
+  display: block !important;
+
+  margin-bottom: 6px !important;
+
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+#foundationManagementPanel .foundation-current-file strong,
+#foundationManagementPanel .foundation-warning-stat strong {
+  display: block !important;
+
+  min-width: 0 !important;
+
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+#foundationManagementPanel .admin-form-grid {
+  margin-top: 18px !important;
+}
+
+#foundationManagementPanel .admin-selected-files {
+  min-height: 52px !important;
+  padding: 12px 14px !important;
+}
+
+#foundationManagementPanel .admin-action-row {
+  margin-top: 16px !important;
+}
+
+#foundationManagementPanel .admin-validation-box {
+  margin-top: 16px !important;
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 1200px) {
+  #foundationManagementPanel .foundation-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  #foundationManagementPanel .foundation-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

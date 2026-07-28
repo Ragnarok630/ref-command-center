@@ -86,21 +86,14 @@
     ]);
 
   const PROTECTED_ROUTES =
-    Object.freeze({
-      "admin-center":
-        Object.freeze([
-          "owner",
-          "admin",
-          "officer"
-        ]),
-
-      "afk-service":
-        Object.freeze([
-          "owner",
-          "admin",
-          "officer"
-        ])
-    });
+  Object.freeze({
+    "admin-center":
+      Object.freeze([
+        "owner",
+        "admin",
+        "officer"
+      ])
+  });
 
   /* =====================================================
      PRIVATE STATE

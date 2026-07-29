@@ -1181,140 +1181,379 @@
   }
 
   async function validateFoundation() {
-    if (!selectedFoundationFile) {
+  if (!selectedFoundationFile) {
+    setValidation(
+      "foundationValidationBox",
+      "warning",
+      "Select a Foundation JSON file first.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  const engine =
+    global.K630FoundationEngine;
+
+  if (
+    !engine ||
+    typeof engine.validate !==
+      "function"
+  ) {
+    validatedFoundationData =
+      null;
+
+    setButtonEnabled(
+      "saveFoundationBtn",
+      false
+    );
+
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      "K630FoundationEngine is not loaded. Load foundation-engine.js before admin-center.js.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  try {
+    const data =
+      await readJsonFile(
+        selectedFoundationFile
+      );
+
+    const validationResult =
+      engine.validate(data);
+
+    validatedFoundationData =
+      data;
+
+    setText(
+      "foundationValidationStatus",
+      "Validated"
+    );
+
+    setText(
+      "foundationPlayerCount",
+      String(
+        validationResult.eligibleCount
+      )
+    );
+
+    setButtonEnabled(
+      "saveFoundationBtn",
+      isOwner() &&
+      workflowState.githubWrite
+    );
+
+    setValidation(
+      "foundationValidationBox",
+      "success",
+      (
+        `Foundation validated: ` +
+        `${validationResult.eligibleCount} eligible players, ` +
+        `${validationResult.excludedLowPowerCount} excluded below 250,000 Top Power` +
+        (
+          validationResult.invalidRecordCount >
+          0
+            ? `, ${validationResult.invalidRecordCount} invalid records ignored.`
+            : "."
+        )
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Foundation validation",
+      "success",
+      (
+        `${validationResult.eligibleCount} eligible players. ` +
+        `${validationResult.excludedLowPowerCount} low-power records excluded.`
+      )
+    );
+  } catch (error) {
+    validatedFoundationData =
+      null;
+
+    setText(
+      "foundationValidationStatus",
+      "Failed"
+    );
+
+    setButtonEnabled(
+      "saveFoundationBtn",
+      false
+    );
+
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      error?.message ||
+      "Foundation validation failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Foundation validation",
+      "error",
+      error?.message ||
+      "Foundation validation failed."
+    );
+  }
+}
+
+  async function saveFoundation() {
+  const writer =
+    getWriter();
+
+  const engine =
+    global.K630FoundationEngine;
+
+  if (!isOwner()) {
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      "Only the Owner can save the permanent Foundation.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.build !==
+      "function"
+  ) {
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      "K630FoundationEngine is not loaded. Load foundation-engine.js before admin-center.js.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (!validatedFoundationData) {
+    setValidation(
+      "foundationValidationBox",
+      "warning",
+      "Validate the Foundation before saving.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  setButtonEnabled(
+    "saveFoundationBtn",
+    false
+  );
+
+  setBadge(
+    "foundationStatusBadge",
+    "checking",
+    "Building"
+  );
+
+  setValidation(
+    "foundationValidationBox",
+    "warning",
+    "Foundation Engine is generating and saving all official datasets.",
+    "fa-gears"
+  );
+
+  try {
+    const session =
+      getSession();
+
+    const result =
+      engine.build(
+        validatedFoundationData,
+        {
+          foundationDate:
+            "2026-03-27",
+
+          sourceFilename:
+            selectedFoundationFile?.name ||
+            "630-foundation.json",
+
+          uploadedBy:
+            session?.email ||
+            getRole()
+        }
+      );
+
+    const fileEntries =
+      Object.entries(
+        result.files
+      );
+
+    if (
+      fileEntries.length ===
+      0
+    ) {
+      throw new Error(
+        "Foundation Engine generated no files."
+      );
+    }
+
+    let savedCount =
+      0;
+
+    for (
+      const [
+        path,
+        data
+      ] of fileEntries
+    ) {
       setValidation(
         "foundationValidationBox",
         "warning",
-        "Select a Foundation JSON file first.",
-        "fa-triangle-exclamation"
+        (
+          `Saving Foundation file ` +
+          `${savedCount + 1} of ${fileEntries.length}: ${path}`
+        ),
+        "fa-cloud-arrow-up"
       );
 
-      return;
-    }
-
-    try {
-      const data =
-        await readJsonFile(
-          selectedFoundationFile
-        );
-
-      const count =
-        countRecords(data);
-
-      if (
-        count <=
-        0
-      ) {
-        throw new Error(
-          "The selected Foundation contains no records."
-        );
-      }
-
-      validatedFoundationData =
-        data;
-
-      setText(
-        "foundationValidationStatus",
-        "Validated"
-      );
-
-      setText(
-        "foundationPlayerCount",
-        String(count)
-      );
-
-      setButtonEnabled(
-        "saveFoundationBtn",
-        isOwner() &&
-        workflowState.githubWrite
-      );
-
-      setValidation(
-        "foundationValidationBox",
-        "success",
-        `Foundation validated successfully with ${count} records.`,
-        "fa-circle-check"
-      );
-    } catch (error) {
-      validatedFoundationData =
-        null;
-
-      setButtonEnabled(
-        "saveFoundationBtn",
-        false
-      );
-
-      setValidation(
-        "foundationValidationBox",
-        "error",
-        error?.message ||
-        "Foundation validation failed.",
-        "fa-circle-xmark"
-      );
-    }
-  }
-
-  async function saveFoundation() {
-    const writer =
-      getWriter();
-
-    if (
-      !isOwner() ||
-      !writer ||
-      typeof writer.writeJson !==
-        "function" ||
-      !validatedFoundationData
-    ) {
-      return;
-    }
-
-    try {
       await writer.writeJson(
-        `assets/data/${FOUNDATION_PATH}`,
-        validatedFoundationData,
+        path,
+        data,
         {
           repository:
             REPOSITORIES.data,
 
           message:
-            "Update permanent Kingdom 630 Foundation"
+            (
+              path ===
+              "assets/data/foundation/630-foundation.json"
+                ? "Update permanent Kingdom 630 Foundation"
+                : `Generate Foundation dataset: ${path}`
+            )
         }
       );
 
-      workflowState.foundation =
-        true;
-
-      setValidation(
-        "foundationValidationBox",
-        "success",
-        "The Foundation was saved to k630-public-data.",
-        "fa-circle-check"
-      );
-
-      appendLog(
-        "Foundation saved",
-        "success",
-        "The permanent Foundation was updated."
-      );
-
-      await recheckFoundation();
-    } catch (error) {
-      setValidation(
-        "foundationValidationBox",
-        "error",
-        error?.message ||
-        "The Foundation could not be saved.",
-        "fa-circle-xmark"
-      );
-
-      appendLog(
-        "Foundation save",
-        "error",
-        error?.message ||
-        "The Foundation could not be saved."
-      );
+      savedCount +=
+        1;
     }
+
+    workflowState.foundation =
+      true;
+
+    setText(
+      "foundationPlayerCount",
+      String(
+        result.summary.activePlayers
+      )
+    );
+
+    setText(
+      "foundationValidationStatus",
+      "Generated"
+    );
+
+    setBadge(
+      "foundationStatusBadge",
+      "ready",
+      "Ready"
+    );
+
+    setValidation(
+      "foundationValidationBox",
+      "success",
+      (
+        `Foundation Engine completed successfully. ` +
+        `${savedCount} files saved, ` +
+        `${result.summary.activePlayers} active players, ` +
+        `${result.summary.excludedLowPower} excluded below 250,000 Top Power, ` +
+        `${result.summary.warriors} Warriors and ` +
+        `${result.summary.farmers} Farmers.`
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Foundation Engine",
+      "success",
+      (
+        `${savedCount} files generated and saved. ` +
+        `${result.summary.activePlayers} eligible players. ` +
+        `Total Server Power: ${result.summary.totalServerPower}.`
+      )
+    );
+
+    dispatchEvent(
+      "k630:foundation-generated",
+      {
+        foundationDate:
+          result.foundationDate,
+
+        summary:
+          result.summary,
+
+        files:
+          fileEntries.map(
+            ([path]) =>
+              path
+          )
+      }
+    );
+
+    updateWorkflow();
+  } catch (error) {
+    workflowState.foundation =
+      false;
+
+    setBadge(
+      "foundationStatusBadge",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "foundationValidationBox",
+      "error",
+      error?.message ||
+      "The Foundation Engine failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Foundation Engine",
+      "error",
+      error?.message ||
+      "The Foundation Engine failed."
+    );
+  } finally {
+    setButtonEnabled(
+      "saveFoundationBtn",
+      Boolean(
+        isOwner() &&
+        workflowState.githubWrite &&
+        validatedFoundationData
+      )
+    );
   }
+}
 
   /* =====================================================
      MATCHMAKING

@@ -1555,23 +1555,48 @@
   }
 }
 
-  /* =====================================================
+   /* =====================================================
      MATCHMAKING
   ===================================================== */
 
+  const ACTIVE_AVERAGE_PATH =
+    "generated/active-average/current.json";
+
+  const OLD_PLAYERS_PATH =
+    "generated/old-players/current.json";
+
   function getMatchmakingPath() {
     const season =
-      numberValue(
-        getElement(
-          "matchmakingSeasonNumber"
-        )?.value
+      Math.trunc(
+        numberValue(
+          getElement(
+            "matchmakingSeasonNumber"
+          )?.value
+        )
       );
 
-    return season >
-      0
+    return season > 0
       ? (
           `matchmaking/season-${season}/` +
           "matchmaking.json"
+        )
+      : "";
+  }
+
+  function getMatchmakingManifestPath() {
+    const season =
+      Math.trunc(
+        numberValue(
+          getElement(
+            "matchmakingSeasonNumber"
+          )?.value
+        )
+      );
+
+    return season > 0
+      ? (
+          `matchmaking/season-${season}/` +
+          "manifest.json"
         )
       : "";
   }
@@ -1588,133 +1613,555 @@
     );
   }
 
-  async function validateMatchmaking() {
-    if (!selectedMatchmakingFile) {
-      setValidation(
-        "matchmakingValidationBox",
-        "warning",
-        "Select a Matchmaking JSON file first.",
-        "fa-triangle-exclamation"
-      );
+  async function readMatchmakingDependency(
+    relativePath,
+    optional = false
+  ) {
+    const normalizedPath =
+      normalizeText(relativePath)
+        .replace(/^\/+/, "");
 
-      return;
+    if (!normalizedPath) {
+      throw new Error(
+        "A Matchmaking dependency path is required."
+      );
     }
 
-    const season =
+    const response =
+      await fetch(
+        (
+          `${DATA_ROOT}/${normalizedPath}` +
+          `?t=${Date.now()}`
+        ),
+        {
+          method:
+            "GET",
+
+          cache:
+            "no-store",
+
+          headers: {
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
+    if (
+      optional &&
+      response.status === 404
+    ) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        (
+          `${normalizedPath} could not be loaded. ` +
+          `HTTP ${response.status}.`
+        )
+      );
+    }
+
+    try {
+      return await response.json();
+    } catch (error) {
+      throw new Error(
+        `${normalizedPath} does not contain valid JSON.`
+      );
+    }
+  }
+
+  async function validateMatchmaking() {
+  const engine =
+    global.K630MatchmakingEngine;
+
+  const fileInput =
+    getElement(
+      "matchmakingFileInput"
+    );
+
+  const matchmakingFile =
+    fileInput?.files?.[0] ||
+    selectedMatchmakingFile ||
+    null;
+
+  if (!matchmakingFile) {
+    selectedMatchmakingFile =
+      null;
+
+    validatedMatchmakingData =
+      null;
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setBadge(
+      "matchmakingStatusBadge",
+      "waiting",
+      "Waiting"
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "warning",
+      "Select a Matchmaking JSON file first.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  selectedMatchmakingFile =
+    matchmakingFile;
+
+  if (
+    !engine ||
+    typeof engine.validate !==
+      "function"
+  ) {
+    validatedMatchmakingData =
+      null;
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setBadge(
+      "matchmakingStatusBadge",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "error",
+      "K630MatchmakingEngine is not loaded. Load matchmaking-engine.js before admin-center.js.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  const seasonNumber =
+    Math.trunc(
       numberValue(
         getElement(
           "matchmakingSeasonNumber"
         )?.value
+      )
+    );
+
+  const matchmakingDate =
+    normalizeText(
+      getElement(
+        "matchmakingOfficialDate"
+      )?.value
+    );
+
+  if (seasonNumber <= 0) {
+    validatedMatchmakingData =
+      null;
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "warning",
+      "Enter a valid Season number.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      matchmakingDate
+    )
+  ) {
+    validatedMatchmakingData =
+      null;
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "warning",
+      "Enter a valid Matchmaking official date.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  setButtonEnabled(
+    "validateMatchmakingBtn",
+    false
+  );
+
+  setButtonEnabled(
+    "uploadMatchmakingBtn",
+    false
+  );
+
+  setBadge(
+    "matchmakingStatusBadge",
+    "checking",
+    "Validating"
+  );
+
+  setValidation(
+    "matchmakingValidationBox",
+    "warning",
+    `Validating ${matchmakingFile.name}...`,
+    "fa-spinner"
+  );
+
+  try {
+    const data =
+      await readJsonFile(
+        matchmakingFile
       );
 
-    const officialDate =
+    const validationResult =
+      engine.validate(data);
+
+    validatedMatchmakingData =
+      data;
+
+    setBadge(
+      "matchmakingStatusBadge",
+      "validated",
+      "Validated"
+    );
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.githubWrite
+      )
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "success",
+      (
+        `Matchmaking validated: ` +
+        `${validationResult.eligibleCount} eligible players, ` +
+        `${validationResult.excludedLowPowerCount} excluded below 250,000 Top Power` +
+        (
+          validationResult.invalidRecordCount > 0
+            ? (
+                `, ${validationResult.invalidRecordCount} ` +
+                "invalid records ignored."
+              )
+            : "."
+        )
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Matchmaking validation",
+      "success",
+      (
+        `Season ${seasonNumber}: ` +
+        `${validationResult.eligibleCount} eligible players, ` +
+        `${validationResult.excludedLowPowerCount} excluded.`
+      )
+    );
+  } catch (error) {
+    validatedMatchmakingData =
+      null;
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setBadge(
+      "matchmakingStatusBadge",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "error",
+      error?.message ||
+      "Matchmaking validation failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Matchmaking validation",
+      "error",
+      error?.message ||
+      "Matchmaking validation failed."
+    );
+  } finally {
+    setButtonEnabled(
+      "validateMatchmakingBtn",
+      canWrite()
+    );
+  }
+}
+
+  async function uploadMatchmaking() {
+    const writer =
+      getWriter();
+
+    const engine =
+      global.K630MatchmakingEngine;
+
+    const seasonNumber =
+      Math.trunc(
+        numberValue(
+          getElement(
+            "matchmakingSeasonNumber"
+          )?.value
+        )
+      );
+
+    const matchmakingDate =
       normalizeText(
         getElement(
           "matchmakingOfficialDate"
         )?.value
       );
 
+    const matchmakingPath =
+      getMatchmakingPath();
+
+    const manifestPath =
+      getMatchmakingManifestPath();
+
+    if (!canWrite()) {
+      setValidation(
+        "matchmakingValidationBox",
+        "error",
+        "Only an active Owner or Admin may process Matchmaking.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
     if (
-      season <=
-        0 ||
-      !officialDate
+      !writer ||
+      typeof writer.writeJson !==
+        "function"
     ) {
       setValidation(
         "matchmakingValidationBox",
+        "error",
+        "GitHub writer is not available.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
+    if (
+      !engine ||
+      typeof engine.build !==
+        "function"
+    ) {
+      setValidation(
+        "matchmakingValidationBox",
+        "error",
+        "K630MatchmakingEngine is not loaded. Load matchmaking-engine.js before admin-center.js.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
+    if (!validatedMatchmakingData) {
+      setValidation(
+        "matchmakingValidationBox",
         "warning",
-        "Enter a valid Season number and official date.",
+        "Validate the Matchmaking file before processing it.",
         "fa-triangle-exclamation"
       );
 
       return;
     }
 
-    try {
-      const data =
-        await readJsonFile(
-          selectedMatchmakingFile
-        );
-
-      const count =
-        countRecords(data);
-
-      if (
-        count <=
-        0
-      ) {
-        throw new Error(
-          "The Matchmaking file contains no player records."
-        );
-      }
-
-      validatedMatchmakingData =
-        data;
-
-      setButtonEnabled(
-        "uploadMatchmakingBtn",
-        canWrite() &&
-        workflowState.githubWrite
-      );
-
-      setValidation(
-        "matchmakingValidationBox",
-        "success",
-        `Matchmaking validated successfully with ${count} records.`,
-        "fa-circle-check"
-      );
-    } catch (error) {
-      validatedMatchmakingData =
-        null;
-
-      setButtonEnabled(
-        "uploadMatchmakingBtn",
-        false
-      );
-
-      setValidation(
-        "matchmakingValidationBox",
-        "error",
-        error?.message ||
-        "Matchmaking validation failed.",
-        "fa-circle-xmark"
-      );
-    }
-  }
-
-  async function uploadMatchmaking() {
-    const writer =
-      getWriter();
-
-    const path =
-      getMatchmakingPath();
-
     if (
-      !canWrite() ||
-      !writer ||
-      typeof writer.writeJson !==
-        "function" ||
-      !path ||
-      !validatedMatchmakingData
+      seasonNumber <= 0 ||
+      !matchmakingPath ||
+      !manifestPath
     ) {
+      setValidation(
+        "matchmakingValidationBox",
+        "warning",
+        "Enter a valid Matchmaking Season number.",
+        "fa-triangle-exclamation"
+      );
+
       return;
     }
 
-    try {
-      await writer.writeJson(
-        `assets/data/${path}`,
-        validatedMatchmakingData,
-        {
-          repository:
-            REPOSITORIES.data,
-
-          message:
-            `Upload Matchmaking for Season ${
-              getElement(
-                "matchmakingSeasonNumber"
-              )?.value
-            }`
-        }
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(
+        matchmakingDate
+      )
+    ) {
+      setValidation(
+        "matchmakingValidationBox",
+        "warning",
+        "Enter a valid Matchmaking official date.",
+        "fa-triangle-exclamation"
       );
+
+      return;
+    }
+
+    setButtonEnabled(
+      "uploadMatchmakingBtn",
+      false
+    );
+
+    setBadge(
+      "matchmakingStatusBadge",
+      "checking",
+      "Building"
+    );
+
+    setValidation(
+      "matchmakingValidationBox",
+      "warning",
+      "Loading the current Kingdom datasets.",
+      "fa-spinner"
+    );
+
+    try {
+      const [
+        currentActiveAverage,
+        currentOldPlayers
+      ] =
+        await Promise.all([
+          readMatchmakingDependency(
+            ACTIVE_AVERAGE_PATH
+          ),
+
+          readMatchmakingDependency(
+            OLD_PLAYERS_PATH,
+            true
+          )
+        ]);
+
+      const session =
+        getSession();
+
+      setValidation(
+        "matchmakingValidationBox",
+        "warning",
+        "Matchmaking Engine is comparing active, new and departed players.",
+        "fa-gears"
+      );
+
+      const result =
+        engine.build(
+          validatedMatchmakingData,
+          currentActiveAverage,
+          currentOldPlayers,
+          {
+            seasonNumber,
+
+            matchmakingDate,
+
+            matchmakingPath:
+              `assets/data/${matchmakingPath}`,
+
+            manifestPath:
+              `assets/data/${manifestPath}`,
+
+            sourceFilename:
+              selectedMatchmakingFile?.name ||
+              `630-matchmaking-season-${seasonNumber}.json`,
+
+            uploadedBy:
+              session?.email ||
+              getRole()
+          }
+        );
+
+      const fileEntries =
+        Object.entries(
+          result.files
+        );
+
+      if (fileEntries.length === 0) {
+        throw new Error(
+          "Matchmaking Engine generated no files."
+        );
+      }
+
+      let savedCount =
+        0;
+
+      for (
+        const [
+          path,
+          data
+        ] of fileEntries
+      ) {
+        setValidation(
+          "matchmakingValidationBox",
+          "warning",
+          (
+            `Saving Matchmaking file ` +
+            `${savedCount + 1} of ${fileEntries.length}: ${path}`
+          ),
+          "fa-cloud-arrow-up"
+        );
+
+        let message;
+
+        if (
+          path ===
+          `assets/data/${matchmakingPath}`
+        ) {
+          message =
+            `Upload official Matchmaking for Season ${seasonNumber}`;
+        } else if (
+          path ===
+          `assets/data/${manifestPath}`
+        ) {
+          message =
+            `Generate Matchmaking manifest for Season ${seasonNumber}`;
+        } else {
+          message =
+            `Generate Matchmaking dataset: ${path}`;
+        }
+
+        await writer.writeJson(
+          path,
+          data,
+          {
+            repository:
+              REPOSITORIES.data,
+
+            message
+          }
+        );
+
+        savedCount +=
+          1;
+      }
 
       workflowState.matchmaking =
         true;
@@ -1728,31 +2175,87 @@
       setValidation(
         "matchmakingValidationBox",
         "success",
-        "Matchmaking was uploaded successfully.",
+        (
+          `Matchmaking Engine completed successfully. ` +
+          `${savedCount} files saved, ` +
+          `${result.summary.activePlayers} active players, ` +
+          `${result.summary.existingPlayers} existing players updated, ` +
+          `${result.summary.newPlayers} new players added and ` +
+          `${result.summary.leftPlayers} players moved to Old Players.`
+        ),
         "fa-circle-check"
       );
 
       appendLog(
-        "Matchmaking upload",
+        "Matchmaking Engine",
         "success",
-        "Official Matchmaking data was uploaded."
+        (
+          `Season ${seasonNumber}: ` +
+          `${savedCount} files saved. ` +
+          `${result.summary.activePlayers} active, ` +
+          `${result.summary.newPlayers} new and ` +
+          `${result.summary.leftPlayers} departed players.`
+        )
       );
 
-      await recheckMatchmaking();
+      dispatchEvent(
+        "k630:matchmaking-generated",
+        {
+          seasonNumber:
+            result.seasonNumber,
+
+          matchmakingDate:
+            result.matchmakingDate,
+
+          summary:
+            result.summary,
+
+          changes:
+            result.changes,
+
+          files:
+            fileEntries.map(
+              ([path]) =>
+                path
+            )
+        }
+      );
+
+      updateWorkflow();
     } catch (error) {
+      workflowState.matchmaking =
+        false;
+
+      setBadge(
+        "matchmakingStatusBadge",
+        "error",
+        "Failed"
+      );
+
       setValidation(
         "matchmakingValidationBox",
         "error",
         error?.message ||
-        "Matchmaking upload failed.",
+        "The Matchmaking Engine failed.",
         "fa-circle-xmark"
       );
 
       appendLog(
-        "Matchmaking upload",
+        "Matchmaking Engine",
         "error",
         error?.message ||
-        "Matchmaking upload failed."
+        "The Matchmaking Engine failed."
+      );
+
+      updateWorkflow();
+    } finally {
+      setButtonEnabled(
+        "uploadMatchmakingBtn",
+        Boolean(
+          canWrite() &&
+          workflowState.githubWrite &&
+          validatedMatchmakingData
+        )
       );
     }
   }
@@ -1762,6 +2265,15 @@
       getMatchmakingPath();
 
     if (!path) {
+      workflowState.matchmaking =
+        false;
+
+      setBadge(
+        "matchmakingStatusBadge",
+        "waiting",
+        "Waiting"
+      );
+
       setValidation(
         "matchmakingValidationBox",
         "warning",
@@ -1769,37 +2281,29 @@
         "fa-triangle-exclamation"
       );
 
+      updateWorkflow();
+
       return;
     }
 
+    setBadge(
+      "matchmakingStatusBadge",
+      "checking",
+      "Checking"
+    );
+
     try {
-      const response =
-        await fetch(
-          `${DATA_ROOT}/${path}?t=${Date.now()}`,
-          {
-            cache:
-              "no-store"
-          }
-        );
-
-      if (!response.ok) {
-        throw new Error(
-          `Matchmaking returned HTTP ${response.status}.`
-        );
-      }
-
       const data =
-        await response.json();
+        await readMatchmakingDependency(
+          path
+        );
 
       const count =
         countRecords(data);
 
-      if (
-        count <=
-        0
-      ) {
+      if (count <= 0) {
         throw new Error(
-          "The Matchmaking file contains no records."
+          "The current Matchmaking file contains no records."
         );
       }
 
@@ -1817,6 +2321,18 @@
         "success",
         `Current Matchmaking contains ${count} records.`,
         "fa-circle-check"
+      );
+
+      appendLog(
+        "Matchmaking check",
+        "success",
+        (
+          `Season ${
+            getElement(
+              "matchmakingSeasonNumber"
+            )?.value
+          } Matchmaking loaded with ${count} records.`
+        )
       );
     } catch (error) {
       workflowState.matchmaking =

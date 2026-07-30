@@ -1041,42 +1041,64 @@ Deno.serve(
         }
 
         case "write-json": {
-          const path =
-            validateFilePath(
-              body.path
-            );
+  const path =
+    validateFilePath(
+      body.path
+    );
 
-          if (
-            !path
-              .toLowerCase()
-              .endsWith(".json")
-          ) {
-            throw new Error(
-              "Only JSON files can be written."
-            );
-          }
+  if (
+    !path
+      .toLowerCase()
+      .endsWith(".json")
+  ) {
+    throw new Error(
+      "Only JSON files can be written."
+    );
+  }
 
-          if (
-            body.data ===
-            undefined
-          ) {
-            throw new Error(
-              "No JSON data was provided."
-            );
-          }
+  if (
+    body.data ===
+    undefined
+  ) {
+    throw new Error(
+      "No JSON data was provided."
+    );
+  }
 
-          result =
-            await writeJson(
-              repository,
-              path,
-              body.data,
-              normalizeText(
-                body.message
-              ),
-              user
-            );
-          break;
-        }
+  console.log(
+    "[K630 GitHub Writer] Write started:",
+    path
+  );
+
+  const jsonSize =
+    JSON.stringify(
+      body.data
+    ).length;
+
+  console.log(
+    "[K630 GitHub Writer] JSON size:",
+    jsonSize,
+    "characters"
+  );
+
+  result =
+    await writeJson(
+      repository,
+      path,
+      body.data,
+      normalizeText(
+        body.message
+      ),
+      user
+    );
+
+  console.log(
+    "[K630 GitHub Writer] Write completed:",
+    path
+  );
+
+  break;
+}
 
         case "delete-file": {
           const path =

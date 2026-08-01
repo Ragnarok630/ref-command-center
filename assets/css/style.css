@@ -2629,3 +2629,106 @@ td {
     height: 30px !important;
   }
 }
+
+/* =========================================================
+   HOME STAT CARD NUMBER SIZE CORRECTION
+   Full values always visible
+========================================================= */
+
+.home-stat-card .stat-card-content {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  text-align: center !important;
+}
+
+.home-stat-card .stat-card-content strong {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+
+  font-variant-numeric: tabular-nums;
+
+  line-height: 1 !important;
+}
+
+/* Total Warriors and Total Farmers */
+
+.home-stat-grid
+.home-stat-card:nth-child(1)
+.stat-card-content strong,
+.home-stat-grid
+.home-stat-card:nth-child(2)
+.stat-card-content strong {
+  font-size:
+    clamp(
+      1.75rem,
+      2vw,
+      2.4rem
+    ) !important;
+
+  letter-spacing: -0.025em !important;
+}
+
+/* Power, Merits, Kills and Healing */
+
+.home-stat-grid
+.home-stat-card:nth-child(3)
+.stat-card-content strong,
+.home-stat-grid
+.home-stat-card:nth-child(4)
+.stat-card-content strong,
+.home-stat-grid
+.home-stat-card:nth-child(5)
+.stat-card-content strong,
+.home-stat-grid
+.home-stat-card:nth-child(6)
+.stat-card-content strong {
+  font-size:
+    clamp(
+      1rem,
+      1.18vw,
+      1.42rem
+    ) !important;
+
+  letter-spacing: -0.055em !important;
+}
+
+/* Smaller laptop screens */
+
+@media (max-width: 1600px) {
+  .home-stat-grid
+  .home-stat-card:nth-child(n + 3)
+  .stat-card-content strong {
+    font-size:
+      clamp(
+        0.9rem,
+        1.05vw,
+        1.18rem
+      ) !important;
+
+    letter-spacing: -0.06em !important;
+  }
+}
+
+/* Narrower desktop screens */
+
+@media (max-width: 1350px) {
+  .home-stat-grid
+  .home-stat-card:nth-child(n + 3)
+  .stat-card-content strong {
+    font-size:
+      clamp(
+        0.78rem,
+        0.95vw,
+        1rem
+      ) !important;
+
+    letter-spacing: -0.065em !important;
+  }
+}

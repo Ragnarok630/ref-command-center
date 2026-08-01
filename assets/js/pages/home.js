@@ -90,6 +90,74 @@
       );
   }
 
+function formatCompactNumber(value) {
+  const number =
+    integerValue(value);
+
+  if (number >= 1000000000) {
+    return {
+      value:
+        (number / 1000000000)
+          .toFixed(2)
+          .replace(
+            /\.00$/,
+            ""
+          )
+          .replace(
+            /(\.\d)0$/,
+            "$1"
+          ),
+
+      unit:
+        "B"
+    };
+  }
+
+  if (number >= 1000000) {
+    return {
+      value:
+        (number / 1000000)
+          .toFixed(2)
+          .replace(
+            /\.00$/,
+            ""
+          )
+          .replace(
+            /(\.\d)0$/,
+            "$1"
+          ),
+
+      unit:
+        "M"
+    };
+  }
+
+  if (number >= 1000) {
+    return {
+      value:
+        (number / 1000)
+          .toFixed(1)
+          .replace(
+            /\.0$/,
+            ""
+          ),
+
+      unit:
+        "K"
+    };
+  }
+
+  return {
+    value:
+      formatNumber(
+        number
+      ),
+
+    unit:
+      ""
+  };
+}
+
   function escapeHtml(value) {
     return normalizeText(value)
       .replaceAll(
@@ -293,57 +361,129 @@
   ===================================================== */
 
   function renderTotals(data) {
-    const totals =
-      (
-        data.totals &&
-        typeof data.totals ===
-          "object"
-      )
-        ? data.totals
-        : {};
+  const totals =
+    (
+      data.totals &&
+      typeof data.totals ===
+        "object"
+    )
+      ? data.totals
+      : {};
 
-    setText(
-      "homeTotalWarriors",
-      formatNumber(
-        totals.warriors
-      )
+  setText(
+    "homeTotalWarriors",
+    formatNumber(
+      totals.warriors
+    )
+  );
+
+  setText(
+    "homeTotalFarmers",
+    formatNumber(
+      totals.farmers
+    )
+  );
+
+  const totalPower =
+    getElement(
+      "homeTotalPower"
     );
 
-    setText(
-      "homeTotalFarmers",
-      formatNumber(
-        totals.farmers
-      )
-    );
-
-    setText(
-      "homeTotalPower",
-      formatNumber(
-        totals.serverPower
-      )
-    );
-
-    setText(
-      "homeTotalMerits",
-      formatNumber(
-        totals.serverMerits
-      )
-    );
-
-    setText(
-      "homeTotalKills",
-      formatNumber(
-        totals.serverKills
-      )
-    );
-
-    setText(
-      "homeTotalHealing",
-      formatNumber(
-        totals.serverHealing
-      )
-    );
+  if (totalPower) {
+    totalPower.innerHTML =
+      `
+        <span class="compact-number-value">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverPower
+            ).value
+          )}
+        </span>
+        <span class="compact-unit">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverPower
+            ).unit
+          )}
+        </span>
+      `;
   }
+
+  const totalMerits =
+    getElement(
+      "homeTotalMerits"
+    );
+
+  if (totalMerits) {
+    totalMerits.innerHTML =
+      `
+        <span class="compact-number-value">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverMerits
+            ).value
+          )}
+        </span>
+        <span class="compact-unit">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverMerits
+            ).unit
+          )}
+        </span>
+      `;
+  }
+
+  const totalKills =
+    getElement(
+      "homeTotalKills"
+    );
+
+  if (totalKills) {
+    totalKills.innerHTML =
+      `
+        <span class="compact-number-value">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverKills
+            ).value
+          )}
+        </span>
+        <span class="compact-unit">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverKills
+            ).unit
+          )}
+        </span>
+      `;
+  }
+
+  const totalHealing =
+    getElement(
+      "homeTotalHealing"
+    );
+
+  if (totalHealing) {
+    totalHealing.innerHTML =
+      `
+        <span class="compact-number-value">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverHealing
+            ).value
+          )}
+        </span>
+        <span class="compact-unit">
+          ${escapeHtml(
+            formatCompactNumber(
+              totals.serverHealing
+            ).unit
+          )}
+        </span>
+      `;
+  }
+}
 
   /* =====================================================
      TOP PLAYER MERITS
@@ -372,7 +512,7 @@
       `
         <tr>
           <td
-            colspan="4"
+            colspan="5"
             class="text-center"
           >
             No player merit data available until Matchmaking or Season data is processed.
@@ -432,6 +572,14 @@
                 entry.lordId
               );
 
+            const playerName =
+              escapeHtml(
+                entry.name ||
+                entry.playerName ||
+                entry.nickname ||
+                "-"
+              );
+
             const kingdom =
               integerValue(
                 entry.kingdom
@@ -462,6 +610,10 @@
 
                 <td>
                   ${id || "-"}
+                </td>
+
+                <td>
+                 ${playerName}
                 </td>
 
                 <td>
@@ -940,7 +1092,7 @@
         `
           <tr>
             <td
-              colspan="4"
+              colspan="5"
               class="text-center"
             >
               Home data could not be loaded.

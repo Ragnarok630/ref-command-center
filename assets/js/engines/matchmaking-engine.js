@@ -2167,25 +2167,45 @@
         `season-${seasonNumber}-manifest.json`
       );
 
-    const files = {
-      [matchmakingPath]:
-        cloneData(sourceData),
+    const adminConfigFile =
+  window.K630AdminConfigEngine.buildFile(
+    window.K630AdminConfigEngine.updateMatchmaking(
+      options.adminConfig || null,
+      {
+        ready: true,
+        seasonNumber,
+        officialDate: matchmakingDate,
+        playerCount: activePlayers.length,
+        updatedAt: generatedAt
+      },
+      {
+        updatedAt: generatedAt,
+        updatedBy: options.uploadedBy || ""
+      }
+    )
+  );
 
-      [manifestPath]:
-        manifest,
+const files = {
+  [matchmakingPath]:
+    cloneData(sourceData),
 
-      [PATHS.playerIndex]:
-        playerIndex,
+  [manifestPath]:
+    manifest,
 
-      [PATHS.activeAverage]:
-        activeAverage,
+  [PATHS.playerIndex]:
+    playerIndex,
 
-      [PATHS.oldPlayers]:
-        oldPlayers,
+  [PATHS.activeAverage]:
+    activeAverage,
 
-      [PATHS.home]:
-        home
-    };
+  [PATHS.oldPlayers]:
+    oldPlayers,
+
+  [PATHS.home]:
+    home,
+
+  ...adminConfigFile.files
+};
 
     return {
       success:

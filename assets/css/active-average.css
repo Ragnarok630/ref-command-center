@@ -2032,3 +2032,864 @@
 .aa-note-empty{
     opacity:.45;
 }
+
+/* =========================================================
+   ACTIVE & AVERAGE
+   NEW PLAYER ICON + ALLIANCE STATUS TOOLTIP
+========================================================= */
+
+/* =========================================================
+   PLAYER NOTE ICONS
+========================================================= */
+
+.active-average-page .aa-note-icons {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+}
+
+.active-average-page .aa-note-icon {
+  width: 15px;
+  min-width: 15px;
+  height: 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: none;
+
+  border-radius: 4px;
+
+  font-size: 9px;
+  line-height: 1;
+
+  cursor: help;
+}
+
+.active-average-page .aa-note-left {
+  color: #ff6868;
+
+  background:
+    rgba(
+      255,
+      72,
+      72,
+      0.1
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      72,
+      72,
+      0.28
+    );
+
+  filter:
+    drop-shadow(
+      0 0 3px
+      rgba(
+        255,
+        72,
+        72,
+        0.45
+      )
+    );
+}
+
+.active-average-page .aa-note-afk {
+  color: #ffd36a;
+
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.1
+    );
+
+  border:
+    1px solid
+    rgba(
+      217,
+      180,
+      95,
+      0.28
+    );
+
+  filter:
+    drop-shadow(
+      0 0 3px
+      rgba(
+        217,
+        180,
+        95,
+        0.42
+      )
+    );
+}
+
+.active-average-page .aa-note-new {
+  color: #e7b7ff;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(184, 51, 255, 0.24),
+      rgba(101, 25, 190, 0.12)
+    );
+
+  border:
+    1px solid
+    rgba(
+      190,
+      101,
+      255,
+      0.62
+    );
+
+  box-shadow:
+    inset 0 0 5px
+    rgba(
+      220,
+      155,
+      255,
+      0.12
+    ),
+    0 0 5px
+    rgba(
+      184,
+      51,
+      255,
+      0.38
+    );
+
+  filter:
+    drop-shadow(
+      0 0 3px
+      rgba(
+        205,
+        113,
+        255,
+        0.62
+      )
+    );
+}
+
+.active-average-page .aa-note-new:hover {
+  color: #ffffff;
+
+  border-color:
+    rgba(
+      236,
+      178,
+      255,
+      0.92
+    );
+
+  box-shadow:
+    inset 0 0 7px
+    rgba(
+      238,
+      192,
+      255,
+      0.18
+    ),
+    0 0 8px
+    rgba(
+      184,
+      51,
+      255,
+      0.66
+    );
+}
+
+.active-average-page .aa-note-empty {
+  width: 4px;
+  min-width: 4px;
+  height: 1px;
+
+  display: inline-block;
+
+  flex: none;
+
+  opacity: 0;
+}
+
+/* =========================================================
+   STATUS BADGE INTERACTION
+========================================================= */
+
+.active-average-page .aa-status-tooltip-trigger {
+  position: relative;
+
+  cursor: help;
+
+  outline: none;
+
+  transition:
+    transform 0.16s ease,
+    filter 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.active-average-page .aa-status-tooltip-trigger:hover,
+.active-average-page .aa-status-tooltip-trigger:focus-visible {
+  transform:
+    translateY(-1px)
+    scale(1.06);
+
+  filter:
+    brightness(1.16);
+
+  box-shadow:
+    0 0 8px
+    currentColor;
+}
+
+/* =========================================================
+   STATUS TOOLTIP CONTAINER
+========================================================= */
+
+.aa-status-tooltip {
+  position: fixed;
+  z-index: 20000;
+
+  left: 0;
+  top: 0;
+
+  box-sizing: border-box;
+
+  width:
+    min(
+      430px,
+      calc(100vw - 24px)
+    );
+
+  max-height:
+    calc(
+      100vh -
+      24px
+    );
+
+  padding:
+    15px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  color: #eee9ff;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(184, 51, 255, 0.17),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(24, 17, 34, 0.99),
+      rgba(9, 9, 14, 0.995)
+    );
+
+  border:
+    1px solid
+    rgba(
+      184,
+      82,
+      255,
+      0.8
+    );
+
+  border-radius: 14px;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(
+      75,
+      20,
+      111,
+      0.72
+    ),
+    inset 0 0 22px
+    rgba(
+      157,
+      78,
+      221,
+      0.07
+    ),
+    0 0 8px
+    rgba(
+      220,
+      105,
+      255,
+      0.55
+    ),
+    0 0 22px
+    rgba(
+      124,
+      36,
+      210,
+      0.38
+    ),
+    0 16px 40px
+    rgba(
+      0,
+      0,
+      0,
+      0.72
+    );
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transform:
+    translateY(5px)
+    scale(0.975);
+
+  transform-origin:
+    center;
+
+  transition:
+    opacity 0.16s ease,
+    visibility 0.16s ease,
+    transform 0.16s ease;
+}
+
+.aa-status-tooltip.is-visible {
+  opacity: 1;
+  visibility: visible;
+
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+/* =========================================================
+   TOOLTIP HEADER
+========================================================= */
+
+.aa-status-tooltip-header {
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding-bottom: 12px;
+
+  border-bottom:
+    1px solid
+    rgba(
+      184,
+      82,
+      255,
+      0.25
+    );
+}
+
+.aa-status-tooltip-header-icon {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  color: #e5b4ff;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(184, 51, 255, 0.32),
+      rgba(92, 24, 153, 0.13)
+    );
+
+  border:
+    1px solid
+    rgba(
+      194,
+      105,
+      255,
+      0.62
+    );
+
+  border-radius: 11px;
+
+  box-shadow:
+    0 0 12px
+    rgba(
+      184,
+      51,
+      255,
+      0.3
+    );
+
+  font-size: 17px;
+}
+
+.aa-status-tooltip-kicker {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #b97aff;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.aa-status-tooltip-header h2 {
+  margin: 0;
+
+  color: #e8b9ff;
+
+  font-size: 16px;
+  font-weight: 900;
+
+  line-height: 1.1;
+
+  text-shadow:
+    0 0 8px
+    rgba(
+      184,
+      51,
+      255,
+      0.42
+    );
+}
+
+/* =========================================================
+   TOOLTIP INTRODUCTION
+========================================================= */
+
+.aa-status-tooltip-intro {
+  margin-top: 12px;
+
+  color: #d8d1e2;
+
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.aa-status-tooltip-intro strong {
+  font-weight: 900;
+}
+
+.aa-tooltip-lv2 {
+  color: #8dffb7;
+
+  text-shadow:
+    0 0 5px
+    rgba(
+      44,
+      198,
+      112,
+      0.45
+    );
+}
+
+/* =========================================================
+   STATUS LEVEL ROWS
+========================================================= */
+
+.aa-status-tooltip-levels {
+  display: grid;
+
+  gap: 7px;
+
+  margin-top: 12px;
+}
+
+.aa-status-tooltip-level {
+  display: grid;
+
+  grid-template-columns:
+    43px
+    minmax(0, 1fr);
+
+  align-items: start;
+
+  gap: 9px;
+
+  padding:
+    9px;
+
+  border-radius: 9px;
+}
+
+.aa-status-tooltip-level-badge {
+  min-width: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    4px
+    6px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  line-height: 1;
+}
+
+.aa-status-tooltip-level strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.aa-status-tooltip-level p {
+  margin: 0;
+
+  color: #c9c2d0;
+
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+/* LV3 */
+
+.aa-tooltip-level-lv3 {
+  background:
+    rgba(
+      177,
+      80,
+      255,
+      0.09
+    );
+
+  border:
+    1px solid
+    rgba(
+      177,
+      80,
+      255,
+      0.27
+    );
+}
+
+.aa-tooltip-level-lv3
+.aa-status-tooltip-level-badge {
+  color: #f1d8ff;
+
+  background:
+    rgba(
+      177,
+      80,
+      255,
+      0.18
+    );
+
+  border:
+    1px solid
+    rgba(
+      177,
+      80,
+      255,
+      0.72
+    );
+}
+
+.aa-tooltip-level-lv3 strong {
+  color: #e1a9ff;
+}
+
+/* LV2 */
+
+.aa-tooltip-level-lv2 {
+  background:
+    rgba(
+      44,
+      198,
+      112,
+      0.07
+    );
+
+  border:
+    1px solid
+    rgba(
+      44,
+      198,
+      112,
+      0.23
+    );
+}
+
+.aa-tooltip-level-lv2
+.aa-status-tooltip-level-badge {
+  color: #a9ffca;
+
+  background:
+    rgba(
+      44,
+      198,
+      112,
+      0.14
+    );
+
+  border:
+    1px solid
+    rgba(
+      44,
+      198,
+      112,
+      0.62
+    );
+}
+
+.aa-tooltip-level-lv2 strong {
+  color: #8dffb7;
+}
+
+/* LV1 */
+
+.aa-tooltip-level-lv1 {
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.07
+    );
+
+  border:
+    1px solid
+    rgba(
+      217,
+      180,
+      95,
+      0.23
+    );
+}
+
+.aa-tooltip-level-lv1
+.aa-status-tooltip-level-badge {
+  color: #ffe7a3;
+
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.14
+    );
+
+  border:
+    1px solid
+    rgba(
+      217,
+      180,
+      95,
+      0.66
+    );
+}
+
+.aa-tooltip-level-lv1 strong {
+  color: #f1cf76;
+}
+
+/* LV0 */
+
+.aa-tooltip-level-lv0 {
+  background:
+    rgba(
+      255,
+      72,
+      72,
+      0.07
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      72,
+      72,
+      0.23
+    );
+}
+
+.aa-tooltip-level-lv0
+.aa-status-tooltip-level-badge {
+  color: #ffb4b4;
+
+  background:
+    rgba(
+      255,
+      72,
+      72,
+      0.14
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      72,
+      72,
+      0.62
+    );
+}
+
+.aa-tooltip-level-lv0 strong {
+  color: #ff8e8e;
+}
+
+/* =========================================================
+   MERIT REQUIREMENTS
+========================================================= */
+
+.aa-status-tooltip-requirements {
+  margin-top: 11px;
+
+  padding:
+    10px;
+
+  background:
+    rgba(
+      217,
+      180,
+      95,
+      0.06
+    );
+
+  border:
+    1px solid
+    rgba(
+      217,
+      180,
+      95,
+      0.22
+    );
+
+  border-radius: 9px;
+}
+
+.aa-status-tooltip-requirements-title {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #e5c46d;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  text-transform: uppercase;
+}
+
+.aa-status-tooltip-requirements p {
+  margin:
+    6px
+    0
+    0;
+
+  color: #c9c1ce;
+
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   TOOLTIP FOOTER
+========================================================= */
+
+.aa-status-tooltip-footer {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 7px;
+
+  margin-top: 11px;
+
+  padding-top: 10px;
+
+  color: #d9b8e8;
+
+  border-top:
+    1px solid
+    rgba(
+      184,
+      82,
+      255,
+      0.2
+    );
+
+  font-size: 9px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+.aa-status-tooltip-footer i {
+  flex: none;
+
+  margin-top: 2px;
+
+  color: #ff69c8;
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      rgba(
+        255,
+        105,
+        200,
+        0.48
+      )
+    );
+}
+
+/* =========================================================
+   SMALL VIEWPORTS
+========================================================= */
+
+@media (max-width: 700px) {
+  .aa-status-tooltip {
+    width:
+      calc(
+        100vw -
+        20px
+      );
+
+    padding:
+      12px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .active-average-page .aa-status-tooltip-trigger,
+  .aa-status-tooltip {
+    transition: none !important;
+  }
+}

@@ -1253,22 +1253,41 @@
      * The permanent source file is preserved exactly as uploaded.
      * The 250,000 Top Power filter is applied to all generated files.
      */
-    const files = {
-      [PATHS.foundation]:
-        cloneData(sourceData),
+    const adminConfigFile =
+  window.K630AdminConfigEngine.buildFile(
+    window.K630AdminConfigEngine.updateFoundation(
+      null,
+      {
+        ready: true,
+        officialDate: foundationDate,
+        playerCount: players.length,
+        updatedAt: generatedAt
+      },
+      {
+        updatedAt: generatedAt,
+        updatedBy: options.uploadedBy || ""
+      }
+    )
+  );
 
-      [PATHS.manifest]:
-        manifest,
+const files = {
+  [PATHS.foundation]:
+    cloneData(sourceData),
 
-      [PATHS.playerIndex]:
-        playerIndex,
+  [PATHS.manifest]:
+    manifest,
 
-      [PATHS.activeAverage]:
-        activeAverage,
+  [PATHS.playerIndex]:
+    playerIndex,
 
-      [PATHS.home]:
-        home
-    };
+  [PATHS.activeAverage]:
+    activeAverage,
+
+  [PATHS.home]:
+    home,
+
+  ...adminConfigFile.files
+};
 
     return {
       success:

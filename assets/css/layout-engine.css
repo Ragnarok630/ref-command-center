@@ -4439,3 +4439,496 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+/* =========================================================
+   K630 FINAL FIXED SIDEBAR + MAIN CONTENT SCROLL
+   Version: 630.0.26
+
+   Result:
+   - Topbar stays fixed
+   - Complete sidebar stays fixed
+   - Navigation, login and Ragnarok card stay together
+   - Only the right page content scrolls
+   - Footer stays fixed
+========================================================= */
+
+/* =========================================================
+   LOCK COMPLETE APPLICATION TO VIEWPORT
+========================================================= */
+
+html,
+body {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+}
+
+body {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1fr) !important;
+
+  grid-template-rows:
+    var(--k630-topbar-height)
+    minmax(0, 1fr)
+    var(--k630-footer-height) !important;
+}
+
+/* =========================================================
+   FIXED CENTRAL WORKSPACE
+========================================================= */
+
+html body > .layout {
+  grid-row: 2 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  display: grid !important;
+
+  grid-template-columns:
+    var(--k630-sidebar-width)
+    minmax(0, 1fr) !important;
+
+  grid-template-rows:
+    minmax(0, 1fr) !important;
+
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   COMPLETE LEFT BAR ALWAYS VISIBLE
+========================================================= */
+
+html body > .layout > aside.sidebar,
+html body > .layout > .sidebar {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+
+  position: relative !important;
+
+  width: var(--k630-sidebar-width) !important;
+  min-width: var(--k630-sidebar-width) !important;
+  max-width: var(--k630-sidebar-width) !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  overflow: hidden !important;
+
+  transform: none !important;
+}
+
+/* =========================================================
+   SIDEBAR CONTENT DIRECTLY BELOW EACH OTHER
+========================================================= */
+
+html body > .layout > .sidebar > .sidebar-inner {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+
+  gap: 0 !important;
+
+  padding:
+    10px
+    18px
+    8px !important;
+
+  overflow: hidden !important;
+}
+
+/* Navigation remains at the top */
+
+html body .sidebar-navigation {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+
+  overflow: visible !important;
+}
+
+html body .sidebar-navigation ul {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 4px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+}
+
+/* Compact buttons so the complete sidebar fits */
+
+html body .sidebar-navigation li.sidebar-page-button {
+  width: 100% !important;
+
+  min-height: 34px !important;
+  max-height: 38px !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+
+  padding:
+    6px
+    24px
+    6px
+    23px !important;
+}
+
+/* =========================================================
+   LOGIN DIRECTLY BELOW NAVIGATION
+========================================================= */
+
+html body .sidebar-auth-panel {
+  width: 100% !important;
+
+  min-height: 48px !important;
+
+  flex: 0 0 auto !important;
+
+  margin:
+    8px
+    0
+    0 !important;
+
+  padding:
+    8px
+    9px !important;
+}
+
+/* =========================================================
+   RAGNAROK CARD DIRECTLY BELOW LOGIN
+========================================================= */
+
+html body .sidebar-ragnarok-card {
+  position: relative !important;
+
+  align-self: center !important;
+
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+
+  height: 225px !important;
+  min-height: 225px !important;
+  max-height: 225px !important;
+
+  flex: 0 0 225px !important;
+
+  margin:
+    9px
+    auto
+    0 !important;
+
+  overflow: hidden !important;
+}
+
+/* Remove any earlier automatic spacing */
+
+html body .sidebar-auth-panel,
+html body .sidebar-ragnarok-card {
+  margin-bottom: 0 !important;
+}
+
+html body .sidebar-ragnarok-card {
+  margin-top: 9px !important;
+}
+
+/* =========================================================
+   ONLY RIGHT PAGE CONTENT MAY SCROLL
+========================================================= */
+
+html body > .layout > main.main,
+html body > .layout > #app-content {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+
+  position: relative !important;
+
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+
+  scrollbar-gutter: stable !important;
+}
+
+/* Page itself may grow inside the right scroll container */
+
+html body > .layout > #app-content > * {
+  box-sizing: border-box !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  margin-top: 0 !important;
+}
+
+/* =========================================================
+   PREVENT SIDEBAR FROM BECOMING A SCROLL AREA
+========================================================= */
+
+html body .sidebar,
+html body .sidebar-inner,
+html body .sidebar-navigation,
+html body .sidebar-navigation ul {
+  overflow-y: hidden !important;
+
+  scrollbar-width: none !important;
+}
+
+html body .sidebar::-webkit-scrollbar,
+html body .sidebar-inner::-webkit-scrollbar,
+html body .sidebar-navigation::-webkit-scrollbar,
+html body .sidebar-navigation ul::-webkit-scrollbar {
+  display: none !important;
+
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* =========================================================
+   SHORT LAPTOP SCREENS
+========================================================= */
+
+@media (max-height: 820px) {
+  html body > .layout > .sidebar > .sidebar-inner {
+    padding:
+      7px
+      18px
+      6px !important;
+  }
+
+  html body .sidebar-navigation ul {
+    gap: 2px !important;
+  }
+
+  html body .sidebar-navigation li.sidebar-page-button {
+    min-height: 31px !important;
+    max-height: 34px !important;
+
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  html body .sidebar-auth-panel {
+    min-height: 43px !important;
+
+    margin-top: 6px !important;
+
+    padding:
+      5px
+      8px !important;
+  }
+
+  html body .sidebar-ragnarok-card {
+    width: 136px !important;
+    min-width: 136px !important;
+    max-width: 136px !important;
+
+    height: 204px !important;
+    min-height: 204px !important;
+    max-height: 204px !important;
+
+    flex-basis: 204px !important;
+
+    margin-top: 7px !important;
+  }
+}
+
+/* =========================================================
+   VERY SHORT SCREENS
+========================================================= */
+
+@media (max-height: 700px) {
+  html body > .layout > .sidebar > .sidebar-inner {
+    padding:
+      5px
+      18px
+      4px !important;
+  }
+
+  html body .sidebar-navigation ul {
+    gap: 1px !important;
+  }
+
+  html body .sidebar-navigation li.sidebar-page-button {
+    min-height: 27px !important;
+    max-height: 29px !important;
+
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+
+  html body .sidebar-auth-panel {
+    min-height: 36px !important;
+
+    margin-top: 4px !important;
+
+    padding:
+      4px
+      7px !important;
+  }
+
+  html body .sidebar-auth-content small {
+    display: none !important;
+  }
+
+  html body .sidebar-ragnarok-card {
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
+
+    height: 165px !important;
+    min-height: 165px !important;
+    max-height: 165px !important;
+
+    flex-basis: 165px !important;
+
+    margin-top: 5px !important;
+  }
+}
+
+/* Compact number suffix */
+
+.compact-unit {
+  color: #b36cff;
+  font-weight: 800;
+  margin-left: 1px;
+}
+
+/* =========================================================
+   HOME - LIVE SERVER STATISTICS CARDS
+========================================================= */
+
+.home-stat-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+
+    height: 190px !important;
+
+    padding: 22px 18px 18px !important;
+}
+
+.home-stat-card .stat-card-icon {
+    width: 56px !important;
+    height: 56px !important;
+
+    margin: 0 0 18px 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.home-stat-card .stat-card-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.home-stat-card .stat-card-content h4 {
+    height: 32px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 0 12px 0 !important;
+
+    text-align: center !important;
+}
+
+.home-stat-card .stat-card-content strong {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: baseline !important;
+
+    height: 46px !important;
+
+    margin: 0 0 12px 0 !important;
+
+    gap: 2px !important;
+
+    white-space: nowrap !important;
+}
+
+.home-stat-card .compact-number-value {
+    color: #ffffff !important;
+
+    font-size: inherit !important;
+    font-weight: 800 !important;
+
+    line-height: 1 !important;
+}
+
+.home-stat-card .compact-unit {
+    color: #b86cff !important;
+
+    font-size: 0.62em !important;
+    font-weight: 900 !important;
+
+    line-height: 1 !important;
+
+    margin-left: 2px !important;
+
+    vertical-align: 0.10em !important;
+
+    text-shadow:
+        0 0 4px rgba(184,108,255,.65),
+        0 0 10px rgba(184,108,255,.35);
+}
+
+.home-stat-card .stat-card-content p {
+    margin-top: auto !important;
+
+    text-align: center !important;
+
+    min-height: 16px !important;
+}

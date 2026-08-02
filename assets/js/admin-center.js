@@ -76,6 +76,12 @@
   const FOUNDATION_PATH =
     "foundation/630-foundation.json";
 
+  const ADMIN_CONFIG_RELATIVE_PATH =
+    "config/admin-config.json";
+
+  const ADMIN_CONFIG_WRITE_PATH =
+    "assets/data/config/admin-config.json";
+
   const MAX_PARTICIPATING_SERVERS =
     20;
 
@@ -198,6 +204,9 @@
     [];
 
   let selectedSeason =
+    null;
+
+  let adminConfig =
     null;
 
   const workflowState = {
@@ -395,6 +404,454 @@
       )
     );
   }
+
+/* =====================================================
+   ADMIN CONFIG
+===================================================== */
+
+function getAdminConfigEngine() {
+  return global.K630AdminConfigEngine || null;
+}
+
+function createDefaultAdminConfig() {
+  const engine =
+    getAdminConfigEngine();
+
+  if (
+    !engine ||
+    typeof engine.createDefaultConfig !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
+    );
+  }
+
+  return engine.createDefaultConfig({
+    updatedAt:
+      nowIso(),
+
+    updatedBy:
+      getSession()?.email ||
+      getRole()
+  });
+}
+
+async function loadAdminConfig() {
+  const engine =
+    getAdminConfigEngine();
+
+  const writer =
+    getWriter();
+
+  if (
+    !engine ||
+    typeof engine.normalize !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
+    );
+  }
+
+  try {
+    if (
+      writer &&
+      typeof writer.readJson ===
+        "function"
+    ) {
+      const result =
+        await writer.readJson(
+          ADMIN_CONFIG_WRITE_PATH,
+          {
+            repository:
+              REPOSITORIES.data
+          }
+        );
+
+      if (
+        result?.data &&
+        typeof result.data ===
+          "object"
+      ) {
+        adminConfig =
+          engine.normalize(
+            result.data
+          );
+
+        return true;
+      }
+    }
+
+    const response =
+      await fetch(
+        (
+          `${DATA_ROOT}/${ADMIN_CONFIG_RELATIVE_PATH}` +
+          `?cacheBust=${Date.now()}`
+        ),
+        {
+          method:
+            "GET",
+
+          cache:
+            "no-store",
+
+          headers: {
+            Accept:
+              "application/json",
+
+            "Cache-Control":
+              "no-cache"
+          }
+        }
+      );
+
+    if (response.status === 404) {
+      adminConfig =
+        createDefaultAdminConfig();
+
+      return false;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `admin-config.json returned HTTP ${response.status}.`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    adminConfig =
+      engine.normalize(
+        data
+      );
+
+    return true;
+  } catch (error) {
+    console.error(
+      `[${MODULE_NAME}] Failed to load admin-config.json.`,
+      error
+    );
+
+    adminConfig =
+      createDefaultAdminConfig();
+
+    return false;
+  }
+}
+
+function applyAdminConfigToState() {
+  if (!adminConfig) {
+    return;
+  }
+
+  workflowState.githubRead =
+    Boolean(
+      adminConfig.github
+        ?.repositoryRead
+    );
+
+  workflowState.githubWrite =
+    Boolean(
+      adminConfig.github
+        ?.repositoryWrite
+    );
+
+  workflowState.foundation =
+    Boolean(
+      adminConfig.foundation
+        ?.ready
+    );
+
+  workflowState.matchmaking =
+    Boolean(
+      adminConfig.matchmaking
+        ?.ready
+    );
+
+  workflowState.seasonActive =
+    Boolean(
+      adminConfig.season
+        ?.active
+    );
+
+  workflowState.weekData =
+    Boolean(
+      adminConfig.weeks
+        ?.ready
+    );
+
+  workflowState.websiteBuilt =
+    Boolean(
+      adminConfig.websiteBuild
+        ?.ready
+    );
+
+  workflowState.archiveReady =
+    Boolean(
+      adminConfig.archive
+        ?.ready
+    );
+
+  selectedSeason =
+    adminConfig.season
+      ?.selectedSeason
+      ? {
+          year:
+            numberValue(
+              adminConfig.season
+                .selectedSeason.year
+            ),
+
+          season:
+            numberValue(
+              adminConfig.season
+                .selectedSeason.season
+            ),
+
+          sosNumber:
+            numberValue(
+              adminConfig.season
+                .selectedSeason.sosNumber
+            ),
+
+          sosName:
+            normalizeText(
+              adminConfig.season
+                .selectedSeason.sosName
+            )
+        }
+      : null;
+
+  participatingServers =
+    Array.isArray(
+      adminConfig.season
+        ?.participatingServers
+    )
+      ? [
+          ...adminConfig.season
+            .participatingServers
+        ]
+          .map(numberValue)
+          .filter(
+            server =>
+              server > 0
+          )
+          .sort(
+            (
+              first,
+              second
+            ) =>
+              first -
+              second
+          )
+      : [];
+
+  workflowState.seasonConfigured =
+    Boolean(
+      selectedSeason &&
+      workflowState.matchmaking &&
+      participatingServers.length > 0
+    );
+
+  const matchmakingSeasonInput =
+    getElement(
+      "matchmakingSeasonNumber"
+    );
+
+  const matchmakingDateInput =
+    getElement(
+      "matchmakingOfficialDate"
+    );
+
+  if (
+    matchmakingSeasonInput &&
+    adminConfig.matchmaking
+      ?.seasonNumber > 0
+  ) {
+    matchmakingSeasonInput.value =
+      String(
+        adminConfig.matchmaking
+          .seasonNumber
+      );
+  }
+
+  if (
+    matchmakingDateInput &&
+    adminConfig.matchmaking
+      ?.officialDate
+  ) {
+    matchmakingDateInput.value =
+      adminConfig.matchmaking
+        .officialDate;
+  }
+
+  if (selectedSeason) {
+    const seasonYearInput =
+      getElement(
+        "seasonYear"
+      );
+
+    const seasonNumberInput =
+      getElement(
+        "seasonNumber"
+      );
+
+    const sosNumberInput =
+      getElement(
+        "sosNumber"
+      );
+
+    const sosNameInput =
+      getElement(
+        "sosName"
+      );
+
+    const uploadSeasonInput =
+      getElement(
+        "uploadSeasonNumber"
+      );
+
+    const archiveSeasonInput =
+      getElement(
+        "archiveSeasonNumber"
+      );
+
+    if (seasonYearInput) {
+      seasonYearInput.value =
+        String(
+          selectedSeason.year
+        );
+    }
+
+    if (seasonNumberInput) {
+      seasonNumberInput.value =
+        String(
+          selectedSeason.season
+        );
+    }
+
+    if (sosNumberInput) {
+      sosNumberInput.value =
+        String(
+          selectedSeason.sosNumber
+        );
+    }
+
+    if (sosNameInput) {
+      sosNameInput.value =
+        selectedSeason.sosName;
+    }
+
+    if (uploadSeasonInput) {
+      uploadSeasonInput.value =
+        String(
+          selectedSeason.season
+        );
+    }
+
+    if (archiveSeasonInput) {
+      archiveSeasonInput.value =
+        String(
+          selectedSeason.season
+        );
+    }
+  }
+
+  const websiteStatusInput =
+    getElement(
+      "websiteStatusSelect"
+    );
+
+  if (
+    websiteStatusInput &&
+    adminConfig.season
+      ?.websiteStatus
+  ) {
+    websiteStatusInput.value =
+      adminConfig.season
+        .websiteStatus;
+  }
+
+  setBadge(
+    "foundationStatusBadge",
+    workflowState.foundation
+      ? "ready"
+      : "waiting",
+    workflowState.foundation
+      ? "Ready"
+      : "Waiting"
+  );
+
+  setBadge(
+    "matchmakingStatusBadge",
+    workflowState.matchmaking
+      ? "ready"
+      : "waiting",
+    workflowState.matchmaking
+      ? "Ready"
+      : "Waiting"
+  );
+
+  setBadge(
+    "seasonActivationBadge",
+    workflowState.seasonActive
+      ? "ready"
+      : "locked",
+    workflowState.seasonActive
+      ? "W0 Unlocked"
+      : "W0 Locked"
+  );
+
+  if (
+    workflowState.matchmaking
+  ) {
+    setValidation(
+      "matchmakingValidationBox",
+      "success",
+      (
+        `Matchmaking Season ` +
+        `${adminConfig.matchmaking.seasonNumber} is ready.`
+      ),
+      "fa-circle-check"
+    );
+  }
+
+  if (
+    workflowState.seasonActive &&
+    selectedSeason
+  ) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "success",
+      (
+        `Season ${selectedSeason.season} is active. ` +
+        `Week 0 is unlocked.`
+      ),
+      "fa-circle-check"
+    );
+  } else if (
+    workflowState.seasonConfigured
+  ) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "success",
+      (
+        `Season ${selectedSeason?.season || ""} is configured. ` +
+        `${participatingServers.length} participating servers are saved.`
+      ),
+      "fa-circle-check"
+    );
+  } else {
+    setValidation(
+      "seasonActivationValidationBox",
+      "warning",
+      "Complete Matchmaking and all Season Configuration sections before activating the Season.",
+      "fa-triangle-exclamation"
+    );
+  }
+}
 
   /* =====================================================
      STATUS HELPERS
@@ -1386,35 +1843,49 @@
       getSession();
 
     const result =
-      engine.build(
-        validatedFoundationData,
-        {
-          foundationDate:
-            "2026-03-27",
+  engine.build(
+    validatedFoundationData,
+    {
+      foundationDate:
+        "2026-03-27",
 
-          sourceFilename:
-            selectedFoundationFile?.name ||
-            "630-foundation.json",
+      sourceFilename:
+        selectedFoundationFile?.name ||
+        "630-foundation.json",
 
-          uploadedBy:
-            session?.email ||
-            getRole()
-        }
-      );
+      uploadedBy:
+        session?.email ||
+        getRole(),
+
+      adminConfig:
+        adminConfig
+    }
+  );
 
     const fileEntries =
-      Object.entries(
-        result.files
-      );
+  Object.entries(
+    result.files
+  );
 
-    if (
-      fileEntries.length ===
-      0
-    ) {
-      throw new Error(
-        "Foundation Engine generated no files."
-      );
-    }
+if (
+  result.files[
+    ADMIN_CONFIG_WRITE_PATH
+  ]
+) {
+  adminConfig =
+    result.files[
+      ADMIN_CONFIG_WRITE_PATH
+    ];
+}
+
+if (
+  fileEntries.length ===
+  0
+) {
+  throw new Error(
+    "Foundation Engine generated no files."
+  );
+}
 
     let savedCount =
       0;
@@ -1564,6 +2035,9 @@
 
   const OLD_PLAYERS_PATH =
     "generated/old-players/current.json";
+
+  const SEASON_INFO_OUTPUT_PATH =
+    "assets/data/generated/season-info/current.json";
 
   function getMatchmakingPath() {
     const season =
@@ -2074,41 +2548,58 @@
       );
 
       const result =
-        engine.build(
-          validatedMatchmakingData,
-          currentActiveAverage,
-          currentOldPlayers,
-          {
-            seasonNumber,
+  engine.build(
+    validatedMatchmakingData,
+    currentActiveAverage,
+    currentOldPlayers,
+    {
+      seasonNumber,
 
-            matchmakingDate,
+      matchmakingDate,
 
-            matchmakingPath:
-              `assets/data/${matchmakingPath}`,
+      matchmakingPath:
+        `assets/data/${matchmakingPath}`,
 
-            manifestPath:
-              `assets/data/${manifestPath}`,
+      manifestPath:
+        `assets/data/${manifestPath}`,
 
-            sourceFilename:
-              selectedMatchmakingFile?.name ||
-              `630-matchmaking-season-${seasonNumber}.json`,
+      sourceFilename:
+        selectedMatchmakingFile?.name ||
+        `630-matchmaking-season-${seasonNumber}.json`,
 
-            uploadedBy:
-              session?.email ||
-              getRole()
-          }
-        );
+      uploadedBy:
+        session?.email ||
+        getRole(),
+
+      adminConfig:
+        adminConfig
+    }
+  );
 
       const fileEntries =
-        Object.entries(
-          result.files
-        );
+  Object.entries(
+    result.files
+  );
 
-      if (fileEntries.length === 0) {
-        throw new Error(
-          "Matchmaking Engine generated no files."
-        );
-      }
+if (
+  result.files[
+    ADMIN_CONFIG_WRITE_PATH
+  ]
+) {
+  adminConfig =
+    result.files[
+      ADMIN_CONFIG_WRITE_PATH
+    ];
+}
+
+if (
+  fileEntries.length ===
+  0
+) {
+  throw new Error(
+    "Matchmaking Engine generated no files."
+  );
+}
 
       let savedCount =
         0;
@@ -2414,53 +2905,132 @@
     `;
   }
 
-  function addSeason() {
-    const year =
-      numberValue(
-        getElement(
-          "seasonYear"
-        )?.value
-      );
+  async function addSeason() {
+  const year =
+    numberValue(
+      getElement(
+        "seasonYear"
+      )?.value
+    );
 
-    const season =
-      numberValue(
-        getElement(
-          "seasonNumber"
-        )?.value
-      );
+  const season =
+    numberValue(
+      getElement(
+        "seasonNumber"
+      )?.value
+    );
 
-    const sosNumber =
-      numberValue(
-        getElement(
-          "sosNumber"
-        )?.value
-      );
+  const sosNumber =
+    numberValue(
+      getElement(
+        "sosNumber"
+      )?.value
+    );
 
-    const sosName =
-      normalizeText(
-        getElement(
-          "sosName"
-        )?.value
-      );
+  const sosName =
+    normalizeText(
+      getElement(
+        "sosName"
+      )?.value
+    );
 
-    if (
-      year <
-        2026 ||
-      season <=
-        0 ||
-      sosNumber <=
-        0 ||
-      !sosName
-    ) {
-      return;
-    }
+  const engine =
+    global.K630AdminConfigEngine;
 
-    selectedSeason = {
+  const writer =
+    getWriter();
+
+  if (
+    year < 2026 ||
+    season <= 0 ||
+    sosNumber <= 0 ||
+    !sosName
+  ) {
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
+    );
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
+
+  setButtonEnabled(
+    "addSeasonToLibraryBtn",
+    false
+  );
+
+  try {
+    const nextSelectedSeason = {
       year,
       season,
       sosNumber,
       sosName
     };
+
+    const nextConfig =
+      engine.updateSeason(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          selectedSeason:
+            nextSelectedSeason
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          `Configure Season ${season}`
+      }
+    );
+
+    adminConfig =
+      output.data;
+
+    applyAdminConfigToState();
 
     const uploadSeason =
       getElement(
@@ -2492,11 +3062,6 @@
         String(season);
     }
 
-    workflowState.seasonConfigured =
-      participatingServers.length >
-        0 &&
-      workflowState.matchmaking;
-
     renderSeasonLibrary();
     updateMatchmakingDestination();
     updateUploadDestination();
@@ -2505,9 +3070,147 @@
     appendLog(
       "Season configuration",
       "success",
-      `Season ${season} was selected.`
+      `Season ${season} was configured and saved.`
+    );
+  } catch (error) {
+    appendLog(
+      "Season configuration",
+      "error",
+      error?.message ||
+      "Season configuration could not be saved."
+    );
+  } finally {
+    setButtonEnabled(
+      "addSeasonToLibraryBtn",
+      canWrite()
     );
   }
+}
+
+async function saveWebsiteStatus() {
+  const select =
+    getElement(
+      "websiteStatusSelect"
+    );
+
+  const websiteStatus =
+    normalizeText(
+      select?.value
+    );
+
+  const engine =
+    global.K630AdminConfigEngine;
+
+  const writer =
+    getWriter();
+
+  if (
+    !canWrite() ||
+    !websiteStatus
+  ) {
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
+    );
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
+
+  setButtonEnabled(
+    "saveWebsiteStatusBtn",
+    false
+  );
+
+  try {
+    const nextConfig =
+      engine.updateSeason(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          websiteStatus
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          "Update public website status"
+      }
+    );
+
+    adminConfig =
+      output.data;
+
+    setText(
+      "websiteStatusPreview",
+      select
+        ?.selectedOptions?.[0]
+        ?.textContent ||
+      websiteStatus
+    );
+
+    appendLog(
+      "Website status",
+      "success",
+      "Public website status saved successfully."
+    );
+  } catch (error) {
+    appendLog(
+      "Website status",
+      "error",
+      error?.message ||
+      "Website status could not be saved."
+    );
+  } finally {
+    setButtonEnabled(
+      "saveWebsiteStatusBtn",
+      canWrite()
+    );
+  }
+}
 
   function addParticipatingServer() {
     if (
@@ -2630,82 +3333,448 @@
         .join("");
   }
 
-  function saveParticipatingServers() {
-    workflowState.seasonConfigured =
-      Boolean(
-        selectedSeason &&
-        workflowState.matchmaking &&
-        participatingServers.length >
-          0
-      );
+async function saveParticipatingServers() {
+  const engine =
+    global.K630AdminConfigEngine;
 
-    updateWorkflow();
+  const writer =
+    getWriter();
 
-    appendLog(
-      "Participating servers",
-      workflowState.seasonConfigured
-        ? "success"
-        : "error",
-      workflowState.seasonConfigured
-        ? `${participatingServers.length} servers registered.`
-        : "Season, Matchmaking or participating servers are incomplete."
+  if (
+    !canWrite() ||
+    !selectedSeason ||
+    !workflowState.matchmaking ||
+    participatingServers.length ===
+      0
+  ) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "warning",
+      "Season, Matchmaking or participating servers are incomplete.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
     );
   }
 
-  function activateSeason() {
-    if (
-      !workflowState
-        .seasonConfigured
-    ) {
-      return;
-    }
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
 
-    workflowState.seasonActive =
-      true;
+  setButtonEnabled(
+    "saveParticipatingServersBtn",
+    false
+  );
 
-    setBadge(
-      "seasonActivationBadge",
-      "ready",
-      "W0 Unlocked"
+  try {
+    const nextConfig =
+      engine.updateSeason(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          selectedSeason: {
+            ...selectedSeason
+          },
+
+          participatingServers: [
+            ...participatingServers
+          ]
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          (
+            `Save ${participatingServers.length} participating servers ` +
+            `for Season ${selectedSeason.season}`
+          )
+      }
     );
 
+    adminConfig =
+      output.data;
+
+    applyAdminConfigToState();
+
     renderSeasonLibrary();
+    renderParticipatingServers();
     updateWorkflow();
+
+    setValidation(
+      "seasonActivationValidationBox",
+      "success",
+      (
+        `${participatingServers.length} participating servers ` +
+        `saved successfully for Season ${selectedSeason.season}.`
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Participating servers",
+      "success",
+      (
+        `${participatingServers.length} servers saved ` +
+        `for Season ${selectedSeason.season}.`
+      )
+    );
+  } catch (error) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "error",
+      error?.message ||
+      "Participating servers could not be saved.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Participating servers",
+      "error",
+      error?.message ||
+      "Participating servers could not be saved."
+    );
+  } finally {
+    setButtonEnabled(
+      "saveParticipatingServersBtn",
+      canWrite()
+    );
+  }
+}
+
+async function activateSeason() {
+  const engine =
+    global.K630AdminConfigEngine;
+
+  const writer =
+    getWriter();
+
+  if (
+    !canWrite() ||
+    !workflowState.seasonConfigured
+  ) {
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
+    );
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
+
+  setButtonEnabled(
+    "activateSeasonBtn",
+    false
+  );
+
+  try {
+    const nextConfig =
+      engine.updateSeason(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          selectedSeason: {
+            ...selectedSeason
+          },
+
+          participatingServers: [
+            ...participatingServers
+          ],
+
+          active:
+            true
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          `Activate Season ${selectedSeason.season}`
+      }
+    );
+
+    adminConfig =
+      output.data;
+
+    applyAdminConfigToState();
+
+    renderSeasonLibrary();
+    renderParticipatingServers();
+    updateWorkflow();
+
+    setValidation(
+      "seasonActivationValidationBox",
+      "success",
+      (
+        `Season ${selectedSeason.season} activated successfully. ` +
+        `Week 0 is unlocked.`
+      ),
+      "fa-circle-check"
+    );
 
     dispatchEvent(
       "k630:season-updated",
       {
-        season:
-          selectedSeason
+        season: {
+          ...selectedSeason
+        },
+
+        active:
+          true
       }
     );
 
     appendLog(
       "Season activated",
       "success",
-      `Season ${selectedSeason?.season} was activated.`
+      `Season ${selectedSeason.season} was activated.`
+    );
+  } catch (error) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "error",
+      error?.message ||
+      "Season activation failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Season activated",
+      "error",
+      error?.message ||
+      "Season activation failed."
+    );
+  } finally {
+    updateWorkflow();
+  }
+}
+
+async function deactivateSeason() {
+  const engine =
+    global.K630AdminConfigEngine;
+
+  const writer =
+    getWriter();
+
+  if (!canWrite()) {
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    throw new Error(
+      "K630AdminConfigEngine is not loaded."
     );
   }
 
-  function deactivateSeason() {
-    workflowState.seasonActive =
-      false;
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
 
-    setBadge(
-      "seasonActivationBadge",
-      "locked",
-      "W0 Locked"
+  setButtonEnabled(
+    "deactivateSeasonBtn",
+    false
+  );
+
+  try {
+    const nextConfig =
+      engine.updateSeason(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          active:
+            false
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          (
+            `Deactivate Season ` +
+            `${selectedSeason?.season || ""}`
+          )
+      }
     );
 
+    adminConfig =
+      output.data;
+
+    applyAdminConfigToState();
+
     renderSeasonLibrary();
+    renderParticipatingServers();
     updateWorkflow();
+
+    setValidation(
+      "seasonActivationValidationBox",
+      "success",
+      "Season deactivated successfully. Week 0 is locked.",
+      "fa-circle-check"
+    );
+
+    dispatchEvent(
+      "k630:season-updated",
+      {
+        season:
+          selectedSeason
+            ? {
+                ...selectedSeason
+              }
+            : null,
+
+        active:
+          false
+      }
+    );
 
     appendLog(
       "Season deactivated",
       "success",
       "The active Season was deactivated."
     );
+  } catch (error) {
+    setValidation(
+      "seasonActivationValidationBox",
+      "error",
+      error?.message ||
+      "Season deactivation failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Season deactivated",
+      "error",
+      error?.message ||
+      "Season deactivation failed."
+    );
+  } finally {
+    updateWorkflow();
   }
+}
 
   /* =====================================================
      WEEK UPLOAD
@@ -2755,190 +3824,886 @@
   }
 
   async function validateSeasonFiles() {
-    const officialDate =
-      normalizeText(
-        getElement(
-          "uploadOfficialDate"
-        )?.value
-      );
+  const officialDate =
+    normalizeText(
+      getElement(
+        "uploadOfficialDate"
+      )?.value
+    );
 
-    if (
-      !workflowState
-        .seasonActive
-    ) {
-      setValidation(
-        "seasonUploadValidationBox",
-        "warning",
-        "Activate the Season before uploading weekly data.",
-        "fa-lock"
-      );
+  const writer =
+    getWriter();
 
-      return;
-    }
+  if (
+    !workflowState
+      .seasonActive
+  ) {
+    validatedSeasonFiles =
+      [];
 
-    if (
-      !getUploadPath() ||
-      !officialDate ||
-      selectedSeasonFiles.length ===
-        0
-    ) {
-      setValidation(
-        "seasonUploadValidationBox",
-        "warning",
-        "Select a Season, week, official date and source files.",
-        "fa-triangle-exclamation"
-      );
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      false
+    );
 
-      return;
-    }
+    setValidation(
+      "seasonUploadValidationBox",
+      "warning",
+      "Activate the Season before uploading weekly data.",
+      "fa-lock"
+    );
 
-    try {
-      const results =
-        [];
-
-      for (
-        const file of
-        selectedSeasonFiles
-      ) {
-        const data =
-          await readJsonFile(file);
-
-        const count =
-          countRecords(data);
-
-        if (
-          count <=
-          0
-        ) {
-          throw new Error(
-            `${file.name} contains no records.`
-          );
-        }
-
-        results.push({
-          file,
-          data,
-          count
-        });
-      }
-
-      validatedSeasonFiles =
-        results;
-
-      setButtonEnabled(
-        "uploadSeasonDataBtn",
-        canWrite() &&
-        workflowState.githubWrite
-      );
-
-      setValidation(
-        "seasonUploadValidationBox",
-        "success",
-        `${results.length} source files validated successfully.`,
-        "fa-circle-check"
-      );
-    } catch (error) {
-      validatedSeasonFiles =
-        [];
-
-      setButtonEnabled(
-        "uploadSeasonDataBtn",
-        false
-      );
-
-      setValidation(
-        "seasonUploadValidationBox",
-        "error",
-        error?.message ||
-        "Weekly file validation failed.",
-        "fa-circle-xmark"
-      );
-    }
+    return;
   }
 
-  async function uploadSeasonFiles() {
-    const writer =
-      getWriter();
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    validatedSeasonFiles =
+      [];
 
-    const path =
-      getUploadPath();
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      false
+    );
 
-    if (
-      !writer ||
-      typeof writer.writeJson !==
-        "function" ||
-      !path ||
-      validatedSeasonFiles.length ===
-        0
+    setValidation(
+      "seasonUploadValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !getUploadPath() ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      officialDate
+    ) ||
+    selectedSeasonFiles.length ===
+      0
+  ) {
+    validatedSeasonFiles =
+      [];
+
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      false
+    );
+
+    setValidation(
+      "seasonUploadValidationBox",
+      "warning",
+      "Select a Season, week, valid official date and source files.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  setButtonEnabled(
+    "validateSeasonUploadBtn",
+    false
+  );
+
+  setButtonEnabled(
+    "uploadSeasonDataBtn",
+    false
+  );
+
+  setBadge(
+    "dataUploadStatus",
+    "checking",
+    "Validating"
+  );
+
+  try {
+    const results =
+      [];
+
+    for (
+      const file of
+      selectedSeasonFiles
     ) {
-      return;
-    }
+      const data =
+        await readJsonFile(
+          file
+        );
 
-    try {
-      for (
-        const entry of
-        validatedSeasonFiles
+      const count =
+        countRecords(
+          data
+        );
+
+      if (
+        count <=
+        0
       ) {
-        await writer.writeJson(
-          (
-            `assets/data/${path}` +
-            entry.file.name
-          ),
-          entry.data,
-          {
-            repository:
-              REPOSITORIES.data,
-
-            message:
-              `Upload ${
-                getElement(
-                  "uploadTypeSelect"
-                )?.value
-              } Season data`
-          }
+        throw new Error(
+          `${file.name} contains no records.`
         );
       }
 
-      workflowState.weekData =
-        true;
+      results.push({
+        file,
+        data,
+        count
+      });
+    }
 
-      setBadge(
-        "dataUploadStatus",
-        "ready",
-        "Uploaded"
-      );
+    validatedSeasonFiles =
+      results;
+
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.seasonActive &&
+        validatedSeasonFiles.length >
+          0 &&
+        writer &&
+        typeof writer.writeJson ===
+          "function"
+      )
+    );
+
+    setBadge(
+      "dataUploadStatus",
+      "ready",
+      "Ready"
+    );
+
+    setValidation(
+      "seasonUploadValidationBox",
+      "success",
+      `${results.length} source files validated successfully.`,
+      "fa-circle-check"
+    );
+  } catch (error) {
+    validatedSeasonFiles =
+      [];
+
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      false
+    );
+
+    setBadge(
+      "dataUploadStatus",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "seasonUploadValidationBox",
+      "error",
+      error?.message ||
+      "Weekly file validation failed.",
+      "fa-circle-xmark"
+    );
+  } finally {
+    setButtonEnabled(
+      "validateSeasonUploadBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.seasonActive
+      )
+    );
+  }
+}
+
+  async function uploadSeasonFiles() {
+  const writer =
+    getWriter();
+
+  const engine =
+    global.K630AdminConfigEngine;
+
+  const path =
+    getUploadPath();
+
+  const week =
+    normalizeText(
+      getElement(
+        "uploadTypeSelect"
+      )?.value
+    ).toUpperCase();
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    setValidation(
+      "seasonUploadValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.updateWeeks !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+    setValidation(
+      "seasonUploadValidationBox",
+      "error",
+      "K630AdminConfigEngine is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !workflowState.seasonActive ||
+    !path ||
+    !/^W[0-6]$/.test(week) ||
+    validatedSeasonFiles.length ===
+      0
+  ) {
+    setValidation(
+      "seasonUploadValidationBox",
+      "warning",
+      "Activate the Season and validate the weekly source files first.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  setButtonEnabled(
+    "uploadSeasonDataBtn",
+    false
+  );
+
+  setBadge(
+    "dataUploadStatus",
+    "checking",
+    "Uploading"
+  );
+
+  try {
+    let savedCount =
+      0;
+
+    for (
+      const entry of
+      validatedSeasonFiles
+    ) {
+      const destination =
+        (
+          `assets/data/${path}` +
+          entry.file.name
+        );
 
       setValidation(
         "seasonUploadValidationBox",
-        "success",
-        `${validatedSeasonFiles.length} weekly files were uploaded.`,
-        "fa-circle-check"
+        "warning",
+        (
+          `Saving ${week} file ` +
+          `${savedCount + 1} of ${validatedSeasonFiles.length}: ` +
+          `${entry.file.name}`
+        ),
+        "fa-cloud-arrow-up"
       );
 
-      appendLog(
-        "Weekly upload",
-        "success",
-        `${validatedSeasonFiles.length} source files were uploaded.`
+      await writer.writeJson(
+        destination,
+        entry.data,
+        {
+          repository:
+            REPOSITORIES.data,
+
+          message:
+            (
+              `Upload ${week} data for Season ` +
+              `${selectedSeason?.season || ""}: ${entry.file.name}`
+            )
+        }
+      );
+
+      savedCount +=
+        1;
+    }
+
+    const nextConfig =
+      engine.updateWeeks(
+        adminConfig ||
+        createDefaultAdminConfig(),
+        {
+          addWeek:
+            week,
+
+          updatedAt:
+            nowIso()
+        },
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+          updatedAt:
+            nowIso(),
+
+          updatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    await writer.writeJson(
+      ADMIN_CONFIG_WRITE_PATH,
+      output.data,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          (
+            `Mark ${week} uploaded for Season ` +
+            `${selectedSeason?.season || ""}`
+          )
+      }
+    );
+
+    adminConfig =
+      output.data;
+
+    applyAdminConfigToState();
+
+    workflowState.weekData =
+      true;
+
+    setBadge(
+      "dataUploadStatus",
+      "ready",
+      "Uploaded"
+    );
+
+    setValidation(
+      "seasonUploadValidationBox",
+      "success",
+      (
+        `${savedCount} ${week} source files uploaded successfully. ` +
+        `${week} is saved in admin-config.json.`
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Weekly upload",
+      "success",
+      (
+        `${savedCount} files uploaded for ${week}, ` +
+        `Season ${selectedSeason?.season || ""}.`
+      )
+    );
+
+    dispatchEvent(
+      "k630:week-uploaded",
+      {
+        seasonNumber:
+          selectedSeason?.season ||
+          numberValue(
+            getElement(
+              "uploadSeasonNumber"
+            )?.value
+          ),
+
+        week,
+
+        files:
+          validatedSeasonFiles.map(
+            entry =>
+              entry.file.name
+          )
+      }
+    );
+
+    updateWorkflow();
+  } catch (error) {
+    setBadge(
+      "dataUploadStatus",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "seasonUploadValidationBox",
+      "error",
+      error?.message ||
+      "Weekly data upload failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Weekly upload",
+      "error",
+      error?.message ||
+      "Weekly data upload failed."
+    );
+  } finally {
+    setButtonEnabled(
+      "uploadSeasonDataBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.githubWrite &&
+        workflowState.seasonActive &&
+        validatedSeasonFiles.length >
+          0
+      )
+    );
+  }
+}
+
+async function loadSeasonWeekServerData(
+  seasonNumber,
+  weekNumber,
+  serverNumber
+) {
+  const week =
+    `w${weekNumber}`;
+
+  return readFirstAvailableJson([
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/${serverNumber}-${seasonNumber}-${weekNumber}.json`
+    ),
+
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/${serverNumber}.json`
+    ),
+
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/server-${serverNumber}.json`
+    )
+  ]);
+}
+
+async function readFirstAvailableJson(
+  relativePaths
+) {
+  let lastError =
+    null;
+
+  for (
+    const relativePath of
+    relativePaths
+  ) {
+    try {
+      return await readMatchmakingDependency(
+        relativePath
       );
     } catch (error) {
-      appendLog(
-        "Weekly upload",
-        "error",
-        error?.message ||
-        "Weekly data upload failed."
+      lastError =
+        error;
+    }
+  }
+
+  throw (
+    lastError ||
+    new Error(
+      "No matching JSON source file could be loaded."
+    )
+  );
+}
+
+async function loadSeasonWeekServerData(
+  seasonNumber,
+  weekNumber,
+  serverNumber
+) {
+  const week =
+    `w${weekNumber}`;
+
+  return readFirstAvailableJson([
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/${serverNumber}-${seasonNumber}-${weekNumber}.json`
+    ),
+
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/${serverNumber}.json`
+    ),
+
+    (
+      `seasons/season-${seasonNumber}/` +
+      `${week}/server-${serverNumber}.json`
+    )
+  ]);
+}
+
+async function rebuildSeasonInfo() {
+  const writer =
+    getWriter();
+
+  const engine =
+    global.K630SeasonInfoEngine;
+
+  const seasonNumber =
+    Math.trunc(
+      numberValue(
+        selectedSeason?.season ||
+        adminConfig?.season
+          ?.selectedSeason
+          ?.season ||
+        adminConfig?.matchmaking
+          ?.seasonNumber
+      )
+    );
+
+  if (
+    !canWrite() ||
+    seasonNumber <= 0
+  ) {
+    setValidation(
+      "websiteUpdateValidationBox",
+      "warning",
+      "A valid active Season is required.",
+      "fa-triangle-exclamation"
+    );
+
+    return;
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    setValidation(
+      "websiteUpdateValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    !engine ||
+    typeof engine.build !==
+      "function"
+  ) {
+    setValidation(
+      "websiteUpdateValidationBox",
+      "error",
+      "K630SeasonInfoEngine is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  setButtonEnabled(
+    "rebuildSeasonInfoBtn",
+    false
+  );
+
+  setBadge(
+    "websiteUpdateStatus",
+    "checking",
+    "Building"
+  );
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Loading Active & Average and Season 1 weekly data.",
+    "fa-spinner"
+  );
+
+  try {
+    const activeAverageData =
+      await readMatchmakingDependency(
+        ACTIVE_AVERAGE_PATH
       );
 
-      setValidation(
-        "seasonUploadValidationBox",
-        "error",
-        error?.message ||
-        "Weekly data upload failed.",
-        "fa-circle-xmark"
+    const uploadedWeeks =
+      Array.isArray(
+        adminConfig?.weeks
+          ?.uploaded
+      )
+        ? adminConfig.weeks
+            .uploaded
+        : [];
+
+    if (
+      uploadedWeeks.length ===
+      0
+    ) {
+      throw new Error(
+        "No uploaded Season weeks are registered."
       );
     }
 
+    const weeklyFiles =
+      {};
+
+    for (
+      const weekLabel of
+      uploadedWeeks
+    ) {
+      const weekNumber =
+        Number(
+          normalizeText(
+            weekLabel
+          )
+            .toUpperCase()
+            .replace(
+              "W",
+              ""
+            )
+        );
+
+      if (
+        !Number.isInteger(
+          weekNumber
+        ) ||
+        weekNumber < 0 ||
+        weekNumber > 6
+      ) {
+        continue;
+      }
+
+      setValidation(
+        "websiteUpdateValidationBox",
+        "warning",
+        (
+          `Loading Season ${seasonNumber} ` +
+          `W${weekNumber} Server 630 data.`
+        ),
+        "fa-spinner"
+      );
+
+      const weekData =
+        await loadSeasonWeekServerData(
+          seasonNumber,
+          weekNumber,
+          HOME_KINGDOM
+        );
+
+      weeklyFiles[
+        `W${weekNumber}`
+      ] = [
+        weekData
+      ];
+    }
+
+    const result =
+      engine.build(
+        activeAverageData,
+        weeklyFiles,
+        {
+          seasonNumber,
+
+          officialDate:
+            adminConfig?.matchmaking
+              ?.officialDate ||
+            "",
+
+          generatedAt:
+            nowIso(),
+
+          generatedBy:
+            getSession()?.email ||
+            getRole()
+        }
+      );
+
+    const outputData =
+      result.files[
+        SEASON_INFO_OUTPUT_PATH
+      ] ||
+      result.data;
+
+    if (!outputData) {
+      throw new Error(
+        "Season Info Engine generated no output."
+      );
+    }
+
+    await writer.writeJson(
+      SEASON_INFO_OUTPUT_PATH,
+      outputData,
+      {
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          (
+            `Rebuild Season Info for ` +
+            `Season ${seasonNumber}`
+          )
+      }
+    );
+
+    workflowState.websiteBuilt =
+      true;
+
+    const configEngine =
+      global.K630AdminConfigEngine;
+
+    if (
+      configEngine &&
+      typeof configEngine
+        .updateWebsiteBuild ===
+        "function" &&
+      typeof configEngine
+        .buildFile ===
+        "function"
+    ) {
+      const nextConfig =
+        configEngine.updateWebsiteBuild(
+          adminConfig ||
+          createDefaultAdminConfig(),
+          {
+            ready:
+              true,
+
+            lastBuiltAt:
+              nowIso()
+          },
+          {
+            updatedAt:
+              nowIso(),
+
+            updatedBy:
+              getSession()?.email ||
+              getRole()
+          }
+        );
+
+      const configOutput =
+        configEngine.buildFile(
+          nextConfig,
+          {
+            updatedAt:
+              nowIso(),
+
+            updatedBy:
+              getSession()?.email ||
+              getRole()
+          }
+        );
+
+      await writer.writeJson(
+        ADMIN_CONFIG_WRITE_PATH,
+        configOutput.data,
+        {
+          repository:
+            REPOSITORIES.data,
+
+          message:
+            (
+              `Mark Season Info rebuilt for ` +
+              `Season ${seasonNumber}`
+            )
+        }
+      );
+
+      adminConfig =
+        configOutput.data;
+
+      applyAdminConfigToState();
+    }
+
+    setBadge(
+      "websiteUpdateStatus",
+      "ready",
+      "Ready"
+    );
+
+    setValidation(
+      "websiteUpdateValidationBox",
+      "success",
+      (
+        `Season Info rebuilt successfully. ` +
+        `${result.summary.officialParticipants} official participants, ` +
+        `${result.summary.warriors} Warriors and ` +
+        `${result.summary.farmers} Farmers.`
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Season Info rebuild",
+      "success",
+      (
+        `Season ${seasonNumber}: ` +
+        `${result.summary.officialParticipants} participants generated.`
+      )
+    );
+
+    dispatchEvent(
+      "k630:season-info-rebuilt",
+      {
+        seasonNumber,
+
+        summary:
+          result.summary,
+
+        outputPath:
+          SEASON_INFO_OUTPUT_PATH
+      }
+    );
+
     updateWorkflow();
+  } catch (error) {
+    setBadge(
+      "websiteUpdateStatus",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "websiteUpdateValidationBox",
+      "error",
+      error?.message ||
+      "Season Info rebuild failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Season Info rebuild",
+      "error",
+      error?.message ||
+      "Season Info rebuild failed."
+    );
+  } finally {
+    setButtonEnabled(
+      "rebuildSeasonInfoBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.weekData
+      )
+    );
   }
+}
 
   /* =====================================================
      WEBSITE UPDATE AND ARCHIVE PLACEHOLDERS
@@ -2956,12 +4721,25 @@
     );
   }
 
-  function rebuildPage() {
-    unavailableEngine(
-      "websiteUpdateValidationBox",
-      "Website Update"
-    );
+  function rebuildPage(event) {
+  const buttonId =
+    event?.currentTarget?.id ||
+    "";
+
+  if (
+    buttonId ===
+    "rebuildSeasonInfoBtn"
+  ) {
+    rebuildSeasonInfo();
+
+    return;
   }
+
+  unavailableEngine(
+    "websiteUpdateValidationBox",
+    "Website Update"
+  );
+}
 
   function validateArchive() {
     unavailableEngine(
@@ -2975,137 +4753,150 @@
   ===================================================== */
 
   function updateWorkflow() {
-    workflowState.seasonConfigured =
-      Boolean(
-        selectedSeason &&
-        workflowState.matchmaking &&
-        participatingServers.length >
-          0
-      );
-
-    const updateReady =
-      Boolean(
-        workflowState.githubRead &&
-        workflowState.githubWrite &&
-        workflowState.foundation &&
-        workflowState.matchmaking &&
-        workflowState.seasonActive &&
-        workflowState.weekData
-      );
-
-    setBadge(
-      "adminCenterSystemStatus",
-      canWrite()
-        ? (
-            workflowState.githubRead
-              ? "ready"
-              : "initializing"
-          )
-        : "read-only",
-      canWrite()
-        ? (
-            workflowState.githubRead
-              ? "Ready"
-              : "Initializing"
-          )
-        : "Read Only"
+  workflowState.seasonConfigured =
+    Boolean(
+      selectedSeason &&
+      workflowState.matchmaking &&
+      participatingServers.length > 0
     );
 
-    setBadge(
-      "seasonConfigurationStatus",
-      workflowState.seasonActive
-        ? "ready"
-        : (
-            workflowState
-              .seasonConfigured
-              ? "configured"
-              : "not-configured"
-          ),
-      workflowState.seasonActive
-        ? "Active"
-        : (
-            workflowState
-              .seasonConfigured
-              ? "Configured"
-              : "Not Configured"
-          )
+  const weekDataReady =
+    Boolean(
+      adminConfig?.weeks?.ready === true ||
+      workflowState.weekData
     );
 
-    setBadge(
-      "dataUploadStatus",
-      workflowState.seasonActive
-        ? "ready"
-        : "waiting",
-      workflowState.seasonActive
-        ? "Ready"
-        : "Waiting"
+  workflowState.weekData =
+    weekDataReady;
+
+  const updateReady =
+    Boolean(
+      workflowState.githubRead &&
+      workflowState.foundation &&
+      workflowState.matchmaking &&
+      workflowState.seasonActive &&
+      weekDataReady
     );
 
-    setBadge(
-      "websiteUpdateStatus",
+  setBadge(
+    "adminCenterSystemStatus",
+    canWrite()
+      ? (
+          workflowState.githubRead
+            ? "ready"
+            : "initializing"
+        )
+      : "read-only",
+    canWrite()
+      ? (
+          workflowState.githubRead
+            ? "Ready"
+            : "Initializing"
+        )
+      : "Read Only"
+  );
+
+  setBadge(
+    "seasonConfigurationStatus",
+    workflowState.seasonActive
+      ? "ready"
+      : (
+          workflowState.seasonConfigured
+            ? "configured"
+            : "not-configured"
+        ),
+    workflowState.seasonActive
+      ? "Active"
+      : (
+          workflowState.seasonConfigured
+            ? "Configured"
+            : "Not Configured"
+        )
+  );
+
+  setBadge(
+    "dataUploadStatus",
+    weekDataReady
+      ? "ready"
+      : (
+          workflowState.seasonActive
+            ? "waiting"
+            : "locked"
+        ),
+    weekDataReady
+      ? "Ready"
+      : (
+          workflowState.seasonActive
+            ? "Waiting"
+            : "Locked"
+        )
+  );
+
+  setBadge(
+    "websiteUpdateStatus",
+    updateReady
+      ? "ready"
+      : "locked",
+    updateReady
+      ? "Ready"
+      : "Locked"
+  );
+
+  setBadge(
+    "saveArchiveStatus",
+    workflowState.archiveReady
+      ? "ready"
+      : "locked",
+    workflowState.archiveReady
+      ? "Ready"
+      : "Locked"
+  );
+
+  setButtonEnabled(
+    "activateSeasonBtn",
+    canWrite() &&
+    workflowState.seasonConfigured &&
+    !workflowState.seasonActive
+  );
+
+  setButtonEnabled(
+    "deactivateSeasonBtn",
+    canWrite() &&
+    workflowState.seasonActive
+  );
+
+  setButtonEnabled(
+    "validateSeasonUploadBtn",
+    canWrite() &&
+    workflowState.seasonActive
+  );
+
+  [
+    "rebuildHomeBtn",
+    "rebuildActiveAverageBtn",
+    "rebuildSeasonInfoBtn",
+    "rebuildServerVsServerBtn",
+    "rebuildAllWebsiteDataBtn"
+  ].forEach(id => {
+    setButtonEnabled(
+      id,
+      canWrite() &&
       updateReady
-        ? "ready"
-        : "locked",
-      updateReady
-        ? "Ready"
-        : "Locked"
     );
+  });
 
-    setBadge(
-      "saveArchiveStatus",
-      workflowState.archiveReady
-        ? "ready"
-        : "locked",
-      workflowState.archiveReady
-        ? "Ready"
-        : "Locked"
-    );
+  setButtonEnabled(
+    "validateSeasonArchiveBtn",
+    canWrite() &&
+    workflowState.websiteBuilt
+  );
 
-    setButtonEnabled(
-      "activateSeasonBtn",
-      canWrite() &&
-      workflowState.seasonConfigured &&
-      !workflowState.seasonActive
-    );
-
-    setButtonEnabled(
-      "deactivateSeasonBtn",
-      canWrite() &&
-      workflowState.seasonActive
-    );
-
-    setButtonEnabled(
-      "validateSeasonUploadBtn",
-      canWrite() &&
-      workflowState.seasonActive
-    );
-
-    [
-      "rebuildHomeBtn",
-      "rebuildActiveAverageBtn",
-      "rebuildSeasonInfoBtn",
-      "rebuildServerVsServerBtn",
-      "rebuildAllWebsiteDataBtn"
-    ].forEach(id => {
-      setButtonEnabled(
-        id,
-        canWrite() &&
-        updateReady
-      );
-    });
-
-    setButtonEnabled(
-      "validateSeasonArchiveBtn",
-      canWrite() &&
-      workflowState.websiteBuilt
-    );
-
-    setButtonEnabled(
-      "saveSeasonArchiveBtn",
-      canWrite() &&
-      workflowState.archiveReady
-    );
-  }
+  setButtonEnabled(
+    "saveSeasonArchiveBtn",
+    canWrite() &&
+    workflowState.archiveReady
+  );
+}
 
   /* =====================================================
      EVENT BINDING
@@ -3229,6 +5020,11 @@
     );
 
     bindClick(
+      "saveWebsiteStatusBtn",
+      saveWebsiteStatus
+    );
+
+    bindClick(
       "addParticipatingServerBtn",
       addParticipatingServer
     );
@@ -3348,44 +5144,53 @@
   ===================================================== */
 
   async function init() {
-    activeRoot =
-      getElement(
-        "adminCenter"
-      );
+  activeRoot =
+    getElement(
+      "adminCenter"
+    );
 
-    if (!activeRoot) {
-      return false;
-    }
+  if (!activeRoot) {
+    return false;
+  }
 
-    if (
-      activeRoot.dataset
-        .adminInitialized ===
-      "true"
-    ) {
-      return true;
-    }
-
+  if (
     activeRoot.dataset
-      .adminInitialized =
-      "true";
+      .adminInitialized ===
+    "true"
+  ) {
+    return true;
+  }
 
-    initialized =
-      true;
+  activeRoot.dataset
+    .adminInitialized =
+    "true";
 
-    applyPermissions();
-    bindEvents();
+  initialized =
+    true;
 
-    updateMatchmakingDestination();
-    updateUploadDestination();
-    renderSeasonLibrary();
-    renderParticipatingServers();
-    updateWorkflow();
+  applyPermissions();
+  bindEvents();
 
-    await Promise.allSettled([
-      checkGitHubConnection(),
-      recheckFoundation()
-    ]);
+  const configLoaded =
+    await loadAdminConfig();
 
+  applyAdminConfigToState();
+
+  updateMatchmakingDestination();
+  updateUploadDestination();
+  renderSeasonLibrary();
+  renderParticipatingServers();
+  updateWorkflow();
+
+  await Promise.allSettled([
+    checkGitHubConnection(),
+    recheckFoundation()
+  ]);
+
+  if (
+    !configLoaded ||
+    !workflowState.matchmaking
+  ) {
     const season =
       numberValue(
         getElement(
@@ -3393,19 +5198,39 @@
         )?.value
       );
 
-    if (
-      season >
-      0
-    ) {
+    if (season > 0) {
       await recheckMatchmaking();
     }
-
-    console.info(
-      `[${MODULE_NAME}] Version ${MODULE_VERSION} ready.`
+  } else {
+    setBadge(
+      "matchmakingStatusBadge",
+      "ready",
+      "Ready"
     );
 
-    return true;
+    setValidation(
+      "matchmakingValidationBox",
+      "success",
+      (
+        `Matchmaking Season ` +
+        `${adminConfig.matchmaking.seasonNumber} is ready.`
+      ),
+      "fa-circle-check"
+    );
   }
+
+  renderSeasonLibrary();
+  renderParticipatingServers();
+  updateMatchmakingDestination();
+  updateUploadDestination();
+  updateWorkflow();
+
+  console.info(
+    `[${MODULE_NAME}] Version ${MODULE_VERSION} ready.`
+  );
+
+  return true;
+}
 
   function isReady() {
     return initialized;

@@ -32,6 +32,36 @@
   const DEFAULT_WEBSITE_STATUS =
     "home-farming-migration-open";
 
+  const DEFAULT_MERIT_CONFIGURATION =
+    Object.freeze({
+    version:
+      1,
+
+    w6: {
+      t5: {
+        rank3:
+          12,
+
+        rank2:
+          10,
+
+        rank1:
+          8
+      },
+
+      t4: {
+        rank3:
+          10,
+
+        rank2:
+          8,
+
+        rank1:
+          6
+      }
+    }
+  }); 
+
   /* =====================================================
      GENERAL HELPERS
   ===================================================== */
@@ -167,128 +197,365 @@
     );
   }
 
+function normalizePercentage(
+  value,
+  fallback = 0
+) {
+  const parsed =
+    Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return Number(fallback) || 0;
+  }
+
+  return Math.min(
+    100,
+    Math.max(
+      0,
+      Math.round(
+        parsed * 100
+      ) / 100
+    )
+  );
+}
+
+function normalizeMeritGroup(
+  value,
+  fallback
+) {
+  const source =
+    isObject(value)
+      ? value
+      : {};
+
+  return {
+    rank3:
+      normalizePercentage(
+        source.rank3,
+        fallback.rank3
+      ),
+
+    rank2:
+      normalizePercentage(
+        source.rank2,
+        fallback.rank2
+      ),
+
+    rank1:
+      normalizePercentage(
+        source.rank1,
+        fallback.rank1
+      )
+  };
+}
+
+function calculateWeeklyMeritTargets(
+  w6
+) {
+  const result = {};
+
+  for (
+    let weekNumber = 1;
+    weekNumber <= 6;
+    weekNumber += 1
+  ) {
+    const factor =
+      weekNumber / 6;
+
+    result[
+      `W${weekNumber}`
+    ] = {
+      t5: {
+        rank3:
+          normalizePercentage(
+            w6.t5.rank3 *
+            factor
+          ),
+
+        rank2:
+          normalizePercentage(
+            w6.t5.rank2 *
+            factor
+          ),
+
+        rank1:
+          normalizePercentage(
+            w6.t5.rank1 *
+            factor
+          )
+      },
+
+      t4: {
+        rank3:
+          normalizePercentage(
+            w6.t4.rank3 *
+            factor
+          ),
+
+        rank2:
+          normalizePercentage(
+            w6.t4.rank2 *
+            factor
+          ),
+
+        rank1:
+          normalizePercentage(
+            w6.t4.rank1 *
+            factor
+          )
+      }
+    };
+  }
+
+  return result;
+}
+
+function normalizeMeritConfiguration(
+  value
+) {
+  const source =
+    isObject(value)
+      ? value
+      : {};
+
+  const w6Source =
+    isObject(source.w6)
+      ? source.w6
+      : {};
+
+  const w6 = {
+    t5:
+      normalizeMeritGroup(
+        w6Source.t5,
+        DEFAULT_MERIT_CONFIGURATION
+          .w6.t5
+      ),
+
+    t4:
+      normalizeMeritGroup(
+        w6Source.t4,
+        DEFAULT_MERIT_CONFIGURATION
+          .w6.t4
+      )
+  };
+
+  return {
+    version:
+      normalizeInteger(
+        source.version
+      ) ||
+      DEFAULT_MERIT_CONFIGURATION
+        .version,
+
+    w6,
+
+    weeks:
+      calculateWeeklyMeritTargets(
+        w6
+      ),
+
+    savedAt:
+      normalizeIsoDateTime(
+        source.savedAt
+      ),
+
+    savedBy:
+      normalizeText(
+        source.savedBy
+      ),
+
+    updatePending:
+      normalizeBoolean(
+        source.updatePending
+      ),
+
+    recalculatedAt:
+      normalizeIsoDateTime(
+        source.recalculatedAt
+      )
+  };
+}
+
+function normalizeWeekDates(value) {
+  const source =
+    isObject(value)
+      ? value
+      : {};
+
+  const output =
+    {};
+
+  for (
+    let weekNumber = 0;
+    weekNumber <= 6;
+    weekNumber += 1
+  ) {
+    const week =
+      `W${weekNumber}`;
+
+    const officialDate =
+      normalizeOfficialDate(
+        source[week] ||
+        source[week.toLowerCase()]
+      );
+
+    if (officialDate) {
+      output[week] =
+        officialDate;
+    }
+  }
+
+  return output;
+}
+
   /* =====================================================
      DEFAULT CONFIGURATION
   ===================================================== */
 
   function createDefaultConfig(options = {}) {
-    const timestamp =
-      normalizeIsoDateTime(
-        options.updatedAt
-      ) ||
-      nowIso();
+  const timestamp =
+    normalizeIsoDateTime(
+      options.updatedAt
+    ) ||
+    nowIso();
 
-    return {
-      schemaVersion:
-        SCHEMA_VERSION,
+  return {
+    schemaVersion:
+      SCHEMA_VERSION,
+
+    updatedAt:
+      timestamp,
+
+    updatedBy:
+      normalizeText(
+        options.updatedBy
+      ),
+
+    github: {
+      repositoryRead:
+        false,
+
+      repositoryWrite:
+        false,
+
+      lastCheckedAt:
+        ""
+    },
+
+    foundation: {
+      ready:
+        false,
+
+      officialDate:
+        "",
+
+      playerCount:
+        0,
 
       updatedAt:
-        timestamp,
+        ""
+    },
 
-      updatedBy:
-        normalizeText(
-          options.updatedBy
-        ),
+    matchmaking: {
+      ready:
+        false,
 
-      github: {
-        repositoryRead:
-          false,
+      seasonNumber:
+        0,
 
-        repositoryWrite:
-          false,
+      officialDate:
+        "",
 
-        lastCheckedAt:
-          ""
-      },
+      playerCount:
+        0,
 
-      foundation: {
-        ready:
-          false,
+      updatedAt:
+        ""
+    },
 
-        officialDate:
-          "",
+    season: {
+      websiteStatus:
+        DEFAULT_WEBSITE_STATUS,
 
-        playerCount:
-          0,
+      selectedSeason:
+        null,
 
-        updatedAt:
-          ""
-      },
+      participatingServers:
+        [],
 
-      matchmaking: {
-        ready:
-          false,
+      active:
+        false,
 
-        seasonNumber:
-          0,
+      week0Unlocked:
+        false,
 
-        officialDate:
-          "",
+      updatedAt:
+        ""
+    },
 
-        playerCount:
-          0,
+    meritConfiguration:
+  normalizeMeritConfiguration({
+    version:
+      DEFAULT_MERIT_CONFIGURATION
+        .version,
 
-        updatedAt:
-          ""
-      },
+    w6:
+      DEFAULT_MERIT_CONFIGURATION
+        .w6,
 
-      season: {
-        websiteStatus:
-          DEFAULT_WEBSITE_STATUS,
+    savedAt:
+      "",
 
-        selectedSeason:
-          null,
+    savedBy:
+      "",
 
-        participatingServers:
-          [],
+    updatePending:
+      false,
 
-        active:
-          false,
+    recalculatedAt:
+      ""
+  }),
 
-        week0Unlocked:
-          false,
+    weeks: {
+      uploaded:
+        [],
 
-        updatedAt:
-          ""
-      },
+      latestWeek:
+        null,
 
-      weeks: {
-        uploaded:
-          [],
+      officialDates:
+        {},
 
-        latestWeek:
-          null,
+      ready:
+        false,
 
-        ready:
-          false,
+      updatedAt:
+        ""
+    },
 
-        updatedAt:
-          ""
-      },
+    websiteBuild: {
+      ready:
+        false,
 
-      websiteBuild: {
-        ready:
-          false,
+      lastBuiltAt:
+        ""
+    },
 
-        lastBuiltAt:
-          ""
-      },
+    archive: {
+      ready:
+        false,
 
-      archive: {
-        ready:
-          false,
+      archived:
+        false,
 
-        archived:
-          false,
+      seasonNumber:
+        0,
 
-        seasonNumber:
-          0,
-
-        archivedAt:
-          ""
-      }
-    };
-  }
+      archivedAt:
+        ""
+    }
+  };
+}
 
   /* =====================================================
      NORMALIZATION
@@ -335,233 +602,248 @@
   }
 
   function normalizeConfig(
-    source,
-    options = {}
-  ) {
-    const defaults =
-      createDefaultConfig(options);
+  source,
+  options = {}
+) {
+  const defaults =
+    createDefaultConfig(
+      options
+    );
 
-    const input =
-      isObject(source)
-        ? source
-        : {};
+  const input =
+    isObject(source)
+      ? source
+      : {};
 
-    const selectedSeason =
-      normalizeSelectedSeason(
-        input.season
-          ?.selectedSeason
-      );
+  const selectedSeason =
+    normalizeSelectedSeason(
+      input.season
+        ?.selectedSeason
+    );
 
-    const uploadedWeeks =
-      normalizeWeeks(
-        input.weeks
-          ?.uploaded
-      );
+  const participatingServers =
+    uniquePositiveIntegers(
+      input.season
+        ?.participatingServers
+    );
 
-    const latestWeek =
-      uploadedWeeks.length > 0
-        ? uploadedWeeks[
-            uploadedWeeks.length - 1
-          ]
-        : null;
+  const uploadedWeeks =
+    normalizeWeeks(
+      input.weeks
+        ?.uploaded
+    );
 
-    const seasonActive =
-      normalizeBoolean(
-        input.season
-          ?.active
-      );
+  const latestWeek =
+    uploadedWeeks.length > 0
+      ? uploadedWeeks[
+          uploadedWeeks.length - 1
+        ]
+      : null;
 
-    const matchmakingReady =
-      normalizeBoolean(
-        input.matchmaking
-          ?.ready
-      );
+  const officialDates =
+    normalizeWeekDates(
+      input.weeks
+        ?.officialDates
+    );
 
-    const participatingServers =
-      uniquePositiveIntegers(
-        input.season
-          ?.participatingServers
-      );
+  const matchmakingReady =
+    normalizeBoolean(
+      input.matchmaking
+        ?.ready
+    );
 
-    return {
-      schemaVersion:
-        SCHEMA_VERSION,
+  const seasonActive =
+    normalizeBoolean(
+      input.season
+        ?.active
+    );
+
+  return {
+    schemaVersion:
+      SCHEMA_VERSION,
+
+    updatedAt:
+      normalizeIsoDateTime(
+        input.updatedAt
+      ) ||
+      defaults.updatedAt,
+
+    updatedBy:
+      normalizeText(
+        input.updatedBy
+      ),
+
+    github: {
+      repositoryRead:
+        normalizeBoolean(
+          input.github
+            ?.repositoryRead
+        ),
+
+      repositoryWrite:
+        normalizeBoolean(
+          input.github
+            ?.repositoryWrite
+        ),
+
+      lastCheckedAt:
+        normalizeIsoDateTime(
+          input.github
+            ?.lastCheckedAt
+        )
+    },
+
+    foundation: {
+      ready:
+        normalizeBoolean(
+          input.foundation
+            ?.ready
+        ),
+
+      officialDate:
+        normalizeOfficialDate(
+          input.foundation
+            ?.officialDate
+        ),
+
+      playerCount:
+        normalizeInteger(
+          input.foundation
+            ?.playerCount
+        ),
 
       updatedAt:
         normalizeIsoDateTime(
-          input.updatedAt
-        ) ||
-        defaults.updatedAt,
+          input.foundation
+            ?.updatedAt
+        )
+    },
 
-      updatedBy:
-        normalizeText(
-          input.updatedBy
+    matchmaking: {
+      ready:
+        matchmakingReady,
+
+      seasonNumber:
+        normalizeInteger(
+          input.matchmaking
+            ?.seasonNumber
         ),
 
-      github: {
-        repositoryRead:
-          normalizeBoolean(
-            input.github
-              ?.repositoryRead
-          ),
+      officialDate:
+        normalizeOfficialDate(
+          input.matchmaking
+            ?.officialDate
+        ),
 
-        repositoryWrite:
-          normalizeBoolean(
-            input.github
-              ?.repositoryWrite
-          ),
+      playerCount:
+        normalizeInteger(
+          input.matchmaking
+            ?.playerCount
+        ),
 
-        lastCheckedAt:
-          normalizeIsoDateTime(
-            input.github
-              ?.lastCheckedAt
-          )
-      },
+      updatedAt:
+        normalizeIsoDateTime(
+          input.matchmaking
+            ?.updatedAt
+        )
+    },
 
-      foundation: {
-        ready:
-          normalizeBoolean(
-            input.foundation
-              ?.ready
-          ),
+    season: {
+      websiteStatus:
+        normalizeText(
+          input.season
+            ?.websiteStatus
+        ) ||
+        DEFAULT_WEBSITE_STATUS,
 
-        officialDate:
-          normalizeOfficialDate(
-            input.foundation
-              ?.officialDate
-          ),
+      selectedSeason,
 
-        playerCount:
-          normalizeInteger(
-            input.foundation
-              ?.playerCount
-          ),
+      participatingServers,
 
-        updatedAt:
-          normalizeIsoDateTime(
-            input.foundation
-              ?.updatedAt
-          )
-      },
+      active:
+        seasonActive,
 
-      matchmaking: {
-        ready:
-          matchmakingReady,
+      week0Unlocked:
+        Boolean(
+          seasonActive &&
+          matchmakingReady &&
+          selectedSeason &&
+          participatingServers.length >
+            0
+        ),
 
-        seasonNumber:
-          normalizeInteger(
-            input.matchmaking
-              ?.seasonNumber
-          ),
+      updatedAt:
+        normalizeIsoDateTime(
+          input.season
+            ?.updatedAt
+        )
+    },
 
-        officialDate:
-          normalizeOfficialDate(
-            input.matchmaking
-              ?.officialDate
-          ),
+    meritConfiguration:
+      normalizeMeritConfiguration(
+        input.meritConfiguration
+      ),
 
-        playerCount:
-          normalizeInteger(
-            input.matchmaking
-              ?.playerCount
-          ),
+    weeks: {
+      uploaded:
+        uploadedWeeks,
 
-        updatedAt:
-          normalizeIsoDateTime(
-            input.matchmaking
-              ?.updatedAt
-          )
-      },
+      latestWeek,
 
-      season: {
-        websiteStatus:
-          normalizeText(
-            input.season
-              ?.websiteStatus
-          ) ||
-          DEFAULT_WEBSITE_STATUS,
+      officialDates,
 
-        selectedSeason,
+      ready:
+        uploadedWeeks.length >
+        0,
 
-        participatingServers,
+      updatedAt:
+        normalizeIsoDateTime(
+          input.weeks
+            ?.updatedAt
+        )
+    },
 
-        active:
-          seasonActive,
+    websiteBuild: {
+      ready:
+        normalizeBoolean(
+          input.websiteBuild
+            ?.ready
+        ),
 
-        week0Unlocked:
-          Boolean(
-            seasonActive &&
-            matchmakingReady &&
-            selectedSeason &&
-            participatingServers.length >
-              0
-          ),
+      lastBuiltAt:
+        normalizeIsoDateTime(
+          input.websiteBuild
+            ?.lastBuiltAt
+        )
+    },
 
-        updatedAt:
-          normalizeIsoDateTime(
-            input.season
-              ?.updatedAt
-          )
-      },
+    archive: {
+      ready:
+        normalizeBoolean(
+          input.archive
+            ?.ready
+        ),
 
-      weeks: {
-        uploaded:
-          uploadedWeeks,
+      archived:
+        normalizeBoolean(
+          input.archive
+            ?.archived
+        ),
 
-        latestWeek,
+      seasonNumber:
+        normalizeInteger(
+          input.archive
+            ?.seasonNumber
+        ),
 
-        ready:
-          uploadedWeeks.length >
-          0,
-
-        updatedAt:
-          normalizeIsoDateTime(
-            input.weeks
-              ?.updatedAt
-          )
-      },
-
-      websiteBuild: {
-        ready:
-          normalizeBoolean(
-            input.websiteBuild
-              ?.ready
-          ),
-
-        lastBuiltAt:
-          normalizeIsoDateTime(
-            input.websiteBuild
-              ?.lastBuiltAt
-          )
-      },
-
-      archive: {
-        ready:
-          normalizeBoolean(
-            input.archive
-              ?.ready
-          ),
-
-        archived:
-          normalizeBoolean(
-            input.archive
-              ?.archived
-          ),
-
-        seasonNumber:
-          normalizeInteger(
-            input.archive
-              ?.seasonNumber
-          ),
-
-        archivedAt:
-          normalizeIsoDateTime(
-            input.archive
-              ?.archivedAt
-          )
-      }
-    };
-  }
+      archivedAt:
+        normalizeIsoDateTime(
+          input.archive
+            ?.archivedAt
+        )
+    }
+  };
+}
 
   /* =====================================================
      UPDATE HELPERS
@@ -847,123 +1129,275 @@
     );
   }
 
-  function updateWeeks(
-    currentConfig,
-    weeksUpdate = {},
-    options = {}
+function updateMeritConfiguration(
+  currentConfig,
+  meritUpdate = {},
+  options = {}
+) {
+  const config =
+    normalizeConfig(
+      currentConfig
+    );
+
+  const current =
+    normalizeMeritConfiguration(
+      config.meritConfiguration
+    );
+
+  const nextW6 = {
+    t5:
+      normalizeMeritGroup(
+        meritUpdate.w6
+          ?.t5,
+        current.w6.t5
+      ),
+
+    t4:
+      normalizeMeritGroup(
+        meritUpdate.w6
+          ?.t4,
+        current.w6.t4
+      )
+  };
+
+  if (
+    nextW6.t5.rank3 <
+      nextW6.t5.rank2 ||
+    nextW6.t5.rank2 <
+      nextW6.t5.rank1
   ) {
-    const config =
-  loadOrCreateConfig(currentConfig);
-
-    let uploaded =
-      normalizeWeeks(
-        config.weeks.uploaded
-      );
-
-    if (
-      Array.isArray(
-        weeksUpdate.uploaded
-      )
-    ) {
-      uploaded =
-        normalizeWeeks(
-          weeksUpdate.uploaded
-        );
-    }
-
-    const addedWeek =
-      normalizeText(
-        weeksUpdate.addWeek
-      ).toUpperCase();
-
-    if (
-      /^W[0-6]$/.test(
-        addedWeek
-      )
-    ) {
-      uploaded =
-        normalizeWeeks([
-          ...uploaded,
-          addedWeek
-        ]);
-    }
-
-    const latestWeek =
-      uploaded.length >
-        0
-        ? uploaded[
-            uploaded.length - 1
-          ]
-        : null;
-
-    config.weeks = {
-      uploaded,
-
-      latestWeek,
-
-      ready:
-        uploaded.length >
-        0,
-
-      updatedAt:
-        normalizeIsoDateTime(
-          weeksUpdate.updatedAt
-        ) ||
-        nowIso()
-    };
-
-    config.websiteBuild.ready =
-      false;
-
-    config.websiteBuild.lastBuiltAt =
-      "";
-
-    config.archive.ready =
-      false;
-
-    return finalizeConfig(
-      config,
-      options
+    throw new Error(
+      "T5 Rank 3 must be equal to or higher than Rank 2, and Rank 2 must be equal to or higher than Rank 1."
     );
   }
+
+  if (
+    nextW6.t4.rank3 <
+      nextW6.t4.rank2 ||
+    nextW6.t4.rank2 <
+      nextW6.t4.rank1
+  ) {
+    throw new Error(
+      "T4 Rank 3 must be equal to or higher than Rank 2, and Rank 2 must be equal to or higher than Rank 1."
+    );
+  }
+
+  const savedAt =
+    normalizeIsoDateTime(
+      meritUpdate.savedAt
+    ) ||
+    nowIso();
+
+  config.meritConfiguration = {
+    version:
+      1,
+
+    w6:
+      nextW6,
+
+    weeks:
+      calculateWeeklyMeritTargets(
+        nextW6
+      ),
+
+    savedAt,
+
+    savedBy:
+      normalizeText(
+        meritUpdate.savedBy
+      ) ||
+      config.updatedBy,
+
+    updatePending:
+      Object.prototype.hasOwnProperty.call(
+        meritUpdate,
+        "updatePending"
+      )
+        ? normalizeBoolean(
+            meritUpdate.updatePending
+          )
+        : true,
+
+    recalculatedAt:
+      normalizeIsoDateTime(
+        meritUpdate.recalculatedAt
+      ) ||
+      current.recalculatedAt
+  };
+
+  config.websiteBuild.ready =
+    false;
+
+  config.websiteBuild.lastBuiltAt =
+    "";
+
+  config.archive.ready =
+    false;
+
+  return finalizeConfig(
+    config,
+    options
+  );
+}
+
+  function updateWeeks(
+  currentConfig,
+  weeksUpdate = {},
+  options = {}
+) {
+  const config =
+    normalizeConfig(
+      currentConfig
+    );
+
+  let uploaded =
+    normalizeWeeks(
+      config.weeks.uploaded
+    );
+
+  const officialDates =
+    normalizeWeekDates(
+      config.weeks
+        .officialDates
+    );
+
+  if (
+    Array.isArray(
+      weeksUpdate.uploaded
+    )
+  ) {
+    uploaded =
+      normalizeWeeks(
+        weeksUpdate.uploaded
+      );
+  }
+
+  const addedWeek =
+    normalizeText(
+      weeksUpdate.addWeek
+    ).toUpperCase();
+
+  if (
+    /^W[0-6]$/.test(
+      addedWeek
+    )
+  ) {
+    uploaded =
+      normalizeWeeks([
+        ...uploaded,
+        addedWeek
+      ]);
+
+    const officialDate =
+      normalizeOfficialDate(
+        weeksUpdate.officialDate
+      );
+
+    if (officialDate) {
+      officialDates[
+        addedWeek
+      ] =
+        officialDate;
+    }
+  }
+
+  if (
+    isObject(
+      weeksUpdate.officialDates
+    )
+  ) {
+    Object.assign(
+      officialDates,
+      normalizeWeekDates(
+        weeksUpdate
+          .officialDates
+      )
+    );
+  }
+
+  const latestWeek =
+    uploaded.length > 0
+      ? uploaded[
+          uploaded.length - 1
+        ]
+      : null;
+
+  config.weeks = {
+    uploaded,
+
+    latestWeek,
+
+    officialDates,
+
+    ready:
+      uploaded.length >
+      0,
+
+    updatedAt:
+      normalizeIsoDateTime(
+        weeksUpdate.updatedAt
+      ) ||
+      nowIso()
+  };
+
+  config.websiteBuild.ready =
+    false;
+
+  config.websiteBuild.lastBuiltAt =
+    "";
+
+  config.archive.ready =
+    false;
+
+  return finalizeConfig(
+    config,
+    options
+  );
+}
 
   function updateWebsiteBuild(
-    currentConfig,
-    buildUpdate = {},
-    options = {}
-  ) {
-    const config =
-  loadOrCreateConfig(currentConfig);
-
-    config.websiteBuild = {
-      ready:
-        Object.prototype.hasOwnProperty.call(
-          buildUpdate,
-          "ready"
-        )
-          ? normalizeBoolean(
-              buildUpdate.ready
-            )
-          : true,
-
-      lastBuiltAt:
-        normalizeIsoDateTime(
-          buildUpdate.lastBuiltAt
-        ) ||
-        nowIso()
-    };
-
-    config.archive.ready =
-      Boolean(
-        config.websiteBuild.ready &&
-        config.weeks.ready
-      );
-
-    return finalizeConfig(
-      config,
+  currentConfig,
+  websiteBuildUpdate = {},
+  options = {}
+) {
+  const config =
+    normalizeConfig(
+      currentConfig,
       options
     );
+
+  const ready =
+    websiteBuildUpdate.ready ===
+    true;
+
+  config.websiteBuild = {
+    ready,
+
+    lastBuiltAt:
+      ready
+        ? (
+            normalizeIsoDateTime(
+              websiteBuildUpdate
+                .lastBuiltAt
+            ) ||
+            nowIso()
+          )
+        : ""
+  };
+
+  if (ready) {
+    config.archive.ready =
+      true;
+  } else {
+    config.archive.ready =
+      false;
   }
+
+  return finalizeConfig(
+    config,
+    options
+  );
+}
 
   function updateArchive(
     currentConfig,
@@ -1274,6 +1708,8 @@ function loadOrCreateConfig(existingConfig = null) {
       updateMatchmaking,
 
       updateSeason,
+
+      updateMeritConfiguration,
 
       updateWeeks,
 

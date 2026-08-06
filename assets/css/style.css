@@ -379,21 +379,25 @@ body {
 ========================================================= */
 
 .home-context-bar {
-  width: min(1040px, 100%);
+  width: min(720px, 100%);
 
   display: grid;
 
   grid-template-columns:
     repeat(
-      3,
-      minmax(0, 1fr)
+      2,
+      minmax(280px, 1fr)
     );
+
+  justify-content: center;
+  justify-items: stretch;
+  align-items: stretch;
 
   gap:
     clamp(
-      8px,
+      10px,
       1vw,
-      14px
+      16px
     );
 
   margin:
@@ -2731,4 +2735,16 @@ td {
 
     letter-spacing: -0.065em !important;
   }
+}
+function formatCompactNumber(value) {
+  const number = integerValue(value);
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      notation: "compact",
+      compactDisplay: "short",
+      maximumFractionDigits: 2
+    }
+  ).format(number);
 }

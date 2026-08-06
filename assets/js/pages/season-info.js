@@ -285,188 +285,282 @@
   ===================================================== */
 
   function normalizeWeek(
-    player,
-    weekNumber
-  ) {
-    const weekKey =
-      `W${weekNumber}`;
+  player,
+  weekNumber
+) {
+  const weekKey =
+    `W${weekNumber}`;
 
-    const source =
-      player?.weeks?.[weekKey] ||
-      {};
+  const source =
+    player?.weeks?.[weekKey] ||
+    {};
 
-    return {
-      week:
-        weekNumber,
-
-      available:
-        source.available ===
-        true,
-
-      merits:
-        source.merits ===
-          null ||
-        source.merits ===
-          undefined
-          ? null
-          : integerValue(
-              source.merits
+  const meritTargets =
+    source.meritTargets &&
+    typeof source.meritTargets ===
+      "object"
+      ? {
+          rank3:
+            numberValue(
+              source.meritTargets
+                .rank3
             ),
 
-      meritPowerPercentage:
-        source
-          .meritPowerPercentage ===
-          null ||
-        source
-          .meritPowerPercentage ===
-          undefined
-          ? null
-          : numberValue(
-              source
-                .meritPowerPercentage
+          rank2:
+            numberValue(
+              source.meritTargets
+                .rank2
             ),
 
-      currentPower:
-        source.currentPower ===
-          null ||
-        source.currentPower ===
-          undefined
-          ? null
-          : integerValue(
-              source.currentPower
-            ),
-
-      rank:
-        source.rank ===
-          null ||
-        source.rank ===
-          undefined
-          ? null
-          : integerValue(
-              source.rank
+          rank1:
+            numberValue(
+              source.meritTargets
+                .rank1
             )
-    };
-  }
+        }
+      : null;
+
+  return {
+    week:
+      weekNumber,
+
+    weekLabel:
+      normalizeText(
+        source.weekLabel
+      ) ||
+      weekKey,
+
+    officialDate:
+      normalizeText(
+        source.officialDate
+      ) ||
+      null,
+
+    available:
+      source.available ===
+      true,
+
+    merits:
+      source.merits ===
+        null ||
+      source.merits ===
+        undefined
+        ? null
+        : integerValue(
+            source.merits
+          ),
+
+    meritPowerPercentage:
+      source
+        .meritPowerPercentage ===
+        null ||
+      source
+        .meritPowerPercentage ===
+        undefined
+        ? null
+        : numberValue(
+            source
+              .meritPowerPercentage
+          ),
+
+    meritTargets,
+
+    meritRank:
+      source.meritRank ===
+        null ||
+      source.meritRank ===
+        undefined
+        ? null
+        : integerValue(
+            source.meritRank
+          ),
+
+    currentPower:
+      source.currentPower ===
+        null ||
+      source.currentPower ===
+        undefined
+        ? null
+        : integerValue(
+            source.currentPower
+          ),
+
+    historicalPower:
+      source.historicalPower ===
+        null ||
+      source.historicalPower ===
+        undefined
+        ? null
+        : integerValue(
+            source.historicalPower
+          ),
+
+    rank:
+      source.rank ===
+        null ||
+      source.rank ===
+        undefined
+        ? null
+        : integerValue(
+            source.rank
+          ),
+
+    serverRank:
+      source.serverRank ===
+        null ||
+      source.serverRank ===
+        undefined
+        ? null
+        : integerValue(
+            source.serverRank
+          )
+  };
+}
 
   function normalizePlayer(
-    player,
-    sourceIndex
-  ) {
-    const notes =
-      Array.isArray(
-        player.notes
-      )
-        ? player.notes
-            .map(
-              normalizeText
-            )
-            .filter(Boolean)
-        : [];
+  player,
+  sourceIndex
+) {
+  const notes =
+    Array.isArray(
+      player.notes
+    )
+      ? player.notes
+          .map(
+            normalizeText
+          )
+          .filter(Boolean)
+      : [];
 
-    const noteFlags = {
-      new:
-        player.noteFlags?.new ===
-          true ||
-        notes.includes("new"),
-
-      left:
-        player.noteFlags?.left ===
-          true ||
-        notes.includes("left"),
-
-      afk:
-        player.noteFlags?.afk ===
-          true ||
-        notes.includes("afk")
-    };
-
-    const normalizedWeeks =
-      {};
-
-    WEEK_NUMBERS.forEach(
-      weekNumber => {
-        normalizedWeeks[
-          `W${weekNumber}`
-        ] =
-          normalizeWeek(
-            player,
-            weekNumber
-          );
-      }
+  const normalizedNotes =
+    notes.map(
+      note =>
+        note.toLowerCase()
     );
 
-    return {
-      sourceIndex,
+  const noteFlags = {
+    new:
+      player.noteFlags?.new ===
+        true ||
+      normalizedNotes.includes(
+        "new"
+      ),
 
-      index:
-        integerValue(
-          player.index
-        ) ||
-        sourceIndex + 1,
+    left:
+      player.noteFlags?.left ===
+        true ||
+      player.leftDuringSeason ===
+        true ||
+      normalizedNotes.includes(
+        "left"
+      ),
 
-      id:
-        normalizeText(
-          player.id
-        ),
+    afk:
+      player.noteFlags?.afk ===
+        true ||
+      normalizedNotes.includes(
+        "afk"
+      )
+  };
 
-      name:
-        normalizeText(
-          player.name
-        ),
+  const normalizedWeeks =
+    {};
 
-      alliance:
-        normalizeText(
-          player.alliance
-        ),
+  WEEK_NUMBERS.forEach(
+    weekNumber => {
+      normalizedWeeks[
+        `W${weekNumber}`
+      ] =
+        normalizeWeek(
+          player,
+          weekNumber
+        );
+    }
+  );
 
-      troopTier:
-        normalizeText(
-          player.troopTier
-        ) ||
-        "T4",
+  return {
+    sourceIndex,
 
-      playerType:
-        normalizeText(
-          player.playerType
-        ).toLowerCase() ===
-          "warrior"
-          ? "warrior"
-          : "farmer",
+    index:
+      integerValue(
+        player.index
+      ) ||
+      sourceIndex + 1,
 
-      historicalPower:
-        integerValue(
-          player.historicalPower
-        ),
+    id:
+      normalizeText(
+        player.id
+      ),
 
-      serverStatus:
-        normalizeText(
-          player.serverStatus
-        ) ||
-        "LV2",
+    name:
+      normalizeText(
+        player.name
+      ),
 
-      serverStatusColor:
-        normalizeText(
-          player.serverStatusColor
-        ) ||
-        "green",
+    alliance:
+      normalizeText(
+        player.alliance
+      ),
 
-      dateJoinKingdom:
-        normalizeText(
-          player.dateJoinKingdom
-        ),
+    troopTier:
+      normalizeText(
+        player.troopTier
+      ).toUpperCase() ===
+        "T5"
+        ? "T5"
+        : "T4",
 
-      active:
-        player.active !==
+    playerType:
+      normalizeText(
+        player.playerType
+      ).toLowerCase() ===
+        "warrior"
+        ? "warrior"
+        : "farmer",
+
+    historicalPower:
+      integerValue(
+        player.historicalPower
+      ),
+
+    serverStatus:
+      normalizeText(
+        player.serverStatus
+      ) ||
+      "LV2",
+
+    serverStatusColor:
+      normalizeText(
+        player.serverStatusColor
+      ) ||
+      "green",
+
+    dateJoinKingdom:
+      normalizeText(
+        player.dateJoinKingdom
+      ),
+
+    dateLeftKingdom:
+      normalizeText(
+        player.dateLeftKingdom
+      ) ||
+      null,
+
+    leftDuringSeason:
+      noteFlags.left,
+
+    active:
+      player.active !==
         false,
 
-      notes,
+    notes,
 
-      noteFlags,
+    noteFlags,
 
-      weeks:
-        normalizedWeeks
-    };
-  }
+    weeks:
+      normalizedWeeks
+  };
+}
 
   /* =====================================================
      NOTE SYMBOLS
@@ -732,52 +826,99 @@
   ===================================================== */
 
   function buildBaseRow(
-    player,
-    visibleIndex
-  ) {
-    return `
-      <tr data-player-id="${escapeHtml(player.id)}">
+  player,
+  visibleIndex
+) {
+  const rowNumber =
+    visibleIndex + 1;
 
-        <td>
-          ${visibleIndex + 1}
-        </td>
+  const playerId =
+    normalizeText(
+      player.id
+    );
 
-        <td class="si-player-id">
-          ${escapeHtml(player.id)}
-        </td>
+  const playerName =
+    normalizeText(
+      player.name
+    );
 
-        <td class="si-player-name">
-          ${escapeHtml(player.name)}
-        </td>
+  const playerAlliance =
+    normalizeText(
+      player.alliance
+    );
 
-        <td class="si-player-alliance">
-          ${escapeHtml(player.alliance)}
-        </td>
+  const troopTier =
+    normalizeText(
+      player.troopTier
+    ).toUpperCase() ===
+      "T5"
+      ? "T5"
+      : "T4";
 
-        <td>
-          <span
-            class="
-              si-tier-badge
-              si-tier-badge--${escapeHtml(
-                player.troopTier.toLowerCase()
-              )}
-            "
-          >
-            ${escapeHtml(player.troopTier)}
-          </span>
-        </td>
+  const historicalPower =
+    integerValue(
+      player.historicalPower
+    );
 
-        <td class="si-note-cell">
-          ${buildNoteHtml(player)}
-        </td>
+  return `
+    <tr
+      data-player-id="${escapeHtml(
+        playerId
+      )}"
+    >
 
-        <td class="si-historical-power">
-          ${formatNumber(player.historicalPower)}
-        </td>
+      <td class="si-base-cell-index">
+        ${rowNumber}
+      </td>
 
-      </tr>
-    `;
-  }
+      <td class="si-player-id">
+        ${escapeHtml(
+          playerId
+        )}
+      </td>
+
+      <td class="si-player-name">
+        ${escapeHtml(
+          playerName
+        )}
+      </td>
+
+      <td class="si-player-alliance">
+        ${escapeHtml(
+          playerAlliance
+        )}
+      </td>
+
+      <td class="si-base-cell-tier">
+        <span
+          class="
+            si-tier-badge
+            si-tier-badge--${escapeHtml(
+              troopTier.toLowerCase()
+            )}
+          "
+        >
+          ${escapeHtml(
+            troopTier
+          )}
+        </span>
+      </td>
+
+      <td class="si-note-cell">
+        ${buildNoteHtml(
+          player
+        )}
+      </td>
+
+      <td class="si-historical-power">
+        ${formatNumber(
+          historicalPower
+        )}
+      </td>
+
+    </tr>
+  `;
+}
 
   function buildWeekZeroCells(
     player
@@ -809,56 +950,181 @@
   }
 
   function buildRegularWeekCells(
-    player,
-    weekNumber
+  player,
+  weekNumber
+) {
+  const weekKey =
+    `W${weekNumber}`;
+
+  const week =
+    player.weeks?.[
+      weekKey
+    ] ||
+    null;
+
+  const latestWeekLabel =
+    normalizeText(
+      seasonData?.season
+        ?.latestWeek
+    ).toUpperCase();
+
+  const latestWeekNumber =
+    /^W[0-6]$/.test(
+      latestWeekLabel
+    )
+      ? Number(
+          latestWeekLabel.slice(1)
+        )
+      : 0;
+
+  /*
+   * Toekomstige weken blijven volledig leeg.
+   * OUT kan pas verschijnen nadat de betreffende
+   * week daadwerkelijk is geüpload.
+   */
+  if (
+    weekNumber >
+    latestWeekNumber
   ) {
-    const week =
-      player.weeks[
-        `W${weekNumber}`
-      ];
-
-    if (
-      !week ||
-      !week.available
-    ) {
-      return `
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      `;
-    }
-
     return `
-      <td>
-        ${formatNumber(week.merits)}
-      </td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td class="si-rank-cell">-</td>
+    `;
+  }
 
-      <td>
+  const troopTier =
+    player.troopTier ===
+      "T5"
+      ? "T5"
+      : "T4";
+
+  const playerLeft =
+    player.leftDuringSeason ===
+      true ||
+    player.noteFlags?.left ===
+      true ||
+    player.active ===
+      false;
+
+  /*
+   * Bestaande/geüploade week zonder spelersdata:
+   * alleen dan OUT tonen wanneer de speler vertrokken is.
+   */
+  if (
+    !week ||
+    week.available !==
+      true
+  ) {
+    return `
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+
+      <td class="si-rank-cell">
         ${
-          formatPercentage(
-            week
-              .meritPowerPercentage
-          )
-        }
-      </td>
-
-      <td>
-        ${formatNumber(week.currentPower)}
-      </td>
-
-      <td>
-        ${
-          week.rank ===
-            null
-            ? "-"
-            : formatNumber(
-                week.rank
-              )
+          playerLeft
+            ? `
+              <span
+                class="
+                  si-rank-badge
+                  si-rank-out
+                "
+                data-season-rank-card="true"
+                data-rank-status="out"
+                data-rank-week="${weekNumber}"
+                data-rank-tier="${troopTier}"
+              >
+                OUT
+              </span>
+            `
+            : "-"
         }
       </td>
     `;
   }
+
+  const numericRank =
+    Number(
+      week.rank ??
+      week.meritRank ??
+      0
+    );
+
+  let rankLabel =
+    "Move";
+
+  let rankClass =
+    "si-rank-move";
+
+  if (numericRank === 3) {
+    rankLabel =
+      "Rank 3";
+
+    rankClass =
+      "si-rank-3";
+  } else if (
+    numericRank === 2
+  ) {
+    rankLabel =
+      "Rank 2";
+
+    rankClass =
+      "si-rank-2";
+  } else if (
+    numericRank === 1
+  ) {
+    rankLabel =
+      "Rank 1";
+
+    rankClass =
+      "si-rank-1";
+  }
+
+  const tierClass =
+    troopTier === "T5"
+      ? "si-rank-t5"
+      : "si-rank-t4";
+
+  return `
+    <td>
+      ${formatNumber(
+        week.merits
+      )}
+    </td>
+
+    <td>
+      ${formatPercentage(
+        week.meritPowerPercentage
+      )}
+    </td>
+
+    <td>
+      ${formatNumber(
+        week.currentPower
+      )}
+    </td>
+
+    <td class="si-rank-cell">
+      <span
+        class="
+          si-rank-badge
+          ${tierClass}
+          ${rankClass}
+        "
+        data-season-rank-card="true"
+        data-rank-status="${numericRank}"
+        data-rank-week="${weekNumber}"
+        data-rank-tier="${troopTier}"
+      >
+        ${escapeHtml(
+          rankLabel
+        )}
+      </span>
+    </td>
+  `;
+}
 
   function buildWeeksRow(
     player
@@ -1332,82 +1598,650 @@
     );
   }
 
+function getLatestSeasonWeekNumber() {
+  const latestWeek =
+    normalizeText(
+      seasonData?.season
+        ?.latestWeek
+    ).toUpperCase();
+
+  return /^W[0-6]$/.test(
+    latestWeek
+  )
+    ? Number(
+        latestWeek.slice(1)
+      )
+    : 0;
+}
+
+function getConfiguredRankTargets(
+  weekNumber,
+  troopTier
+) {
+  const weekKey =
+    `W${weekNumber}`;
+
+  const configuredWeek =
+    seasonData
+      ?.meritConfiguration
+      ?.weeks?.[
+        weekKey
+      ];
+
+  const configuredTier =
+    configuredWeek?.[
+      troopTier.toLowerCase()
+    ];
+
+  if (configuredTier) {
+    return {
+      rank3:
+        numberValue(
+          configuredTier.rank3
+        ),
+
+      rank2:
+        numberValue(
+          configuredTier.rank2
+        ),
+
+      rank1:
+        numberValue(
+          configuredTier.rank1
+        )
+    };
+  }
+
+  const finalTargets =
+    troopTier === "T5"
+      ? {
+          rank3:
+            12,
+
+          rank2:
+            10,
+
+          rank1:
+            8
+        }
+      : {
+          rank3:
+            10,
+
+          rank2:
+            8,
+
+          rank1:
+            6
+        };
+
+  const factor =
+    Math.max(
+      1,
+      Math.min(
+        6,
+        weekNumber
+      )
+    ) / 6;
+
+  return {
+    rank3:
+      finalTargets.rank3 *
+      factor,
+
+    rank2:
+      finalTargets.rank2 *
+      factor,
+
+    rank1:
+      finalTargets.rank1 *
+      factor
+  };
+}
+
+function formatRankTarget(value) {
+  const number =
+    Number(value);
+
+  return Number.isFinite(number)
+    ? `${number.toFixed(2)}%`
+    : "-";
+}
+
+function createSeasonRankHoverCard() {
+  let card =
+    getElement(
+      "seasonRankHoverCard"
+    );
+
+  if (card) {
+    return card;
+  }
+
+  card =
+    document.createElement(
+      "aside"
+    );
+
+  card.id =
+    "seasonRankHoverCard";
+
+  card.className =
+    "season-rank-hover-card";
+
+  card.hidden =
+    true;
+
+  card.setAttribute(
+    "role",
+    "tooltip"
+  );
+
+  document.body.appendChild(
+    card
+  );
+
+  return card;
+}
+
+function buildSeasonRankHoverCardHtml(
+  badge
+) {
+  const status =
+    normalizeText(
+      badge.dataset
+        .rankStatus
+    ).toLowerCase();
+
+  const weekNumber =
+    Math.max(
+      1,
+      Math.min(
+        6,
+        integerValue(
+          badge.dataset
+            .rankWeek
+        )
+      )
+    );
+
+  const currentTier =
+    normalizeText(
+      badge.dataset
+        .rankTier
+    ).toUpperCase() ===
+      "T5"
+      ? "T5"
+      : "T4";
+
+  if (status === "out") {
+    return `
+      <div
+        class="
+          season-rank-hover-card__header
+          season-rank-hover-card__header--out
+        "
+      >
+        <strong>
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+          OUT
+        </strong>
+
+        <span>
+          Week ${weekNumber}
+        </span>
+      </div>
+
+      <p>
+        This player left Kingdom 630 before or during
+        Week ${weekNumber}.
+      </p>
+
+      <p>
+        No weekly Merits, Merits %, Current Power or
+        Rank data is available for this week.
+      </p>
+
+      <b class="season-rank-hover-card__out-note">
+        Player left Kingdom 630.
+      </b>
+    `;
+  }
+
+  const t5 =
+    getConfiguredRankTargets(
+      weekNumber,
+      "T5"
+    );
+
+  const t4 =
+    getConfiguredRankTargets(
+      weekNumber,
+      "T4"
+    );
+
+  let statusLabel =
+    "Move";
+
+  if (status === "3") {
+    statusLabel =
+      "Rank 3";
+  } else if (
+    status === "2"
+  ) {
+    statusLabel =
+      "Rank 2";
+  } else if (
+    status === "1"
+  ) {
+    statusLabel =
+      "Rank 1";
+  }
+
+  return `
+    <div
+      class="
+        season-rank-hover-card__header
+        ${
+          currentTier === "T5"
+            ? "season-rank-hover-card__header--t5"
+            : "season-rank-hover-card__header--t4"
+        }
+      "
+    >
+      <strong>
+        <i class="fa-solid fa-ranking-star"></i>
+        ${escapeHtml(
+          `${currentTier} ${statusLabel}`
+        )}
+      </strong>
+
+      <span>
+        Week ${weekNumber}
+      </span>
+    </div>
+
+    <p>
+      Weekly Rank requirements are based on the player's
+      Merits percentage for this specific week.
+    </p>
+
+    <section class="season-rank-hover-card__tier season-rank-hover-card__tier--t5">
+      <h4>
+        <i class="fa-solid fa-crown"></i>
+        T5 Merit Targets
+      </h4>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 3</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t5.rank3
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 2</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t5.rank2
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 1</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t5.rank1
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target season-rank-hover-card__target--move">
+        <b>Move</b>
+        <span>
+          Below ${formatRankTarget(
+            t5.rank1
+          )}
+        </span>
+      </div>
+    </section>
+
+    <section class="season-rank-hover-card__tier season-rank-hover-card__tier--t4">
+      <h4>
+        <i class="fa-solid fa-shield-halved"></i>
+        T4 Merit Targets
+      </h4>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 3</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t4.rank3
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 2</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t4.rank2
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target">
+        <b>Rank 1</b>
+        <span>
+          Minimum ${formatRankTarget(
+            t4.rank1
+          )}
+        </span>
+      </div>
+
+      <div class="season-rank-hover-card__target season-rank-hover-card__target--move">
+        <b>Move</b>
+        <span>
+          Below ${formatRankTarget(
+            t4.rank1
+          )}
+        </span>
+      </div>
+    </section>
+
+    <p class="season-rank-hover-card__out-info">
+      <strong>OUT</strong>
+      appears only in an uploaded week when the player
+      has left Kingdom 630.
+    </p>
+  `;
+}
+
+function positionSeasonRankHoverCard(
+  card,
+  badge
+) {
+  const badgeRect =
+    badge.getBoundingClientRect();
+
+  const spacing =
+    12;
+
+  const viewportPadding =
+    10;
+
+  card.style.left =
+    "0px";
+
+  card.style.top =
+    "0px";
+
+  card.hidden =
+    false;
+
+  const cardWidth =
+    card.offsetWidth;
+
+  const cardHeight =
+    card.offsetHeight;
+
+  let left =
+    badgeRect.left -
+    cardWidth -
+    spacing;
+
+  if (
+    left <
+    viewportPadding
+  ) {
+    left =
+      badgeRect.right +
+      spacing;
+  }
+
+  if (
+    left +
+    cardWidth >
+    global.innerWidth -
+    viewportPadding
+  ) {
+    left =
+      global.innerWidth -
+      cardWidth -
+      viewportPadding;
+  }
+
+  let top =
+    badgeRect.top +
+    (
+      badgeRect.height / 2
+    ) -
+    (
+      cardHeight / 2
+    );
+
+  if (
+    top <
+    viewportPadding
+  ) {
+    top =
+      viewportPadding;
+  }
+
+  if (
+    top +
+    cardHeight >
+    global.innerHeight -
+    viewportPadding
+  ) {
+    top =
+      global.innerHeight -
+      cardHeight -
+      viewportPadding;
+  }
+
+  card.style.left =
+    `${Math.round(left)}px`;
+
+  card.style.top =
+    `${Math.round(top)}px`;
+}
+
+function hideSeasonRankHoverCard() {
+  const card =
+    getElement(
+      "seasonRankHoverCard"
+    );
+
+  if (!card) {
+    return;
+  }
+
+  card.hidden =
+    true;
+
+  card.innerHTML =
+    "";
+}
+
   /* =====================================================
      EVENT BINDING
   ===================================================== */
 
   function bindEvents() {
-    document
-      .querySelectorAll(
-        "#seasonInfoPage .si-filter-btn"
-      )
-      .forEach(button => {
-        addListener(
-          button,
-          "click",
-          handlePlayerFilter
-        );
-      });
-
-    document
-      .querySelectorAll(
-        "#seasonInfoPage .si-week-sort-select"
-      )
-      .forEach(select => {
-        addListener(
-          select,
-          "change",
-          handleWeekSort
-        );
-      });
-
-    const weeksShell =
-      getElement(
-        "siWeeksShell"
+  document
+    .querySelectorAll(
+      "#seasonInfoPage .si-filter-btn"
+    )
+    .forEach(button => {
+      addListener(
+        button,
+        "click",
+        handlePlayerFilter
       );
+    });
 
-    const filterShell =
-      getElement(
-        "siWeekFilterShell"
+  document
+    .querySelectorAll(
+      "#seasonInfoPage .si-week-sort-select"
+    )
+    .forEach(select => {
+      addListener(
+        select,
+        "change",
+        handleWeekSort
       );
+    });
 
-    const topScroll =
-      getElement(
-        "siTopHorizontalScroll"
-      );
-
-    [
-      weeksShell,
-      filterShell,
-      topScroll
-    ]
-      .filter(Boolean)
-      .forEach(element => {
-        addListener(
-          element,
-          "scroll",
-          () => {
-            synchronizeHorizontalScroll(
-              element
-            );
-          },
-          {
-            passive:
-              true
-          }
-        );
-      });
-
-    addListener(
-      global,
-      "resize",
-      synchronizeScrollWidths,
-      {
-        passive:
-          true
-      }
+  const weeksShell =
+    getElement(
+      "siWeeksShell"
     );
+
+  const filterShell =
+    getElement(
+      "siWeekFilterShell"
+    );
+
+  const topScroll =
+    getElement(
+      "siTopHorizontalScroll"
+    );
+
+  [
+    weeksShell,
+    filterShell,
+    topScroll
+  ]
+    .filter(Boolean)
+    .forEach(element => {
+      addListener(
+        element,
+        "scroll",
+        () => {
+          synchronizeHorizontalScroll(
+            element
+          );
+
+          hideSeasonRankHoverCard();
+        },
+        {
+          passive:
+            true
+        }
+      );
+    });
+
+  addListener(
+    global,
+    "resize",
+    () => {
+      synchronizeScrollWidths();
+      hideSeasonRankHoverCard();
+    },
+    {
+      passive:
+        true
+    }
+  );
+
+  const page =
+    getElement(
+      "seasonInfoPage"
+    );
+
+  if (!page) {
+    return;
   }
+
+  const card =
+    createSeasonRankHoverCard();
+
+  addListener(
+    page,
+    "mouseover",
+    event => {
+      const badge =
+        event.target.closest(
+          "[data-season-rank-card='true']"
+        );
+
+      if (
+        !badge ||
+        !page.contains(
+          badge
+        )
+      ) {
+        return;
+      }
+
+      card.innerHTML =
+        buildSeasonRankHoverCardHtml(
+          badge
+        );
+
+      positionSeasonRankHoverCard(
+        card,
+        badge
+      );
+    }
+  );
+
+  addListener(
+    page,
+    "mouseout",
+    event => {
+      const badge =
+        event.target.closest(
+          "[data-season-rank-card='true']"
+        );
+
+      if (!badge) {
+        return;
+      }
+
+      if (
+        event.relatedTarget &&
+        badge.contains(
+          event.relatedTarget
+        )
+      ) {
+        return;
+      }
+
+      hideSeasonRankHoverCard();
+    }
+  );
+
+  addListener(
+    page,
+    "click",
+    event => {
+      const badge =
+        event.target.closest(
+          "[data-season-rank-card='true']"
+        );
+
+      if (!badge) {
+        hideSeasonRankHoverCard();
+        return;
+      }
+
+      card.innerHTML =
+        buildSeasonRankHoverCardHtml(
+          badge
+        );
+
+      positionSeasonRankHoverCard(
+        card,
+        badge
+      );
+    }
+  );
+}
 
   /* =====================================================
      ERROR RENDERING

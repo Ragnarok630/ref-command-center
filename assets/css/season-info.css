@@ -1124,30 +1124,56 @@
 }
 
 /* =========================================================
-   BASE COLUMN ALIGNMENT
+   BASE COLUMN ALIGNMENT + ACTIVE & AVERAGE LOOK
 ========================================================= */
 
+.si-base-table td:nth-child(2){
+    color:#46b8ff;
+    font-size:11px;
+    font-weight:700;
+    font-family:Consolas,Monaco,monospace;
+    text-align:right;
+}
+
+.si-base-table td:nth-child(3){
+    color:#ffffff;
+    font-size:11px;
+    font-weight:700;
+    text-align:left;
+}
+
+.si-base-table td:nth-child(4){
+    color:#ffffff;
+    font-size:11px;
+    font-weight:500;
+    text-align:left;
+}
+
+.si-base-table td:nth-child(5){
+    text-align:center;
+}
+
+.si-base-table td:nth-child(7){
+    color:#ffffff;
+    font-size:11px;
+    font-weight:700;
+    text-align:right;
+}
+
 .si-base-table th:nth-child(1),
-.si-base-table td:nth-child(1),
-.si-base-table th:nth-child(5),
-.si-base-table td:nth-child(5) {
-  text-align: center;
+.si-base-table td:nth-child(1){
+    text-align:center;
 }
 
 .si-base-table th:nth-child(2),
-.si-base-table td:nth-child(2),
-.si-base-table th:nth-child(7),
-.si-base-table td:nth-child(7) {
-  text-align: right;
+.si-base-table th:nth-child(7){
+    text-align:right;
 }
 
 .si-base-table th:nth-child(3),
-.si-base-table td:nth-child(3),
 .si-base-table th:nth-child(4),
-.si-base-table td:nth-child(4),
-.si-base-table th:nth-child(6),
-.si-base-table td:nth-child(6) {
-  text-align: left;
+.si-base-table th:nth-child(6){
+    text-align:left;
 }
 
 /* =========================================================
@@ -1213,24 +1239,28 @@
     padding-left:6px;
 }
 
-.si-tier {
+.si-tier-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   min-width: 31px;
+  height: 17px;
 
   padding:
-    2px
-    5px;
+    1px
+    6px;
 
   border-radius: 999px;
 
-  font-size: 7px;
-  font-weight: 900;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+
+  white-space: nowrap;
 }
 
-.si-tier--t4 {
+.si-tier-badge--t4 {
   color: #e4c8ff;
 
   background:
@@ -1241,7 +1271,7 @@
     rgba(172, 92, 238, 0.42);
 }
 
-.si-tier--t5 {
+.si-tier-badge--t5 {
   color: #ffd86c;
 
   background:
@@ -1252,7 +1282,8 @@
     rgba(239, 186, 57, 0.5);
 
   text-shadow:
-    0 0 6px rgba(255, 205, 75, 0.22);
+    0 0 6px
+    rgba(255, 205, 75, 0.22);
 }
 
 /* =========================================================
@@ -1513,4 +1544,954 @@
   .si-filter-btn {
     transition: none;
   }
+}
+
+/* =========================================================
+   SEASON INFO RANK BADGES
+
+   T5 Rank 1-3 = Gold
+   T4 Rank 1-3 = Purple
+   Move = Red
+========================================================= */
+
+.si-rank-cell {
+  text-align: center;
+}
+
+.si-rank-badge {
+  min-width: 50px;
+  height: 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    1px
+    6px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    999px;
+
+  font-size:
+    7px;
+
+  font-weight:
+    900;
+
+  line-height:
+    1;
+
+  text-align:
+    center;
+
+  white-space:
+    nowrap;
+}
+
+/* =========================================================
+   T5 RANK 1-3 — GOLD
+========================================================= */
+
+.si-rank-badge.si-rank-t5.si-rank-1,
+.si-rank-badge.si-rank-t5.si-rank-2,
+.si-rank-badge.si-rank-t5.si-rank-3 {
+  color:
+    #fff0a8;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        160,
+        108,
+        15,
+        0.94
+      ),
+      rgba(
+        73,
+        43,
+        4,
+        0.98
+      )
+    );
+
+  border-color:
+    rgba(
+      255,
+      204,
+      55,
+      0.95
+    );
+
+  box-shadow:
+    0 0 6px
+    rgba(
+      255,
+      188,
+      40,
+      0.36
+    ),
+    inset 0 0 5px
+    rgba(
+      255,
+      226,
+      133,
+      0.1
+    );
+
+  text-shadow:
+    0 0 4px
+    rgba(
+      255,
+      220,
+      111,
+      0.55
+    );
+}
+
+/* =========================================================
+   T4 RANK 1-3 — PURPLE
+========================================================= */
+
+.si-rank-badge.si-rank-t4.si-rank-1,
+.si-rank-badge.si-rank-t4.si-rank-2,
+.si-rank-badge.si-rank-t4.si-rank-3 {
+  color:
+    #f0d4ff;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        117,
+        43,
+        178,
+        0.94
+      ),
+      rgba(
+        49,
+        15,
+        80,
+        0.98
+      )
+    );
+
+  border-color:
+    rgba(
+      196,
+      104,
+      255,
+      0.95
+    );
+
+  box-shadow:
+    0 0 6px
+    rgba(
+      174,
+      74,
+      240,
+      0.38
+    ),
+    inset 0 0 5px
+    rgba(
+      220,
+      159,
+      255,
+      0.1
+    );
+
+  text-shadow:
+    0 0 4px
+    rgba(
+      211,
+      143,
+      255,
+      0.55
+    );
+}
+
+/* =========================================================
+   MOVE — ALWAYS RED
+========================================================= */
+
+.si-rank-badge.si-rank-move {
+  color:
+    #ffd4d4;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        160,
+        31,
+        40,
+        0.95
+      ),
+      rgba(
+        71,
+        9,
+        14,
+        0.99
+      )
+    );
+
+  border-color:
+    rgba(
+      255,
+      76,
+      88,
+      0.95
+    );
+
+  box-shadow:
+    0 0 6px
+    rgba(
+      255,
+      51,
+      67,
+      0.38
+    ),
+    inset 0 0 5px
+    rgba(
+      255,
+      145,
+      151,
+      0.1
+    );
+
+  text-shadow:
+    0 0 4px
+    rgba(
+      255,
+      106,
+      115,
+      0.55
+    );
+}
+
+/* =========================================================
+   SEASON INFO RANK TOOLTIP + OUT STATUS
+========================================================= */
+
+.si-rank-cell {
+  position: relative;
+  overflow: visible;
+  text-align: center;
+}
+
+.si-rank-badge {
+  position: relative;
+  cursor: help;
+  overflow: visible;
+  outline: none;
+}
+
+/* =========================================================
+   OUT — PLAYER LEFT KINGDOM 630
+========================================================= */
+
+.si-rank-badge.si-rank-out {
+  min-width: 50px;
+  height: 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    1px
+    6px;
+
+  color:
+    #bffcff;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(
+        10,
+        118,
+        139,
+        0.95
+      ),
+      rgba(
+        3,
+        48,
+        61,
+        0.99
+      )
+    );
+
+  border:
+    1px solid
+    rgba(
+      64,
+      225,
+      255,
+      0.96
+    );
+
+  border-radius:
+    999px;
+
+  font-size:
+    7px;
+
+  font-weight:
+    900;
+
+  line-height:
+    1;
+
+  text-align:
+    center;
+
+  white-space:
+    nowrap;
+
+  box-shadow:
+    0 0 7px
+    rgba(
+      42,
+      218,
+      255,
+      0.42
+    ),
+    inset 0 0 5px
+    rgba(
+      141,
+      241,
+      255,
+      0.12
+    );
+
+  text-shadow:
+    0 0 4px
+    rgba(
+      119,
+      239,
+      255,
+      0.68
+    );
+}
+
+/* =========================================================
+   CUSTOM RANK TOOLTIP
+========================================================= */
+
+.si-rank-badge::before {
+  content:
+    attr(
+      data-rank-tooltip
+    );
+
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  bottom:
+    calc(
+      100% +
+      8px
+    );
+
+  z-index:
+    9999;
+
+  width:
+    max-content;
+
+  max-width:
+    250px;
+
+  padding:
+    7px
+    9px;
+
+  color:
+    #f7f2ff;
+
+  background:
+    rgba(
+      10,
+      7,
+      17,
+      0.98
+    );
+
+  border:
+    1px solid
+    rgba(
+      169,
+      82,
+      235,
+      0.82
+    );
+
+  border-radius:
+    7px;
+
+  box-shadow:
+    0 7px 20px
+    rgba(
+      0,
+      0,
+      0,
+      0.62
+    ),
+    0 0 8px
+    rgba(
+      153,
+      60,
+      229,
+      0.2
+    );
+
+  font-size:
+    9px;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.35;
+
+  text-align:
+    left;
+
+  white-space:
+    normal;
+
+  pointer-events:
+    none;
+
+  opacity:
+    0;
+
+  visibility:
+    hidden;
+
+  transform:
+    translate(
+      -50%,
+      4px
+    );
+
+  transition:
+    opacity
+    0.14s
+    ease,
+    transform
+    0.14s
+    ease,
+    visibility
+    0.14s
+    ease;
+}
+
+.si-rank-badge::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  left:
+    50%;
+
+  bottom:
+    calc(
+      100% +
+      3px
+    );
+
+  z-index:
+    10000;
+
+  width:
+    8px;
+
+  height:
+    8px;
+
+  background:
+    rgba(
+      10,
+      7,
+      17,
+      0.98
+    );
+
+  border-right:
+    1px solid
+    rgba(
+      169,
+      82,
+      235,
+      0.82
+    );
+
+  border-bottom:
+    1px solid
+    rgba(
+      169,
+      82,
+      235,
+      0.82
+    );
+
+  pointer-events:
+    none;
+
+  opacity:
+    0;
+
+  visibility:
+    hidden;
+
+  transform:
+    translateX(
+      -50%
+    )
+    rotate(
+      45deg
+    );
+
+  transition:
+    opacity
+    0.14s
+    ease,
+    visibility
+    0.14s
+    ease;
+}
+
+.si-rank-badge:hover::before,
+.si-rank-badge:focus-visible::before {
+  opacity:
+    1;
+
+  visibility:
+    visible;
+
+  transform:
+    translate(
+      -50%,
+      0
+    );
+}
+
+.si-rank-badge:hover::after,
+.si-rank-badge:focus-visible::after {
+  opacity:
+    1;
+
+  visibility:
+    visible;
+}
+
+/* T5-tooltip: goud */
+
+.si-rank-badge.si-rank-t5::before {
+  border-color:
+    rgba(
+      255,
+      202,
+      55,
+      0.9
+    );
+
+  color:
+    #fff0a8;
+}
+
+/* T4-tooltip: paars */
+
+.si-rank-badge.si-rank-t4::before {
+  border-color:
+    rgba(
+      197,
+      103,
+      255,
+      0.92
+    );
+
+  color:
+    #efd2ff;
+}
+
+/* Move-tooltip: rood */
+
+.si-rank-badge.si-rank-move::before {
+  border-color:
+    rgba(
+      255,
+      74,
+      87,
+      0.92
+    );
+
+  color:
+    #ffd0d3;
+}
+
+/* OUT-tooltip: cyaan */
+
+.si-rank-badge.si-rank-out::before {
+  border-color:
+    rgba(
+      56,
+      222,
+      255,
+      0.94
+    );
+
+  color:
+    #bffaff;
+}
+
+/* =========================================================
+   FINAL SEASON INFO RANK STATUS
+========================================================= */
+
+.si-rank-cell {
+  text-align: center !important;
+}
+
+.si-rank-badge {
+  min-width: 52px !important;
+  height: 17px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 1px 6px !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+
+  font-size: 7px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+
+  white-space: nowrap !important;
+  cursor: help !important;
+}
+
+/* T5 RANK 1–3 — GOUD */
+
+.si-rank-badge.si-rank-t5.si-rank-1,
+.si-rank-badge.si-rank-t5.si-rank-2,
+.si-rank-badge.si-rank-t5.si-rank-3 {
+  color: #fff1aa !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(162, 108, 13, 0.96),
+      rgba(71, 42, 4, 0.99)
+    ) !important;
+
+  border-color:
+    rgba(255, 203, 53, 0.96) !important;
+
+  box-shadow:
+    0 0 6px
+    rgba(255, 188, 37, 0.4) !important;
+}
+
+/* T4 RANK 1–3 — PAARS */
+
+.si-rank-badge.si-rank-t4.si-rank-1,
+.si-rank-badge.si-rank-t4.si-rank-2,
+.si-rank-badge.si-rank-t4.si-rank-3 {
+  color: #f1d5ff !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(118, 42, 180, 0.96),
+      rgba(48, 14, 79, 0.99)
+    ) !important;
+
+  border-color:
+    rgba(198, 102, 255, 0.96) !important;
+
+  box-shadow:
+    0 0 6px
+    rgba(177, 72, 245, 0.4) !important;
+}
+
+/* MOVE — ROOD */
+
+.si-rank-badge.si-rank-move {
+  color: #ffd6d8 !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(161, 30, 40, 0.97),
+      rgba(70, 8, 14, 0.99)
+    ) !important;
+
+  border-color:
+    rgba(255, 75, 88, 0.96) !important;
+
+  box-shadow:
+    0 0 6px
+    rgba(255, 48, 64, 0.4) !important;
+}
+
+/* OUT — CYAAN */
+
+.si-rank-badge.si-rank-out {
+  color: #c7fbff !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(7, 126, 148, 0.97),
+      rgba(2, 47, 60, 0.99)
+    ) !important;
+
+  border-color:
+    rgba(53, 224, 255, 0.98) !important;
+
+  box-shadow:
+    0 0 7px
+    rgba(38, 219, 255, 0.48) !important;
+
+  text-shadow:
+    0 0 4px
+    rgba(116, 241, 255, 0.7) !important;
+}
+
+/* =========================================================
+   DONATE-STYLE SEASON RANK HOVER CARD
+========================================================= */
+
+.si-rank-badge {
+  cursor: default !important;
+}
+
+.season-rank-hover-card {
+  position: fixed;
+  z-index: 1000000;
+
+  width: 310px;
+  max-height: calc(100vh - 20px);
+
+  padding: 15px 16px;
+
+  overflow-y: auto;
+
+  color: #f3edf9;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(29, 17, 43, 0.99),
+      rgba(16, 10, 26, 0.99)
+    );
+
+  border:
+    1px solid
+    rgba(174, 89, 238, 0.92);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 12px 34px
+    rgba(0, 0, 0, 0.78),
+    0 0 22px
+    rgba(157, 66, 226, 0.28),
+    inset 0 0 18px
+    rgba(154, 70, 220, 0.06);
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.48;
+
+  pointer-events: none;
+}
+
+.season-rank-hover-card[hidden] {
+  display: none !important;
+}
+
+.season-rank-hover-card p {
+  margin:
+    9px
+    0;
+
+  color:
+    #e3dbea;
+}
+
+.season-rank-hover-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.11);
+}
+
+.season-rank-hover-card__header strong {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.season-rank-hover-card__header span {
+  color: #bfb3ca;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.season-rank-hover-card__header--t5 strong {
+  color: #ffd85f;
+}
+
+.season-rank-hover-card__header--t4 strong {
+  color: #d99cff;
+}
+
+.season-rank-hover-card__header--out strong {
+  color: #5cecff;
+}
+
+.season-rank-hover-card__tier {
+  margin-top: 11px;
+  padding: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius: 9px;
+}
+
+.season-rank-hover-card__tier h4 {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin:
+    0
+    0
+    7px;
+
+  padding-bottom: 6px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.season-rank-hover-card__tier--t5 {
+  border-color:
+    rgba(255, 197, 44, 0.44);
+
+  background:
+    rgba(100, 64, 4, 0.13);
+}
+
+.season-rank-hover-card__tier--t5 h4,
+.season-rank-hover-card__tier--t5
+.season-rank-hover-card__target b {
+  color: #ffd75c;
+}
+
+.season-rank-hover-card__tier--t4 {
+  border-color:
+    rgba(192, 96, 255, 0.46);
+
+  background:
+    rgba(77, 25, 116, 0.15);
+}
+
+.season-rank-hover-card__tier--t4 h4,
+.season-rank-hover-card__tier--t4
+.season-rank-hover-card__target b {
+  color: #d99aff;
+}
+
+.season-rank-hover-card__target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding:
+    3px
+    0;
+}
+
+.season-rank-hover-card__target b {
+  font-weight: 900;
+}
+
+.season-rank-hover-card__target span {
+  color: #e3dbe9;
+
+  text-align: right;
+}
+
+.season-rank-hover-card__target--move b,
+.season-rank-hover-card__target--move span {
+  color: #ff7c86 !important;
+}
+
+.season-rank-hover-card__out-info {
+  margin-bottom: 0 !important;
+  padding-top: 9px;
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.09);
+
+  color: #bcf8ff !important;
+}
+
+.season-rank-hover-card__out-info strong {
+  color: #55e9ff;
+}
+
+.season-rank-hover-card__out-note {
+  display: block;
+
+  margin-top: 10px;
+
+  color: #57eaff;
+
+  font-size: 12px;
+  font-weight: 900;
 }

@@ -1236,36 +1236,52 @@ function formatCompactNumber(value) {
   }
 
   function startObserver() {
-    const observer =
-      new MutationObserver(
-        mutations => {
-          const pageChanged =
-            mutations.some(
-              mutation =>
+  const observer =
+    new MutationObserver(
+      mutations => {
+        const homePageAdded =
+          mutations.some(
+            mutation => {
+              return Array.from(
                 mutation.addedNodes
-                  .length >
-                0
-            );
+              ).some(node => {
+                if (
+                  !(node instanceof Element)
+                ) {
+                  return false;
+                }
 
-          if (!pageChanged) {
-            return;
-          }
+                return (
+                  node.id === "homePage" ||
+                  Boolean(
+                    node.querySelector(
+                      "#homePage"
+                    )
+                  )
+                );
+              });
+            }
+          );
 
-          scheduleHomeLoad();
+        if (!homePageAdded) {
+          return;
         }
-      );
 
-    observer.observe(
-      document.body,
-      {
-        childList:
-          true,
-
-        subtree:
-          true
+        scheduleHomeLoad();
       }
     );
-  }
+
+  observer.observe(
+    document.body,
+    {
+      childList:
+        true,
+
+      subtree:
+        true
+    }
+  );
+}
 
   function initialize() {
     startObserver();

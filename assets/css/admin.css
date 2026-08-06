@@ -15098,3 +15098,400 @@
    143. END OF ADMIN STYLESHEET
 ========================================================= */
 
+/* =========================================================
+   MERIT CONFIGURATION TABLE
+========================================================= */
+
+.admin-merit-table-shell {
+  width: 100%;
+
+  margin:
+    14px
+    0;
+
+  overflow-x: auto;
+
+  border:
+    1px solid
+    rgba(155, 76, 220, 0.32);
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(8, 7, 13, 0.42);
+}
+
+.admin-merit-table {
+  width: 100%;
+  min-width: 780px;
+
+  border-collapse:
+    collapse;
+
+  table-layout:
+    fixed;
+}
+
+.admin-merit-table th,
+.admin-merit-table td {
+  padding:
+    9px
+    10px;
+
+  border-right:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.065);
+
+  text-align:
+    center;
+
+  vertical-align:
+    middle;
+}
+
+.admin-merit-table tr:last-child th,
+.admin-merit-table tr:last-child td {
+  border-bottom:
+    0;
+}
+
+.admin-merit-table th:last-child,
+.admin-merit-table td:last-child {
+  border-right:
+    0;
+}
+
+.admin-merit-week-column {
+  width:
+    92px;
+
+  color:
+    #ffe55e;
+
+  background:
+    rgba(40, 31, 15, 0.78);
+}
+
+.admin-merit-tier-heading {
+  font-size:
+    13px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.4px;
+}
+
+.admin-merit-tier-heading i {
+  margin-right:
+    6px;
+}
+
+.admin-merit-tier-heading--t5 {
+  color:
+    #ffd75e;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(104, 69, 8, 0.45),
+      rgba(46, 29, 4, 0.58)
+    );
+
+  border-bottom-color:
+    rgba(255, 196, 44, 0.4) !important;
+}
+
+.admin-merit-tier-heading--t4 {
+  color:
+    #d99aff;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(80, 30, 121, 0.42),
+      rgba(39, 15, 62, 0.58)
+    );
+
+  border-bottom-color:
+    rgba(190, 94, 255, 0.42) !important;
+}
+
+.admin-merit-rank-heading {
+  font-size:
+    9px;
+
+  font-weight:
+    900;
+
+  text-transform:
+    uppercase;
+}
+
+.admin-merit-rank-heading--t5 {
+  color:
+    #ffe18a;
+
+  background:
+    rgba(76, 50, 7, 0.3);
+}
+
+.admin-merit-rank-heading--t4 {
+  color:
+    #dfadff;
+
+  background:
+    rgba(64, 24, 96, 0.3);
+}
+
+.admin-merit-table tbody th {
+  background:
+    rgba(26, 21, 32, 0.7);
+}
+
+.admin-merit-table tbody th strong {
+  display:
+    block;
+
+  color:
+    #ffffff;
+
+  font-size:
+    13px;
+
+  font-weight:
+    900;
+}
+
+.admin-merit-table tbody th small {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  color:
+    #a99fb2;
+
+  font-size:
+    8px;
+
+  font-weight:
+    700;
+}
+
+.admin-merit-table output {
+  display:
+    inline-flex;
+
+  min-width:
+    64px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    5px
+    8px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius:
+    7px;
+
+  color:
+    #f4eff8;
+
+  background:
+    rgba(7, 7, 11, 0.52);
+
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+}
+
+.admin-merit-table tbody td:nth-child(2) output,
+.admin-merit-table tbody td:nth-child(3) output,
+.admin-merit-table tbody td:nth-child(4) output {
+  color:
+    #ffe18a;
+
+  border-color:
+    rgba(255, 192, 42, 0.22);
+
+  background:
+    rgba(85, 55, 5, 0.13);
+}
+
+.admin-merit-table tbody td:nth-child(5) output,
+.admin-merit-table tbody td:nth-child(6) output,
+.admin-merit-table tbody td:nth-child(7) output {
+  color:
+    #dda5ff;
+
+  border-color:
+    rgba(187, 89, 250, 0.23);
+
+  background:
+    rgba(68, 22, 103, 0.14);
+}
+
+.admin-merit-editable-row {
+  background:
+    rgba(255, 216, 60, 0.025);
+}
+
+.admin-merit-editable-row th {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(88, 62, 9, 0.52),
+      rgba(38, 27, 7, 0.62)
+    ) !important;
+}
+
+.admin-merit-input-shell {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  width:
+    100%;
+
+  padding-right:
+    7px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-radius:
+    7px;
+
+  background:
+    rgba(7, 7, 12, 0.82);
+}
+
+.admin-merit-input-shell input {
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  padding:
+    7px
+    8px;
+
+  color:
+    #ffffff;
+
+  background:
+    transparent;
+
+  border:
+    0;
+
+  outline:
+    none;
+
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+}
+
+.admin-merit-input-shell span {
+  font-size:
+    9px;
+
+  font-weight:
+    900;
+}
+
+.admin-merit-input-shell--t5 {
+  border-color:
+    rgba(255, 198, 42, 0.55);
+}
+
+.admin-merit-input-shell--t5 span {
+  color:
+    #ffd75c;
+}
+
+.admin-merit-input-shell--t4 {
+  border-color:
+    rgba(191, 92, 255, 0.58);
+}
+
+.admin-merit-input-shell--t4 span {
+  color:
+    #d99bff;
+}
+
+.admin-merit-table-note {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  margin:
+    10px
+    0
+    12px;
+
+  padding:
+    9px
+    11px;
+
+  color:
+    #d7cde0;
+
+  background:
+    rgba(107, 52, 148, 0.1);
+
+  border:
+    1px solid
+    rgba(159, 75, 220, 0.24);
+
+  border-radius:
+    8px;
+
+  font-size:
+    9px;
+
+  font-weight:
+    700;
+}
+
+.admin-merit-table-note i {
+  color:
+    #c16cff;
+}

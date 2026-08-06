@@ -111,66 +111,73 @@
     ]);
 
   const WRITE_ELEMENT_IDS =
-    Object.freeze([
-      "testGithubWriteBtn",
+  Object.freeze([
+    "testGithubWriteBtn",
 
-      "matchmakingSeasonNumber",
-      "matchmakingOfficialDate",
-      "matchmakingFileInput",
-      "validateMatchmakingBtn",
-      "uploadMatchmakingBtn",
+    "matchmakingSeasonNumber",
+    "matchmakingOfficialDate",
+    "matchmakingFileInput",
+    "validateMatchmakingBtn",
+    "uploadMatchmakingBtn",
 
-      "seasonYear",
-      "seasonNumber",
-      "sosNumber",
-      "sosName",
-      "addSeasonToLibraryBtn",
+    "seasonYear",
+    "seasonNumber",
+    "sosNumber",
+    "sosName",
+    "addSeasonToLibraryBtn",
 
-      "websiteStatusSelect",
-      "saveWebsiteStatusBtn",
+    "t5Rank3Merits",
+    "t5Rank2Merits",
+    "t5Rank1Merits",
 
-      "addParticipatingServerBtn",
-      "saveParticipatingServersBtn",
+    "t4Rank3Merits",
+    "t4Rank2Merits",
+    "t4Rank1Merits",
 
-      "activateSeasonBtn",
-      "deactivateSeasonBtn",
+    "saveMeritConfigurationBtn",
 
-      "uploadSeasonNumber",
-      "uploadTypeSelect",
-      "uploadOfficialDate",
-      "seasonDataFileInput",
-      "validateSeasonUploadBtn",
-      "uploadSeasonDataBtn",
+    "addParticipatingServerBtn",
+    "saveParticipatingServersBtn",
 
-      "rebuildHomeBtn",
-      "rebuildActiveAverageBtn",
-      "rebuildSeasonInfoBtn",
-      "rebuildServerVsServerBtn",
-      "rebuildAllWebsiteDataBtn",
+    "activateSeasonBtn",
+    "deactivateSeasonBtn",
 
-      "archiveSeasonNumber",
-      "archiveOfficialDate",
-      "validateSeasonArchiveBtn",
-      "saveSeasonArchiveBtn",
+    "uploadSeasonNumber",
+    "uploadTypeSelect",
+    "uploadOfficialDate",
+    "seasonDataFileInput",
+    "validateSeasonUploadBtn",
+    "uploadSeasonDataBtn",
 
-      "manualStatusPlayerId",
-      "manualStatusReason",
-      "searchManualStatusPlayerBtn",
-      "increaseManualStatusBtn",
-      "decreaseManualStatusBtn",
+    "rebuildHomeBtn",
+    "rebuildActiveAverageBtn",
+    "rebuildSeasonInfoBtn",
+    "rebuildServerVsServerBtn",
+    "rebuildAllWebsiteDataBtn",
 
-      "playerNotePlayerId",
-      "playerNoteType",
-      "playerNoteReason",
-      "searchPlayerNoteBtn",
-      "addPlayerNoteBtn",
-      "removePlayerNoteBtn",
+    "archiveSeasonNumber",
+    "archiveOfficialDate",
+    "validateSeasonArchiveBtn",
+    "saveSeasonArchiveBtn",
 
-      "addBlacklistBtn",
-      "blacklistPlayerId",
-      "blacklistPlayerName",
-      "blacklistReason"
-    ]);
+    "manualStatusPlayerId",
+    "manualStatusReason",
+    "searchManualStatusPlayerBtn",
+    "increaseManualStatusBtn",
+    "decreaseManualStatusBtn",
+
+    "playerNotePlayerId",
+    "playerNoteType",
+    "playerNoteReason",
+    "searchPlayerNoteBtn",
+    "addPlayerNoteBtn",
+    "removePlayerNoteBtn",
+
+    "addBlacklistBtn",
+    "blacklistPlayerId",
+    "blacklistPlayerName",
+    "blacklistReason"
+  ]);
 
   /* =====================================================
      PRIVATE STATE
@@ -759,20 +766,67 @@ function applyAdminConfigToState() {
     }
   }
 
-  const websiteStatusInput =
-    getElement(
-      "websiteStatusSelect"
-    );
+  const meritConfiguration =
+    adminConfig
+      ?.meritConfiguration
+      ?.w6 ||
+    null;
 
-  if (
-    websiteStatusInput &&
-    adminConfig.season
-      ?.websiteStatus
-  ) {
-    websiteStatusInput.value =
-      adminConfig.season
-        .websiteStatus;
-  }
+  const meritValues = {
+    t5Rank3Merits:
+      meritConfiguration
+        ?.t5
+        ?.rank3,
+
+    t5Rank2Merits:
+      meritConfiguration
+        ?.t5
+        ?.rank2,
+
+    t5Rank1Merits:
+      meritConfiguration
+        ?.t5
+        ?.rank1,
+
+    t4Rank3Merits:
+      meritConfiguration
+        ?.t4
+        ?.rank3,
+
+    t4Rank2Merits:
+      meritConfiguration
+        ?.t4
+        ?.rank2,
+
+    t4Rank1Merits:
+      meritConfiguration
+        ?.t4
+        ?.rank1
+  };
+
+  Object.entries(
+    meritValues
+  ).forEach(
+    (
+      [
+        id,
+        value
+      ]
+    ) => {
+      const input =
+        getElement(id);
+
+      if (
+        input &&
+        Number.isFinite(
+          Number(value)
+        )
+      ) {
+        input.value =
+          String(value);
+      }
+    }
+  );
 
   setBadge(
     "foundationStatusBadge",
@@ -3087,40 +3141,41 @@ if (
   }
 }
 
-async function saveWebsiteStatus() {
-  const select =
-    getElement(
-      "websiteStatusSelect"
-    );
-
-  const websiteStatus =
-    normalizeText(
-      select?.value
-    );
-
+async function saveMeritConfiguration() {
   const engine =
     global.K630AdminConfigEngine;
 
   const writer =
     getWriter();
 
-  if (
-    !canWrite() ||
-    !websiteStatus
-  ) {
+  if (!canWrite()) {
+    setValidation(
+      "meritConfigurationValidationBox",
+      "error",
+      "Only an Owner or Admin can save Merit Configuration.",
+      "fa-circle-xmark"
+    );
+
     return;
   }
 
   if (
     !engine ||
-    typeof engine.updateSeason !==
+    typeof engine
+      .updateMeritConfiguration !==
       "function" ||
-    typeof engine.buildFile !==
+    typeof engine
+      .buildFile !==
       "function"
   ) {
-    throw new Error(
-      "K630AdminConfigEngine is not loaded."
+    setValidation(
+      "meritConfigurationValidationBox",
+      "error",
+      "K630AdminConfigEngine Merit Configuration functions are unavailable.",
+      "fa-circle-xmark"
     );
+
+    return;
   }
 
   if (
@@ -3128,31 +3183,138 @@ async function saveWebsiteStatus() {
     typeof writer.writeJson !==
       "function"
   ) {
-    throw new Error(
-      "GitHub writer is not available."
+    setValidation(
+      "meritConfigurationValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
     );
+
+    return;
+  }
+
+  const readValue =
+    id => {
+      const value =
+        Number(
+          getElement(id)?.value
+        );
+
+      return Number.isFinite(value)
+        ? Math.round(
+            value * 100
+          ) / 100
+        : 0;
+    };
+
+  const w6 = {
+    t5: {
+      rank3:
+        readValue(
+          "t5Rank3Merits"
+        ),
+
+      rank2:
+        readValue(
+          "t5Rank2Merits"
+        ),
+
+      rank1:
+        readValue(
+          "t5Rank1Merits"
+        )
+    },
+
+    t4: {
+      rank3:
+        readValue(
+          "t4Rank3Merits"
+        ),
+
+      rank2:
+        readValue(
+          "t4Rank2Merits"
+        ),
+
+      rank1:
+        readValue(
+          "t4Rank1Merits"
+        )
+    }
+  };
+
+  if (
+    w6.t5.rank3 <
+      w6.t5.rank2 ||
+    w6.t5.rank2 <
+      w6.t5.rank1
+  ) {
+    setValidation(
+      "meritConfigurationValidationBox",
+      "error",
+      "T5 Rank 3 must be equal to or higher than Rank 2, and Rank 2 must be equal to or higher than Rank 1.",
+      "fa-circle-xmark"
+    );
+
+    return;
+  }
+
+  if (
+    w6.t4.rank3 <
+      w6.t4.rank2 ||
+    w6.t4.rank2 <
+      w6.t4.rank1
+  ) {
+    setValidation(
+      "meritConfigurationValidationBox",
+      "error",
+      "T4 Rank 3 must be equal to or higher than Rank 2, and Rank 2 must be equal to or higher than Rank 1.",
+      "fa-circle-xmark"
+    );
+
+    return;
   }
 
   setButtonEnabled(
-    "saveWebsiteStatusBtn",
+    "saveMeritConfigurationBtn",
     false
   );
 
+  setValidation(
+    "meritConfigurationValidationBox",
+    "warning",
+    "Saving Merit Configuration to admin-config.json.",
+    "fa-spinner"
+  );
+
   try {
+    const savedAt =
+      nowIso();
+
+    const savedBy =
+      getSession()?.email ||
+      getRole();
+
     const nextConfig =
-      engine.updateSeason(
+      engine.updateMeritConfiguration(
         adminConfig ||
         createDefaultAdminConfig(),
         {
-          websiteStatus
+          w6,
+
+          savedAt,
+
+          savedBy,
+
+          updatePending:
+            true
         },
         {
           updatedAt:
-            nowIso(),
+            savedAt,
 
           updatedBy:
-            getSession()?.email ||
-            getRole()
+            savedBy
         }
       );
 
@@ -3161,11 +3323,10 @@ async function saveWebsiteStatus() {
         nextConfig,
         {
           updatedAt:
-            nowIso(),
+            savedAt,
 
           updatedBy:
-            getSession()?.email ||
-            getRole()
+            savedBy
         }
       );
 
@@ -3177,38 +3338,82 @@ async function saveWebsiteStatus() {
           REPOSITORIES.data,
 
         message:
-          "Update public website status"
+          (
+            `Update Merit Configuration for ` +
+            `Season ${selectedSeason?.season || ""}`
+          )
       }
     );
 
     adminConfig =
       output.data;
 
-    setText(
-      "websiteStatusPreview",
-      select
-        ?.selectedOptions?.[0]
-        ?.textContent ||
-      websiteStatus
+    workflowState.websiteBuilt =
+      false;
+
+    setBadge(
+      "websiteUpdateStatus",
+      "ready",
+      "Rebuild Required"
+    );
+
+    setValidation(
+      "meritConfigurationValidationBox",
+      "success",
+      (
+        `Merit Configuration saved. ` +
+        `T5: ${w6.t5.rank3}% / ${w6.t5.rank2}% / ${w6.t5.rank1}%. ` +
+        `T4: ${w6.t4.rank3}% / ${w6.t4.rank2}% / ${w6.t4.rank1}%. ` +
+        `Rebuild Season Info to apply the targets.`
+      ),
+      "fa-circle-check"
     );
 
     appendLog(
-      "Website status",
+      "Merit Configuration",
       "success",
-      "Public website status saved successfully."
+      (
+        `T5 targets: ` +
+        `${w6.t5.rank3}/${w6.t5.rank2}/${w6.t5.rank1}. ` +
+        `T4 targets: ` +
+        `${w6.t4.rank3}/${w6.t4.rank2}/${w6.t4.rank1}.`
+      )
+    );
+
+    dispatchEvent(
+      "k630:merit-configuration-updated",
+      {
+        seasonNumber:
+          selectedSeason?.season ||
+          0,
+
+        meritConfiguration:
+          adminConfig
+            .meritConfiguration
+      }
     );
   } catch (error) {
-    appendLog(
-      "Website status",
+    setValidation(
+      "meritConfigurationValidationBox",
       "error",
       error?.message ||
-      "Website status could not be saved."
+      "Merit Configuration could not be saved.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Merit Configuration",
+      "error",
+      error?.message ||
+      "Merit Configuration could not be saved."
     );
   } finally {
     setButtonEnabled(
-      "saveWebsiteStatusBtn",
+      "saveMeritConfigurationBtn",
       canWrite()
     );
+
+    updateWorkflow();
   }
 }
 
@@ -4020,7 +4225,7 @@ async function deactivateSeason() {
   const writer =
     getWriter();
 
-  const engine =
+  const configEngine =
     global.K630AdminConfigEngine;
 
   const path =
@@ -4032,6 +4237,22 @@ async function deactivateSeason() {
         "uploadTypeSelect"
       )?.value
     ).toUpperCase();
+
+  const officialDate =
+    normalizeText(
+      getElement(
+        "uploadOfficialDate"
+      )?.value
+    );
+
+  const seasonNumber =
+    Math.trunc(
+      numberValue(
+        getElement(
+          "uploadSeasonNumber"
+        )?.value
+      )
+    );
 
   if (
     !writer ||
@@ -4049,10 +4270,10 @@ async function deactivateSeason() {
   }
 
   if (
-    !engine ||
-    typeof engine.updateWeeks !==
+    !configEngine ||
+    typeof configEngine.updateWeeks !==
       "function" ||
-    typeof engine.buildFile !==
+    typeof configEngine.buildFile !==
       "function"
   ) {
     setValidation(
@@ -4068,14 +4289,18 @@ async function deactivateSeason() {
   if (
     !workflowState.seasonActive ||
     !path ||
+    seasonNumber <= 0 ||
     !/^W[0-6]$/.test(week) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      officialDate
+    ) ||
     validatedSeasonFiles.length ===
       0
   ) {
     setValidation(
       "seasonUploadValidationBox",
       "warning",
-      "Activate the Season and validate the weekly source files first.",
+      "Activate the Season and validate the weekly source files and official date first.",
       "fa-triangle-exclamation"
     );
 
@@ -4112,7 +4337,8 @@ async function deactivateSeason() {
         "warning",
         (
           `Saving ${week} file ` +
-          `${savedCount + 1} of ${validatedSeasonFiles.length}: ` +
+          `${savedCount + 1} of ` +
+          `${validatedSeasonFiles.length}: ` +
           `${entry.file.name}`
         ),
         "fa-cloud-arrow-up"
@@ -4127,8 +4353,9 @@ async function deactivateSeason() {
 
           message:
             (
-              `Upload ${week} data for Season ` +
-              `${selectedSeason?.season || ""}: ${entry.file.name}`
+              `Upload ${week} data for ` +
+              `Season ${seasonNumber}: ` +
+              `${entry.file.name}`
             )
         }
       );
@@ -4138,12 +4365,14 @@ async function deactivateSeason() {
     }
 
     const nextConfig =
-      engine.updateWeeks(
+      configEngine.updateWeeks(
         adminConfig ||
         createDefaultAdminConfig(),
         {
           addWeek:
             week,
+
+          officialDate,
 
           updatedAt:
             nowIso()
@@ -4158,8 +4387,8 @@ async function deactivateSeason() {
         }
       );
 
-    const output =
-      engine.buildFile(
+    const configOutput =
+      configEngine.buildFile(
         nextConfig,
         {
           updatedAt:
@@ -4173,26 +4402,32 @@ async function deactivateSeason() {
 
     await writer.writeJson(
       ADMIN_CONFIG_WRITE_PATH,
-      output.data,
+      configOutput.data,
       {
         repository:
           REPOSITORIES.data,
 
         message:
           (
-            `Mark ${week} uploaded for Season ` +
-            `${selectedSeason?.season || ""}`
+            `Register ${week} and official date ` +
+            `${officialDate} for Season ${seasonNumber}`
           )
       }
     );
 
     adminConfig =
-      output.data;
+      configOutput.data;
 
     applyAdminConfigToState();
 
     workflowState.weekData =
       true;
+
+    workflowState.websiteBuilt =
+      false;
+
+    workflowState.archiveReady =
+      false;
 
     setBadge(
       "dataUploadStatus",
@@ -4204,8 +4439,8 @@ async function deactivateSeason() {
       "seasonUploadValidationBox",
       "success",
       (
-        `${savedCount} ${week} source files uploaded successfully. ` +
-        `${week} is saved in admin-config.json.`
+        `${savedCount} ${week} source files uploaded. ` +
+        `Official date ${officialDate} was saved in admin-config.json.`
       ),
       "fa-circle-check"
     );
@@ -4215,22 +4450,18 @@ async function deactivateSeason() {
       "success",
       (
         `${savedCount} files uploaded for ${week}, ` +
-        `Season ${selectedSeason?.season || ""}.`
+        `Season ${seasonNumber}, official date ${officialDate}.`
       )
     );
 
     dispatchEvent(
       "k630:week-uploaded",
       {
-        seasonNumber:
-          selectedSeason?.season ||
-          numberValue(
-            getElement(
-              "uploadSeasonNumber"
-            )?.value
-          ),
+        seasonNumber,
 
         week,
+
+        officialDate,
 
         files:
           validatedSeasonFiles.map(
@@ -4267,7 +4498,6 @@ async function deactivateSeason() {
       "uploadSeasonDataBtn",
       Boolean(
         canWrite() &&
-        workflowState.githubWrite &&
         workflowState.seasonActive &&
         validatedSeasonFiles.length >
           0
@@ -4356,12 +4586,12 @@ async function loadSeasonWeekServerData(
   ]);
 }
 
-async function rebuildSeasonInfo() {
+async function rebuildWeeklyPlayerState() {
   const writer =
     getWriter();
 
   const engine =
-    global.K630SeasonInfoEngine;
+    global.K630WeeklyPlayerStateEngine;
 
   const seasonNumber =
     Math.trunc(
@@ -4375,18 +4605,96 @@ async function rebuildSeasonInfo() {
       )
     );
 
-  if (
-    !canWrite() ||
-    seasonNumber <= 0
-  ) {
-    setValidation(
-      "websiteUpdateValidationBox",
-      "warning",
-      "A valid active Season is required.",
-      "fa-triangle-exclamation"
+  const uploadedWeeks =
+    Array.isArray(
+      adminConfig?.weeks
+        ?.uploaded
+    )
+      ? adminConfig.weeks
+          .uploaded
+          .map(value =>
+            normalizeText(value)
+              .toUpperCase()
+          )
+          .filter(value =>
+            /^W[0-6]$/.test(value)
+          )
+      : [];
+
+  const latestWeekLabel =
+    normalizeText(
+      adminConfig?.weeks
+        ?.latestWeek
+    ).toUpperCase() ||
+    uploadedWeeks[
+      uploadedWeeks.length - 1
+    ] ||
+    (
+      adminConfig?.weeks
+        ?.ready === true
+        ? "W0"
+        : ""
     );
 
-    return;
+  const weekNumber =
+    /^W[0-6]$/.test(
+      latestWeekLabel
+    )
+      ? Number(
+          latestWeekLabel.replace(
+            "W",
+            ""
+          )
+        )
+      : -1;
+
+  const officialDate =
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDates
+        ?.[latestWeekLabel]
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.[latestWeekLabel]
+        ?.officialDate
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDate
+    ) ||
+    (
+      weekNumber === 0
+        ? normalizeText(
+            adminConfig?.matchmaking
+              ?.officialDate
+          )
+        : ""
+    );
+
+  if (
+    !canWrite() ||
+    seasonNumber <= 0 ||
+    !/^W[0-6]$/.test(
+      latestWeekLabel
+    ) ||
+    !Number.isInteger(
+      weekNumber
+    ) ||
+    weekNumber < 0 ||
+    weekNumber > 6 ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      officialDate
+    )
+  ) {
+    throw new Error(
+      (
+        `Weekly player state configuration is incomplete. ` +
+        `Season=${seasonNumber || "missing"}, ` +
+        `Week=${latestWeekLabel || "missing"}, ` +
+        `Official date=${officialDate || "missing"}.`
+      )
+    );
   }
 
   if (
@@ -4394,14 +4702,9 @@ async function rebuildSeasonInfo() {
     typeof writer.writeJson !==
       "function"
   ) {
-    setValidation(
-      "websiteUpdateValidationBox",
-      "error",
-      "GitHub writer is not available.",
-      "fa-circle-xmark"
+    throw new Error(
+      "GitHub writer is not available."
     );
-
-    return;
   }
 
   if (
@@ -4409,14 +4712,763 @@ async function rebuildSeasonInfo() {
     typeof engine.build !==
       "function"
   ) {
+    throw new Error(
+      "K630WeeklyPlayerStateEngine is not loaded."
+    );
+  }
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    (
+      `Loading Active & Average and ` +
+      `Season ${seasonNumber} ${latestWeekLabel}.`
+    ),
+    "fa-spinner"
+  );
+
+  const activeAverageData =
+    await readMatchmakingDependency(
+      ACTIVE_AVERAGE_PATH
+    );
+
+  let seasonInfoData = {
+    players: []
+  };
+
+  if (weekNumber > 0) {
+    seasonInfoData =
+      await readMatchmakingDependency(
+        "generated/season-info/current.json"
+      );
+  }
+
+  const currentWeekData =
+    await loadSeasonWeekServerData(
+      seasonNumber,
+      weekNumber,
+      HOME_KINGDOM
+    );
+
+  const generatedAt =
+    nowIso();
+
+  const generatedBy =
+    getSession()?.email ||
+    getRole();
+
+  const result =
+    engine.build(
+      activeAverageData,
+      seasonInfoData,
+      currentWeekData,
+      {
+        seasonNumber,
+
+        weekNumber,
+
+        officialDate,
+
+        generatedAt,
+
+        generatedBy,
+
+        adminConfig,
+
+        meritConfiguration:
+          adminConfig
+            ?.meritConfiguration ||
+          null
+      }
+    );
+
+  const activeAverageOutput =
+    result.files[
+      "assets/data/generated/active-average/current.json"
+    ] ||
+    result.data
+      ?.activeAverage;
+
+  const seasonInfoOutput =
+    result.files[
+      "assets/data/generated/season-info/current.json"
+    ] ||
+    result.data
+      ?.seasonInfo;
+
+  if (
+    !activeAverageOutput ||
+    !seasonInfoOutput
+  ) {
+    throw new Error(
+      "Weekly Player State Engine generated incomplete output."
+    );
+  }
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Saving Active & Average current.json.",
+    "fa-spinner"
+  );
+
+  await writer.writeJson(
+    "assets/data/generated/active-average/current.json",
+    activeAverageOutput,
+    {
+      repository:
+        REPOSITORIES.data,
+
+      message:
+        (
+          `Rebuild Active & Average for ` +
+          `Season ${seasonNumber} ${latestWeekLabel}`
+        )
+    }
+  );
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Saving Season Info current.json.",
+    "fa-spinner"
+  );
+
+  await writer.writeJson(
+    "assets/data/generated/season-info/current.json",
+    seasonInfoOutput,
+    {
+      repository:
+        REPOSITORIES.data,
+
+      message:
+        (
+          `Rebuild Season Info for ` +
+          `Season ${seasonNumber} ${latestWeekLabel}`
+        )
+    }
+  );
+
+  appendLog(
+    "Weekly player state rebuild",
+    "success",
+    (
+      `Season ${seasonNumber} ${latestWeekLabel}: ` +
+      `${result.summary.activeAverage.updatedPlayers} updated, ` +
+      `${result.summary.activeAverage.addedPlayers} added, ` +
+      `${result.summary.seasonInfo.leftPlayers} marked LEFT.`
+    )
+  );
+
+  return result;
+}
+
+async function loadOptionalJson(
+  relativePath,
+  fallbackValue = {}
+) {
+  try {
+    return await readMatchmakingDependency(
+      relativePath
+    );
+  } catch (error) {
+    console.warn(
+      `[Admin Center] Optional JSON unavailable: ${relativePath}`,
+      error
+    );
+
+    return fallbackValue;
+  }
+}
+
+async function loadParticipatingServerWeekData(
+  seasonNumber,
+  weekNumber
+) {
+  const servers =
+    Array.isArray(
+      participatingServers
+    ) &&
+    participatingServers.length > 0
+      ? participatingServers
+      : (
+          Array.isArray(
+            adminConfig?.season
+              ?.participatingServers
+          )
+            ? adminConfig.season
+                .participatingServers
+            : []
+        );
+
+  if (
+    servers.length ===
+    0
+  ) {
+    throw new Error(
+      "No participating servers are configured."
+    );
+  }
+
+  const output =
+    [];
+
+  for (
+    let index = 0;
+    index < servers.length;
+    index += 1
+  ) {
+    const serverNumber =
+      Math.trunc(
+        numberValue(
+          servers[index]
+        )
+      );
+
+    if (
+      serverNumber <=
+      0
+    ) {
+      continue;
+    }
+
+    setValidation(
+      "websiteUpdateValidationBox",
+      "warning",
+      (
+        `Loading Season ${seasonNumber} W${weekNumber} ` +
+        `Server ${serverNumber} ` +
+        `(${index + 1}/${servers.length}).`
+      ),
+      "fa-spinner"
+    );
+
+    const data =
+      await loadSeasonWeekServerData(
+        seasonNumber,
+        weekNumber,
+        serverNumber
+      );
+
+    output.push({
+      serverNumber,
+      data
+    });
+  }
+
+  return output;
+}
+
+async function rebuildHomeWeekly(
+  activeAverageOverride = null
+) {
+  const writer =
+    getWriter();
+
+  const engine =
+    global.K630HomeWeeklyEngine;
+
+  const seasonNumber =
+    Math.trunc(
+      numberValue(
+        selectedSeason?.season ||
+        adminConfig?.season
+          ?.selectedSeason
+          ?.season ||
+        adminConfig?.matchmaking
+          ?.seasonNumber
+      )
+    );
+
+  const uploadedWeeks =
+    Array.isArray(
+      adminConfig?.weeks
+        ?.uploaded
+    )
+      ? adminConfig.weeks
+          .uploaded
+          .map(value =>
+            normalizeText(value)
+              .toUpperCase()
+          )
+          .filter(value =>
+            /^W[0-6]$/.test(value)
+          )
+      : [];
+
+  const latestWeekLabel =
+    normalizeText(
+      adminConfig?.weeks
+        ?.latestWeek
+    ).toUpperCase() ||
+    uploadedWeeks[
+      uploadedWeeks.length - 1
+    ] ||
+    (
+      adminConfig?.weeks
+        ?.ready === true
+        ? "W0"
+        : ""
+    );
+
+  const weekNumber =
+    /^W[0-6]$/.test(
+      latestWeekLabel
+    )
+      ? Number(
+          latestWeekLabel.replace(
+            "W",
+            ""
+          )
+        )
+      : -1;
+
+  const officialDate =
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDates
+        ?.[latestWeekLabel]
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.[latestWeekLabel]
+        ?.officialDate
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDate
+    ) ||
+    (
+      weekNumber === 0
+        ? normalizeText(
+            adminConfig?.season
+              ?.activatedAt
+          )
+        : ""
+    ) ||
+    (
+      weekNumber === 0
+        ? normalizeText(
+            adminConfig?.matchmaking
+              ?.officialDate
+          )
+        : ""
+    );
+
+  console.info(
+    "[K630 Home Rebuild State]",
+    {
+      seasonNumber,
+      uploadedWeeks,
+      latestWeekLabel,
+      weekNumber,
+      officialDate,
+      weeks:
+        adminConfig?.weeks ||
+        null
+    }
+  );
+
+  if (
+    !canWrite() ||
+    seasonNumber <= 0 ||
+    !/^W[0-6]$/.test(
+      latestWeekLabel
+    ) ||
+    !Number.isInteger(
+      weekNumber
+    ) ||
+    weekNumber < 0 ||
+    weekNumber > 6 ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      officialDate
+    )
+  ) {
+    throw new Error(
+      (
+        `Home rebuild configuration is incomplete. ` +
+        `Season=${seasonNumber || "missing"}, ` +
+        `Week=${latestWeekLabel || "missing"}, ` +
+        `Official date=${officialDate || "missing"}.`
+      )
+    );
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
+
+  if (
+    !engine ||
+    typeof engine.build !==
+      "function"
+  ) {
+    throw new Error(
+      "K630HomeWeeklyEngine is not loaded."
+    );
+  }
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Loading current Active & Average data.",
+    "fa-spinner"
+  );
+
+  const activeAverageData =
+    activeAverageOverride ||
+    await readMatchmakingDependency(
+      ACTIVE_AVERAGE_PATH
+    );
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    (
+      `Loading Server ${HOME_KINGDOM} ` +
+      `${latestWeekLabel} data.`
+    ),
+    "fa-spinner"
+  );
+
+  const homeWeekData =
+    await loadSeasonWeekServerData(
+      seasonNumber,
+      weekNumber,
+      HOME_KINGDOM
+    );
+
+  const participatingServerWeekData =
+    await loadParticipatingServerWeekData(
+      seasonNumber,
+      weekNumber
+    );
+
+  const previousHomeData =
+    await loadOptionalJson(
+      "generated/home/current.json",
+      {}
+    );
+
+  const result =
+    engine.build(
+      activeAverageData,
+      homeWeekData,
+      participatingServerWeekData,
+      previousHomeData,
+      {
+        seasonNumber,
+
+        weekNumber,
+
+        officialDate,
+
+        participatingServers:
+          participatingServerWeekData.map(
+            entry =>
+              entry.serverNumber
+          ),
+
+        seasonName:
+          selectedSeason?.sosName ||
+          adminConfig?.season
+            ?.selectedSeason
+            ?.sosName ||
+          `Season ${seasonNumber}`,
+
+        generatedAt:
+          nowIso(),
+
+        generatedBy:
+          getSession()?.email ||
+          getRole()
+      }
+    );
+
+  const output =
+    result.files[
+      "assets/data/generated/home/current.json"
+    ] ||
+    result.data;
+
+  if (!output) {
+    throw new Error(
+      "Home Weekly Engine generated no output."
+    );
+  }
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Saving Home current.json.",
+    "fa-spinner"
+  );
+
+  await writer.writeJson(
+    "assets/data/generated/home/current.json",
+    output,
+    {
+      repository:
+        REPOSITORIES.data,
+
+      message:
+        (
+          `Rebuild Home for Season ` +
+          `${seasonNumber} ${latestWeekLabel}`
+        )
+    }
+  );
+
+  appendLog(
+    "Home rebuild",
+    "success",
+    (
+      `Season ${seasonNumber} ${latestWeekLabel}: ` +
+      `${result.summary.activePlayers} players, ` +
+      `${result.summary.warriors} Warriors, ` +
+      `${result.summary.farmers} Farmers, ` +
+      `${result.summary.serverPower} total Power.`
+    )
+  );
+
+  return result;
+}
+
+async function rebuildServerVsServerWeekly(
+  participatingServerWeekDataOverride = null
+) {
+  const writer =
+    getWriter();
+
+  const engine =
+    global.K630ServerVsServerWeeklyEngine;
+
+  const seasonNumber =
+    Math.trunc(
+      numberValue(
+        selectedSeason?.season ||
+        adminConfig?.season
+          ?.selectedSeason
+          ?.season ||
+        adminConfig?.matchmaking
+          ?.seasonNumber
+      )
+    );
+
+  const uploadedWeeks =
+    Array.isArray(
+      adminConfig?.weeks
+        ?.uploaded
+    )
+      ? adminConfig.weeks
+          .uploaded
+          .map(value =>
+            normalizeText(value)
+              .toUpperCase()
+          )
+          .filter(value =>
+            /^W[0-6]$/.test(value)
+          )
+      : [];
+
+  const latestWeekLabel =
+    normalizeText(
+      adminConfig?.weeks
+        ?.latestWeek
+    ).toUpperCase() ||
+    uploadedWeeks[
+      uploadedWeeks.length - 1
+    ] ||
+    (
+      adminConfig?.weeks
+        ?.ready === true
+        ? "W0"
+        : ""
+    );
+
+  const weekNumber =
+    /^W[0-6]$/.test(
+      latestWeekLabel
+    )
+      ? Number(
+          latestWeekLabel.replace(
+            "W",
+            ""
+          )
+        )
+      : -1;
+
+  const officialDate =
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDates
+        ?.[latestWeekLabel]
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.[latestWeekLabel]
+        ?.officialDate
+    ) ||
+    normalizeText(
+      adminConfig?.weeks
+        ?.officialDate
+    ) ||
+    (
+      weekNumber === 0
+        ? normalizeText(
+            adminConfig?.matchmaking
+              ?.officialDate
+          )
+        : ""
+    );
+
+  if (
+    !canWrite() ||
+    seasonNumber <= 0 ||
+    !/^W[0-6]$/.test(
+      latestWeekLabel
+    ) ||
+    !Number.isInteger(
+      weekNumber
+    ) ||
+    weekNumber < 0 ||
+    weekNumber > 6 ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      officialDate
+    )
+  ) {
+    throw new Error(
+      (
+        `Server vs Server configuration is incomplete. ` +
+        `Season=${seasonNumber || "missing"}, ` +
+        `Week=${latestWeekLabel || "missing"}, ` +
+        `Official date=${officialDate || "missing"}.`
+      )
+    );
+  }
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+    throw new Error(
+      "GitHub writer is not available."
+    );
+  }
+
+  if (
+    !engine ||
+    typeof engine.build !==
+      "function"
+  ) {
+    throw new Error(
+      "K630ServerVsServerWeeklyEngine is not loaded."
+    );
+  }
+
+  const participatingServerWeekData =
+    participatingServerWeekDataOverride ||
+    await loadParticipatingServerWeekData(
+      seasonNumber,
+      weekNumber
+    );
+
+  const previousServerVsServerData =
+    await loadOptionalJson(
+      "generated/server-vs-server/current.json",
+      {}
+    );
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Building Server vs Server current data.",
+    "fa-spinner"
+  );
+
+  const result =
+    engine.build(
+      participatingServerWeekData,
+      previousServerVsServerData,
+      {
+        seasonNumber,
+
+        weekNumber,
+
+        officialDate,
+
+        generatedAt:
+          nowIso(),
+
+        generatedBy:
+          getSession()?.email ||
+          getRole()
+      }
+    );
+
+  const output =
+    result.files[
+      "assets/data/generated/server-vs-server/current.json"
+    ] ||
+    result.data;
+
+  if (!output) {
+    throw new Error(
+      "Server vs Server Weekly Engine generated no output."
+    );
+  }
+
+  setValidation(
+    "websiteUpdateValidationBox",
+    "warning",
+    "Saving Server vs Server current.json.",
+    "fa-spinner"
+  );
+
+  await writer.writeJson(
+    "assets/data/generated/server-vs-server/current.json",
+    output,
+    {
+      repository:
+        REPOSITORIES.data,
+
+      message:
+        (
+          `Rebuild Server vs Server for ` +
+          `Season ${seasonNumber} ${latestWeekLabel}`
+        )
+    }
+  );
+
+  appendLog(
+    "Server vs Server rebuild",
+    "success",
+    (
+      `Season ${seasonNumber} ${latestWeekLabel}: ` +
+      `${result.summary.serverCount} servers rebuilt.`
+    )
+  );
+
+  return result;
+}
+
+async function rebuildSeasonInfo() {
+  if (!canWrite()) {
     setValidation(
       "websiteUpdateValidationBox",
       "error",
-      "K630SeasonInfoEngine is not loaded.",
+      "Only an Owner or Admin can rebuild Season Info.",
       "fa-circle-xmark"
     );
 
-    return;
+    return null;
   }
 
   setButtonEnabled(
@@ -4433,150 +5485,356 @@ async function rebuildSeasonInfo() {
   setValidation(
     "websiteUpdateValidationBox",
     "warning",
-    "Loading Active & Average and Season 1 weekly data.",
+    "Rebuilding Season Info through the Weekly Player State Engine.",
     "fa-spinner"
   );
 
   try {
-    const activeAverageData =
-      await readMatchmakingDependency(
-        ACTIVE_AVERAGE_PATH
-      );
-
-    const uploadedWeeks =
-      Array.isArray(
-        adminConfig?.weeks
-          ?.uploaded
-      )
-        ? adminConfig.weeks
-            .uploaded
-        : [];
-
-    if (
-      uploadedWeeks.length ===
-      0
-    ) {
-      throw new Error(
-        "No uploaded Season weeks are registered."
-      );
-    }
-
-    const weeklyFiles =
-      {};
-
-    for (
-      const weekLabel of
-      uploadedWeeks
-    ) {
-      const weekNumber =
-        Number(
-          normalizeText(
-            weekLabel
-          )
-            .toUpperCase()
-            .replace(
-              "W",
-              ""
-            )
-        );
-
-      if (
-        !Number.isInteger(
-          weekNumber
-        ) ||
-        weekNumber < 0 ||
-        weekNumber > 6
-      ) {
-        continue;
-      }
-
-      setValidation(
-        "websiteUpdateValidationBox",
-        "warning",
-        (
-          `Loading Season ${seasonNumber} ` +
-          `W${weekNumber} Server 630 data.`
-        ),
-        "fa-spinner"
-      );
-
-      const weekData =
-        await loadSeasonWeekServerData(
-          seasonNumber,
-          weekNumber,
-          HOME_KINGDOM
-        );
-
-      weeklyFiles[
-        `W${weekNumber}`
-      ] = [
-        weekData
-      ];
-    }
-
     const result =
-      engine.build(
-        activeAverageData,
-        weeklyFiles,
-        {
-          seasonNumber,
+      await rebuildWeeklyPlayerState();
 
-          officialDate:
-            adminConfig?.matchmaking
-              ?.officialDate ||
-            "",
-
-          generatedAt:
-            nowIso(),
-
-          generatedBy:
-            getSession()?.email ||
-            getRole()
-        }
-      );
-
-    const outputData =
-      result.files[
-        SEASON_INFO_OUTPUT_PATH
+    const seasonInfoData =
+      result?.data
+        ?.seasonInfo ||
+      result?.files?.[
+        "assets/data/generated/season-info/current.json"
       ] ||
-      result.data;
+      null;
 
-    if (!outputData) {
+    if (!seasonInfoData) {
       throw new Error(
-        "Season Info Engine generated no output."
+        "Weekly Player State Engine generated no Season Info output."
       );
     }
 
-    await writer.writeJson(
-      SEASON_INFO_OUTPUT_PATH,
-      outputData,
-      {
-        repository:
-          REPOSITORIES.data,
+    const seasonNumber =
+      Math.trunc(
+        numberValue(
+          result?.seasonNumber ||
+          selectedSeason?.season ||
+          adminConfig?.season
+            ?.selectedSeason
+            ?.season ||
+          adminConfig?.matchmaking
+            ?.seasonNumber
+        )
+      );
 
-        message:
-          (
-            `Rebuild Season Info for ` +
-            `Season ${seasonNumber}`
-          )
+    setBadge(
+      "websiteUpdateStatus",
+      "ready",
+      "Updated"
+    );
+
+    setValidation(
+      "websiteUpdateValidationBox",
+      "success",
+      (
+        `Season Info rebuilt successfully through ` +
+        `K630WeeklyPlayerStateEngine. ` +
+        `${result.summary?.seasonInfo?.officialParticipants || 0} ` +
+        `participants and ` +
+        `${result.summary?.seasonInfo?.leftPlayers || 0} LEFT players processed.`
+      ),
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Season Info rebuild",
+      "success",
+      (
+        `Season ${seasonNumber}: ` +
+        `${result.summary?.seasonInfo?.officialParticipants || 0} ` +
+        `participants rebuilt through the Weekly Player State Engine.`
+      )
+    );
+
+    dispatchEvent(
+      "k630:season-info-rebuilt",
+      {
+        seasonNumber,
+
+        week:
+          result.week ||
+          null,
+
+        summary:
+          result.summary
+            ?.seasonInfo ||
+          {},
+
+        outputPath:
+          "assets/data/generated/season-info/current.json",
+
+        engine:
+          "K630WeeklyPlayerStateEngine"
       }
     );
 
-    workflowState.websiteBuilt =
-      true;
+    updateWorkflow();
 
-    const configEngine =
-      global.K630AdminConfigEngine;
+    return result;
+  } catch (error) {
+    setBadge(
+      "websiteUpdateStatus",
+      "error",
+      "Failed"
+    );
+
+    setValidation(
+      "websiteUpdateValidationBox",
+      "error",
+      error?.message ||
+      "Season Info rebuild failed.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Season Info rebuild",
+      "error",
+      error?.message ||
+      "Season Info rebuild failed."
+    );
+
+    return null;
+  } finally {
+    setButtonEnabled(
+      "rebuildSeasonInfoBtn",
+      Boolean(
+        canWrite() &&
+        workflowState.weekData
+      )
+    );
+  }
+}
+
+  /* =====================================================
+     WEBSITE UPDATE AND ARCHIVE PLACEHOLDERS
+  ===================================================== */
+
+  function unavailableEngine(
+    validationBox,
+    action
+  ) {
+    setValidation(
+      validationBox,
+      "warning",
+      `${action} requires its dedicated data engine. The Admin Center connection is ready, but the engine has not been added yet.`,
+      "fa-triangle-exclamation"
+    );
+  }
+
+  async function rebuildPage(event) {
+  const buttonId =
+    event?.currentTarget?.id ||
+    "";
+
+  const supportedButtons = [
+    "rebuildHomeBtn",
+    "rebuildActiveAverageBtn",
+    "rebuildSeasonInfoBtn",
+    "rebuildServerVsServerBtn",
+    "rebuildAllWebsiteDataBtn"
+  ];
+
+  if (
+    !supportedButtons.includes(
+      buttonId
+    )
+  ) {
+    unavailableEngine(
+      "websiteUpdateValidationBox",
+      "Website Update"
+    );
+
+    return;
+  }
+
+  const writer =
+    getWriter();
+
+  const configEngine =
+    global.K630AdminConfigEngine;
+
+  [
+    "rebuildHomeBtn",
+    "rebuildActiveAverageBtn",
+    "rebuildSeasonInfoBtn",
+    "rebuildServerVsServerBtn",
+    "rebuildAllWebsiteDataBtn"
+  ].forEach(id => {
+    setButtonEnabled(
+      id,
+      false
+    );
+  });
+
+  setBadge(
+    "websiteUpdateStatus",
+    "checking",
+    "Building"
+  );
+
+  try {
+    let weeklyPlayerStateResult =
+      null;
+
+    let homeResult =
+      null;
+
+    let serverVsServerResult =
+      null;
+
+    let participatingServerWeekData =
+      null;
 
     if (
-      configEngine &&
-      typeof configEngine
-        .updateWebsiteBuild ===
-        "function" &&
-      typeof configEngine
-        .buildFile ===
-        "function"
+      buttonId ===
+        "rebuildActiveAverageBtn" ||
+      buttonId ===
+        "rebuildSeasonInfoBtn" ||
+      buttonId ===
+        "rebuildAllWebsiteDataBtn"
     ) {
+      weeklyPlayerStateResult =
+        await rebuildWeeklyPlayerState();
+    }
+
+    if (
+      buttonId ===
+        "rebuildHomeBtn" ||
+      buttonId ===
+        "rebuildServerVsServerBtn" ||
+      buttonId ===
+        "rebuildAllWebsiteDataBtn"
+    ) {
+      const seasonNumber =
+        Math.trunc(
+          numberValue(
+            selectedSeason?.season ||
+            adminConfig?.season
+              ?.selectedSeason
+              ?.season ||
+            adminConfig?.matchmaking
+              ?.seasonNumber
+          )
+        );
+
+      const uploadedWeeks =
+        Array.isArray(
+          adminConfig?.weeks
+            ?.uploaded
+        )
+          ? adminConfig.weeks
+              .uploaded
+              .map(value =>
+                normalizeText(value)
+                  .toUpperCase()
+              )
+              .filter(value =>
+                /^W[0-6]$/.test(value)
+              )
+          : [];
+
+      const latestWeekLabel =
+        normalizeText(
+          adminConfig?.weeks
+            ?.latestWeek
+        ).toUpperCase() ||
+        uploadedWeeks[
+          uploadedWeeks.length - 1
+        ] ||
+        (
+          adminConfig?.weeks
+            ?.ready === true
+            ? "W0"
+            : ""
+        );
+
+      const weekNumber =
+        /^W[0-6]$/.test(
+          latestWeekLabel
+        )
+          ? Number(
+              latestWeekLabel.replace(
+                "W",
+                ""
+              )
+            )
+          : -1;
+
+      if (
+        seasonNumber <= 0 ||
+        weekNumber < 0 ||
+        weekNumber > 6
+      ) {
+        throw new Error(
+          "Season or latest uploaded week is missing."
+        );
+      }
+
+      participatingServerWeekData =
+        await loadParticipatingServerWeekData(
+          seasonNumber,
+          weekNumber
+        );
+    }
+
+    if (
+      buttonId ===
+        "rebuildHomeBtn" ||
+      buttonId ===
+        "rebuildAllWebsiteDataBtn"
+    ) {
+      homeResult =
+        await rebuildHomeWeekly(
+          weeklyPlayerStateResult
+            ?.data
+            ?.activeAverage ||
+          null
+        );
+    }
+
+    if (
+      buttonId ===
+        "rebuildServerVsServerBtn" ||
+      buttonId ===
+        "rebuildAllWebsiteDataBtn"
+    ) {
+      serverVsServerResult =
+        await rebuildServerVsServerWeekly(
+          participatingServerWeekData
+        );
+    }
+
+    if (
+      buttonId ===
+      "rebuildAllWebsiteDataBtn"
+    ) {
+      if (
+        !writer ||
+        typeof writer.writeJson !==
+          "function"
+      ) {
+        throw new Error(
+          "GitHub writer is not available."
+        );
+      }
+
+      if (
+        !configEngine ||
+        typeof configEngine
+          .updateWebsiteBuild !==
+          "function" ||
+        typeof configEngine
+          .buildFile !==
+          "function"
+      ) {
+        throw new Error(
+          "K630AdminConfigEngine website build functions are unavailable."
+        );
+      }
+
       const nextConfig =
         configEngine.updateWebsiteBuild(
           adminConfig ||
@@ -4620,8 +5878,9 @@ async function rebuildSeasonInfo() {
 
           message:
             (
-              `Mark Season Info rebuilt for ` +
-              `Season ${seasonNumber}`
+              `Mark website data rebuilt for ` +
+              `Season ${homeResult?.seasonNumber || ""} ` +
+              `${homeResult?.week || ""}`
             )
         }
       );
@@ -4630,6 +5889,15 @@ async function rebuildSeasonInfo() {
         configOutput.data;
 
       applyAdminConfigToState();
+
+      workflowState.websiteBuilt =
+        true;
+    } else {
+      workflowState.websiteBuilt =
+        Boolean(
+          adminConfig?.websiteBuild
+            ?.ready
+        );
     }
 
     setBadge(
@@ -4638,42 +5906,116 @@ async function rebuildSeasonInfo() {
       "Ready"
     );
 
-    setValidation(
-      "websiteUpdateValidationBox",
-      "success",
-      (
-        `Season Info rebuilt successfully. ` +
-        `${result.summary.officialParticipants} official participants, ` +
-        `${result.summary.warriors} Warriors and ` +
-        `${result.summary.farmers} Farmers.`
-      ),
-      "fa-circle-check"
-    );
+    if (
+      buttonId ===
+      "rebuildServerVsServerBtn"
+    ) {
+      setValidation(
+        "websiteUpdateValidationBox",
+        "success",
+        (
+          `Server vs Server rebuilt for ` +
+          `Season ${serverVsServerResult.seasonNumber} ` +
+          `${serverVsServerResult.week}. ` +
+          `${serverVsServerResult.summary.serverCount} servers generated.`
+        ),
+        "fa-circle-check"
+      );
+    } else if (
+      buttonId ===
+      "rebuildHomeBtn"
+    ) {
+      setValidation(
+        "websiteUpdateValidationBox",
+        "success",
+        (
+          `Home rebuilt for Season ` +
+          `${homeResult.seasonNumber} ${homeResult.week}. ` +
+          `${homeResult.summary.activePlayers} players, ` +
+          `${homeResult.summary.warriors} Warriors, ` +
+          `${homeResult.summary.farmers} Farmers.`
+        ),
+        "fa-circle-check"
+      );
+    } else if (
+      buttonId ===
+      "rebuildAllWebsiteDataBtn"
+    ) {
+      setValidation(
+        "websiteUpdateValidationBox",
+        "success",
+        (
+          `Rebuild All completed for ` +
+          `Season ${homeResult.seasonNumber} ${homeResult.week}. ` +
+          `${weeklyPlayerStateResult.summary.activeAverage.totalPlayers} ` +
+          `Active & Average IDs, ` +
+          `${weeklyPlayerStateResult.summary.seasonInfo.officialParticipants} ` +
+          `Season participants, ` +
+          `${weeklyPlayerStateResult.summary.seasonInfo.leftPlayers} LEFT, ` +
+          `${serverVsServerResult.summary.serverCount} servers.`
+        ),
+        "fa-circle-check"
+      );
+    } else {
+      setValidation(
+        "websiteUpdateValidationBox",
+        "success",
+        (
+          `Active & Average and Season Info rebuilt for ` +
+          `Season ${weeklyPlayerStateResult.seasonNumber} ` +
+          `${weeklyPlayerStateResult.week}. ` +
+          `${weeklyPlayerStateResult.summary.activeAverage.totalPlayers} ` +
+          `Active & Average IDs, ` +
+          `${weeklyPlayerStateResult.summary.seasonInfo.officialParticipants} ` +
+          `Season participants, ` +
+          `${weeklyPlayerStateResult.summary.seasonInfo.leftPlayers} LEFT.`
+        ),
+        "fa-circle-check"
+      );
+    }
 
     appendLog(
-      "Season Info rebuild",
+      "Website data rebuild",
       "success",
       (
-        `Season ${seasonNumber}: ` +
-        `${result.summary.officialParticipants} participants generated.`
+        buttonId ===
+          "rebuildAllWebsiteDataBtn"
+          ? (
+              `Season ${homeResult.seasonNumber} ${homeResult.week} ` +
+              `Rebuild All completed and saved.`
+            )
+          : `${buttonId} completed.`
       )
     );
 
     dispatchEvent(
-      "k630:season-info-rebuilt",
+      "k630:website-data-rebuilt",
       {
-        seasonNumber,
+        buttonId,
 
-        summary:
-          result.summary,
+        weeklyPlayerState:
+          weeklyPlayerStateResult
+            ?.summary ||
+          null,
 
-        outputPath:
-          SEASON_INFO_OUTPUT_PATH
+        home:
+          homeResult
+            ?.summary ||
+          null,
+
+        serverVsServer:
+          serverVsServerResult
+            ?.summary ||
+          null,
+
+        websiteBuilt:
+          workflowState.websiteBuilt
       }
     );
-
-    updateWorkflow();
   } catch (error) {
+    workflowState.websiteBuilt =
+      false;
+
     setBadge(
       "websiteUpdateStatus",
       "error",
@@ -4684,61 +6026,19 @@ async function rebuildSeasonInfo() {
       "websiteUpdateValidationBox",
       "error",
       error?.message ||
-      "Season Info rebuild failed.",
+      "Website data rebuild failed.",
       "fa-circle-xmark"
     );
 
     appendLog(
-      "Season Info rebuild",
+      "Website data rebuild",
       "error",
       error?.message ||
-      "Season Info rebuild failed."
+      "Website data rebuild failed."
     );
   } finally {
-    setButtonEnabled(
-      "rebuildSeasonInfoBtn",
-      Boolean(
-        canWrite() &&
-        workflowState.weekData
-      )
-    );
+    updateWorkflow();
   }
-}
-
-  /* =====================================================
-     WEBSITE UPDATE AND ARCHIVE PLACEHOLDERS
-  ===================================================== */
-
-  function unavailableEngine(
-    validationBox,
-    action
-  ) {
-    setValidation(
-      validationBox,
-      "warning",
-      `${action} requires its dedicated data engine. The Admin Center connection is ready, but the engine has not been added yet.`,
-      "fa-triangle-exclamation"
-    );
-  }
-
-  function rebuildPage(event) {
-  const buttonId =
-    event?.currentTarget?.id ||
-    "";
-
-  if (
-    buttonId ===
-    "rebuildSeasonInfoBtn"
-  ) {
-    rebuildSeasonInfo();
-
-    return;
-  }
-
-  unavailableEngine(
-    "websiteUpdateValidationBox",
-    "Website Update"
-  );
 }
 
   function validateArchive() {
@@ -4766,8 +6066,26 @@ async function rebuildSeasonInfo() {
       workflowState.weekData
     );
 
+  const websiteBuiltReady =
+    Boolean(
+      adminConfig?.websiteBuild?.ready === true ||
+      workflowState.websiteBuilt
+    );
+
+  const archiveReady =
+    Boolean(
+      adminConfig?.archive?.ready === true ||
+      workflowState.archiveReady
+    );
+
   workflowState.weekData =
     weekDataReady;
+
+  workflowState.websiteBuilt =
+    websiteBuiltReady;
+
+  workflowState.archiveReady =
+    archiveReady;
 
   const updateReady =
     Boolean(
@@ -4844,10 +6162,10 @@ async function rebuildSeasonInfo() {
 
   setBadge(
     "saveArchiveStatus",
-    workflowState.archiveReady
+    archiveReady
       ? "ready"
       : "locked",
-    workflowState.archiveReady
+    archiveReady
       ? "Ready"
       : "Locked"
   );
@@ -4888,13 +6206,13 @@ async function rebuildSeasonInfo() {
   setButtonEnabled(
     "validateSeasonArchiveBtn",
     canWrite() &&
-    workflowState.websiteBuilt
+    websiteBuiltReady
   );
 
   setButtonEnabled(
     "saveSeasonArchiveBtn",
     canWrite() &&
-    workflowState.archiveReady
+    archiveReady
   );
 }
 
@@ -5015,19 +6333,19 @@ async function rebuildSeasonInfo() {
     );
 
     bindClick(
-      "addSeasonToLibraryBtn",
-      addSeason
-    );
+  "addSeasonToLibraryBtn",
+  addSeason
+);
 
-    bindClick(
-      "saveWebsiteStatusBtn",
-      saveWebsiteStatus
-    );
+bindClick(
+  "saveMeritConfigurationBtn",
+  saveMeritConfiguration
+);
 
-    bindClick(
-      "addParticipatingServerBtn",
-      addParticipatingServer
-    );
+bindClick(
+  "addParticipatingServerBtn",
+  addParticipatingServer
+);
 
     bindClick(
       "saveParticipatingServersBtn",

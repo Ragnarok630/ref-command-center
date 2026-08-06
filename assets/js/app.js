@@ -1014,11 +1014,36 @@
           break;
 
         case "server-vs-server":
-          await initializeServerVsServerPage();
-          break;
+  await initializeServerVsServerPage();
+  break;
 
-        default:
-          break;
+case "player-id-info":
+  if (
+    global.K630PlayerIdInfoPage &&
+    typeof global
+      .K630PlayerIdInfoPage
+      .init ===
+      "function"
+  ) {
+    await global
+      .K630PlayerIdInfoPage
+      .init();
+  } else if (
+    typeof global
+      .initializeK630PlayerIdInfoPage ===
+      "function"
+  ) {
+    await global
+      .initializeK630PlayerIdInfoPage();
+  } else {
+    throw new Error(
+      "The Player ID Info page module is unavailable."
+    );
+  }
+  break;
+
+default:
+  break;
       }
 
       if (
@@ -1788,25 +1813,24 @@
     const season =
       getSeasonConfig();
 
-    const status =
-      getTopbarStatusValue();
-
     if (
-      !season ||
-      !season.currentSeasonId
-    ) {
-      seasonBox.textContent =
-        `Current Mode: ${status}`;
+  !season ||
+  !season.currentSeasonId
+) {
+  seasonBox.textContent =
+    "Current Season: Not Set";
 
-      return;
-    }
+  return;
+}
 
-    seasonBox.textContent =
-      (
-        `Current Season: ` +
-        `${season.currentSeasonLabel || season.currentSeasonId}` +
-        ` | ${status}`
-      );
+seasonBox.textContent =
+  (
+    `Current Season: ` +
+    (
+      season.currentSeasonLabel ||
+      season.currentSeasonId
+    )
+  );
   }
 
   /* =====================================================

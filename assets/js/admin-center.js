@@ -828,6 +828,8 @@ function applyAdminConfigToState() {
     }
   );
 
+updateMeritConfigurationTable();
+
   setBadge(
     "foundationStatusBadge",
     workflowState.foundation
@@ -3346,10 +3348,12 @@ async function saveMeritConfiguration() {
     );
 
     adminConfig =
-      output.data;
+    output.data;
 
-    workflowState.websiteBuilt =
-      false;
+applyAdminConfigToState();
+
+workflowState.websiteBuilt =
+    false;
 
     setBadge(
       "websiteUpdateStatus",
@@ -4319,28 +4323,16 @@ async function deactivateSeason() {
   );
 
   try {
-    let savedCount =
-      0;
+    let savedCount = 0;
 
-    for (
-      const entry of
-      validatedSeasonFiles
-    ) {
+    for (const entry of validatedSeasonFiles) {
       const destination =
-        (
-          `assets/data/${path}` +
-          entry.file.name
-        );
+        `assets/data/${path}${entry.file.name}`;
 
       setValidation(
         "seasonUploadValidationBox",
         "warning",
-        (
-          `Saving ${week} file ` +
-          `${savedCount + 1} of ` +
-          `${validatedSeasonFiles.length}: ` +
-          `${entry.file.name}`
-        ),
+        `Saving ${week} file ${savedCount + 1} of ${validatedSeasonFiles.length}: ${entry.file.name}`,
         "fa-cloud-arrow-up"
       );
 
@@ -4348,39 +4340,26 @@ async function deactivateSeason() {
         destination,
         entry.data,
         {
-          repository:
-            REPOSITORIES.data,
-
+          repository: REPOSITORIES.data,
           message:
-            (
-              `Upload ${week} data for ` +
-              `Season ${seasonNumber}: ` +
-              `${entry.file.name}`
-            )
+            `Upload ${week} data for Season ${seasonNumber}: ${entry.file.name}`
         }
       );
 
-      savedCount +=
-        1;
+      savedCount++;
     }
 
     const nextConfig =
       configEngine.updateWeeks(
         adminConfig ||
-        createDefaultAdminConfig(),
+          createDefaultAdminConfig(),
         {
-          addWeek:
-            week,
-
+          addWeek: week,
           officialDate,
-
-          updatedAt:
-            nowIso()
+          updatedAt: nowIso()
         },
         {
-          updatedAt:
-            nowIso(),
-
+          updatedAt: nowIso(),
           updatedBy:
             getSession()?.email ||
             getRole()
@@ -4391,9 +4370,7 @@ async function deactivateSeason() {
       configEngine.buildFile(
         nextConfig,
         {
-          updatedAt:
-            nowIso(),
-
+          updatedAt: nowIso(),
           updatedBy:
             getSession()?.email ||
             getRole()
@@ -4404,14 +4381,9 @@ async function deactivateSeason() {
       ADMIN_CONFIG_WRITE_PATH,
       configOutput.data,
       {
-        repository:
-          REPOSITORIES.data,
-
+        repository: REPOSITORIES.data,
         message:
-          (
-            `Register ${week} and official date ` +
-            `${officialDate} for Season ${seasonNumber}`
-          )
+          `Register ${week} and official date ${officialDate} for Season ${seasonNumber}`
       }
     );
 
@@ -4420,14 +4392,14 @@ async function deactivateSeason() {
 
     applyAdminConfigToState();
 
-    workflowState.weekData =
-      true;
+    await Promise.allSettled([
+      checkGitHubConnection(),
+      recheckFoundation()
+    ]);
 
-    workflowState.websiteBuilt =
-      false;
-
-    workflowState.archiveReady =
-      false;
+    workflowState.weekData = true;
+    workflowState.websiteBuilt = false;
+    workflowState.archiveReady = false;
 
     setBadge(
       "dataUploadStatus",
@@ -4438,41 +4410,33 @@ async function deactivateSeason() {
     setValidation(
       "seasonUploadValidationBox",
       "success",
-      (
-        `${savedCount} ${week} source files uploaded. ` +
-        `Official date ${officialDate} was saved in admin-config.json.`
-      ),
+      `${savedCount} ${week} source files uploaded. Official date ${officialDate} was saved in admin-config.json.`,
       "fa-circle-check"
     );
 
     appendLog(
       "Weekly upload",
       "success",
-      (
-        `${savedCount} files uploaded for ${week}, ` +
-        `Season ${seasonNumber}, official date ${officialDate}.`
-      )
+      `${savedCount} files uploaded for ${week}, Season ${seasonNumber}, official date ${officialDate}.`
     );
 
     dispatchEvent(
       "k630:week-uploaded",
       {
         seasonNumber,
-
         week,
-
         officialDate,
-
         files:
           validatedSeasonFiles.map(
-            entry =>
-              entry.file.name
+            entry => entry.file.name
           )
       }
     );
 
     updateWorkflow();
+
   } catch (error) {
+
     setBadge(
       "dataUploadStatus",
       "error",
@@ -4493,16 +4457,18 @@ async function deactivateSeason() {
       error?.message ||
       "Weekly data upload failed."
     );
+
   } finally {
+
     setButtonEnabled(
       "uploadSeasonDataBtn",
       Boolean(
         canWrite() &&
         workflowState.seasonActive &&
-        validatedSeasonFiles.length >
-          0
+        validatedSeasonFiles.length > 0
       )
     );
+
   }
 }
 
@@ -6455,6 +6421,20 @@ bindClick(
         );
       }
     );
+    getElement(
+  "recheckSystemBtn"
+)?.addEventListener(
+  "click",
+  async () => {
+
+    await checkGitHubConnection();
+
+    await recheckFoundation();
+
+    updateWorkflow();
+
+  }
+);
   }
 
   /* =====================================================
@@ -6594,6 +6574,47 @@ bindClick(
         };
       }
     });
+
+function updateMeritConfigurationTable() {
+
+  const ids = [
+    "t5Rank3Merits",
+    "t5Rank2Merits",
+    "t5Rank1Merits",
+    "t4Rank3Merits",
+    "t4Rank2Merits",
+    "t4Rank1Merits"
+  ];
+
+  ids.forEach(id => {
+
+    const input = getElement(id);
+
+    if (!input) {
+      return;
+    }
+
+    const value = numberValue(input.value);
+
+    const troop = id.startsWith("t5") ? "T5" : "T4";
+    const rank = id.match(/Rank(\d)/)[1];
+
+    for (let week = 5; week >= 1; week--) {
+
+      const output = getElement(
+        `meritPreviewW${week}${troop}R${rank}`
+      );
+
+      if (output) {
+        output.textContent =
+          `${((value * week) / 6).toFixed(2)}%`;
+      }
+
+    }
+
+  });
+
+}
 
   global.K630AdminCore =
     publicApi;

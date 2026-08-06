@@ -15495,3 +15495,16 @@
   color:
     #c16cff;
 }
+
+#recheckSystemBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-system-status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}

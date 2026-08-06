@@ -28,13 +28,25 @@
         </p>
       </div>
 
-      <span
-        class="management-status-badge"
-        id="adminCenterSystemStatus"
-        data-status="initializing"
-      >
-        Initializing
-      </span>
+      <div class="admin-system-status-row">
+
+  <span
+    class="management-status-badge"
+    id="adminCenterSystemStatus"
+    data-status="ready"
+  >
+    Ready
+  </span>
+
+  <button
+    id="recheckSystemBtn"
+    class="admin-btn"
+    type="button">
+    <i class="fa-solid fa-rotate"></i>
+    Recheck
+  </button>
+
+</div>
     </div>
 
     <div class="admin-workflow-overview">
@@ -751,162 +763,279 @@
 
       <p>
         Configure the final Week 6 Merit Percentage targets.
-        Week 1 through Week 5 targets are calculated automatically.
+        Week 1 through Week 5 are calculated automatically.
       </p>
     </div>
   </div>
 
-  <div class="admin-merit-configuration-grid">
+  <div class="admin-merit-table-shell">
 
-    <!-- =================================================
-         T5 MERIT TARGETS
-    ================================================== -->
+    <table
+    id="adminMeritConfigurationTable"
+    class="admin-merit-table">
+      <thead>
+        <tr>
+          <th
+            class="admin-merit-week-column"
+            rowspan="2"
+          >
+            Week
+          </th>
 
-    <article class="admin-merit-group admin-merit-group-t5">
-      <div class="admin-merit-group-header">
-        <div>
-          <span>
+          <th
+            class="admin-merit-tier-heading admin-merit-tier-heading--t5"
+            colspan="3"
+          >
+            <i class="fa-solid fa-crown"></i>
             T5 Players
-          </span>
+          </th>
 
-          <strong>
-            Week 6 Targets
-          </strong>
-        </div>
-
-        <i class="fa-solid fa-crown"></i>
-      </div>
-
-      <div class="admin-form-grid three">
-        <div class="admin-field">
-          <label for="t5Rank3Merits">
-            Rank 3 %
-          </label>
-
-          <input
-            id="t5Rank3Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="12"
+          <th
+            class="admin-merit-tier-heading admin-merit-tier-heading--t4"
+            colspan="3"
           >
-        </div>
-
-        <div class="admin-field">
-          <label for="t5Rank2Merits">
-            Rank 2 %
-          </label>
-
-          <input
-            id="t5Rank2Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="10"
-          >
-        </div>
-
-        <div class="admin-field">
-          <label for="t5Rank1Merits">
-            Rank 1 %
-          </label>
-
-          <input
-            id="t5Rank1Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="8"
-          >
-        </div>
-      </div>
-    </article>
-
-    <!-- =================================================
-         T4 MERIT TARGETS
-    ================================================== -->
-
-    <article class="admin-merit-group admin-merit-group-t4">
-      <div class="admin-merit-group-header">
-        <div>
-          <span>
+            <i class="fa-solid fa-shield-halved"></i>
             T4 Players
-          </span>
+          </th>
+        </tr>
 
-          <strong>
-            Week 6 Targets
-          </strong>
-        </div>
+        <tr>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t5">
+            Rank 3
+          </th>
 
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t5">
+            Rank 2
+          </th>
 
-      <div class="admin-form-grid three">
-        <div class="admin-field">
-          <label for="t4Rank3Merits">
-            Rank 3 %
-          </label>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t5">
+            Rank 1
+          </th>
 
-          <input
-            id="t4Rank3Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="10"
-          >
-        </div>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t4">
+            Rank 3
+          </th>
 
-        <div class="admin-field">
-          <label for="t4Rank2Merits">
-            Rank 2 %
-          </label>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t4">
+            Rank 2
+          </th>
 
-          <input
-            id="t4Rank2Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="8"
-          >
-        </div>
+          <th class="admin-merit-rank-heading admin-merit-rank-heading--t4">
+            Rank 1
+          </th>
+        </tr>
+      </thead>
 
-        <div class="admin-field">
-          <label for="t4Rank1Merits">
-            Rank 1 %
-          </label>
+      <tbody>
 
-          <input
-            id="t4Rank1Merits"
-            type="number"
-            min="0"
-            max="100"
-            step="0.01"
-            value="6"
-          >
-        </div>
-      </div>
-    </article>
+        <!-- =============================================
+             WEEK 6 — 100% / EDITABLE
+        ============================================== -->
+
+        <tr class="admin-merit-editable-row">
+          <th>
+            <strong>W6</strong>
+            <small>100%</small>
+          </th>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t5">
+              <input
+                id="t5Rank3Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="12"
+                aria-label="T5 Week 6 Rank 3 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t5">
+              <input
+                id="t5Rank2Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="10"
+                aria-label="T5 Week 6 Rank 2 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t5">
+              <input
+                id="t5Rank1Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="8"
+                aria-label="T5 Week 6 Rank 1 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t4">
+              <input
+                id="t4Rank3Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="10"
+                aria-label="T4 Week 6 Rank 3 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t4">
+              <input
+                id="t4Rank2Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="8"
+                aria-label="T4 Week 6 Rank 2 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="admin-merit-input-shell admin-merit-input-shell--t4">
+              <input
+                id="t4Rank1Merits"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="6"
+                aria-label="T4 Week 6 Rank 1 percentage"
+              >
+
+              <span>%</span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- =============================================
+             WEEK 5 — 5/6
+        ============================================== -->
+
+        <tr>
+          <th>
+            <strong>W5</strong>
+            <small>83.33%</small>
+          </th>
+
+          <td><output id="meritPreviewW5T5R3">10.00%</output></td>
+          <td><output id="meritPreviewW5T5R2">8.33%</output></td>
+          <td><output id="meritPreviewW5T5R1">6.67%</output></td>
+
+          <td><output id="meritPreviewW5T4R3">8.33%</output></td>
+          <td><output id="meritPreviewW5T4R2">6.67%</output></td>
+          <td><output id="meritPreviewW5T4R1">5.00%</output></td>
+        </tr>
+
+        <!-- =============================================
+             WEEK 4 — 4/6
+        ============================================== -->
+
+        <tr>
+          <th>
+            <strong>W4</strong>
+            <small>66.67%</small>
+          </th>
+
+          <td><output id="meritPreviewW4T5R3">8.00%</output></td>
+          <td><output id="meritPreviewW4T5R2">6.67%</output></td>
+          <td><output id="meritPreviewW4T5R1">5.33%</output></td>
+
+          <td><output id="meritPreviewW4T4R3">6.67%</output></td>
+          <td><output id="meritPreviewW4T4R2">5.33%</output></td>
+          <td><output id="meritPreviewW4T4R1">4.00%</output></td>
+        </tr>
+
+        <!-- =============================================
+             WEEK 3 — 3/6
+        ============================================== -->
+
+        <tr>
+          <th>
+            <strong>W3</strong>
+            <small>50%</small>
+          </th>
+
+          <td><output id="meritPreviewW3T5R3">6.00%</output></td>
+          <td><output id="meritPreviewW3T5R2">5.00%</output></td>
+          <td><output id="meritPreviewW3T5R1">4.00%</output></td>
+
+          <td><output id="meritPreviewW3T4R3">5.00%</output></td>
+          <td><output id="meritPreviewW3T4R2">4.00%</output></td>
+          <td><output id="meritPreviewW3T4R1">3.00%</output></td>
+        </tr>
+
+        <!-- =============================================
+             WEEK 2 — 2/6
+        ============================================== -->
+
+        <tr>
+          <th>
+            <strong>W2</strong>
+            <small>33.33%</small>
+          </th>
+
+          <td><output id="meritPreviewW2T5R3">4.00%</output></td>
+          <td><output id="meritPreviewW2T5R2">3.33%</output></td>
+          <td><output id="meritPreviewW2T5R1">2.67%</output></td>
+
+          <td><output id="meritPreviewW2T4R3">3.33%</output></td>
+          <td><output id="meritPreviewW2T4R2">2.67%</output></td>
+          <td><output id="meritPreviewW2T4R1">2.00%</output></td>
+        </tr>
+
+        <!-- =============================================
+             WEEK 1 — 1/6
+        ============================================== -->
+
+        <tr>
+          <th>
+            <strong>W1</strong>
+            <small>16.67%</small>
+          </th>
+
+          <td><output id="meritPreviewW1T5R3">2.00%</output></td>
+          <td><output id="meritPreviewW1T5R2">1.67%</output></td>
+          <td><output id="meritPreviewW1T5R1">1.33%</output></td>
+
+          <td><output id="meritPreviewW1T4R3">1.67%</output></td>
+          <td><output id="meritPreviewW1T4R2">1.33%</output></td>
+          <td><output id="meritPreviewW1T4R1">1.00%</output></td>
+        </tr>
+
+      </tbody>
+    </table>
 
   </div>
 
-  <div class="admin-merit-week-preview">
-    <div>
-      <span>
-        Weekly Calculation
-      </span>
-
-      <strong>
-        W1 = 1/6 · W2 = 2/6 · W3 = 3/6 · W4 = 4/6 · W5 = 5/6 · W6 = full target
-      </strong>
-    </div>
-  </div>
-
-  <div class="admin-action-row">
+    <div class="admin-action-row">
     <button
       class="admin-btn confirm"
       id="saveMeritConfigurationBtn"
@@ -917,19 +1046,6 @@
     </button>
   </div>
 
-  <div
-    class="admin-validation-box"
-    id="meritConfigurationValidationBox"
-  >
-    <div class="validation-state idle">
-      <i class="fa-solid fa-circle-info"></i>
-
-      <span>
-        Rank 3 must be equal to or higher than Rank 2.
-        Rank 2 must be equal to or higher than Rank 1.
-      </span>
-    </div>
-  </div>
 </section>
 
     <section

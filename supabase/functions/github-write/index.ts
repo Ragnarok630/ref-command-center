@@ -698,158 +698,70 @@ async function readJson(
 }
 
 async function writeJson(
-  repository: ReturnType<
-    typeof normalizeRepository
-  >,
-  path: string,
-  data: unknown,
-  message: string,
-  user: {
-    email: string;
-    role: string;
-  }
+  github,
+  path,
+  data,
+  message
 ) {
-  const existingFile =
-    await getFile(
-      repository,
-      path
-    );
 
-  const json =
-    JSON.stringify(
+  requireValue(
+    github,
+    "GitHub API is required."
+  );
+
+  if (
+    typeof github.writeJson ===
+    "function"
+  ) {
+
+    return await github.writeJson(
+      path,
       data,
-      null,
-      2
-    ) + "\n";
-
-  const payload:
-    Record<string, unknown> = {
-      message:
-        normalizeText(message) ||
-        `Update ${path}`,
-
-      content:
-        encodeBase64Utf8(json),
-
-      branch:
-        repository.branch,
-
-      committer: {
-        name:
-          "K630 Command Center",
-
-        email:
-          "admin@kingdom630.com"
-      }
-    };
-
-  const existingSha =
-    normalizeText(
-      existingFile?.sha
+      message
     );
 
-  if (existingSha) {
-    payload.sha =
-      existingSha;
   }
 
-  const encodedPath =
-    path
-      .split("/")
-      .map(segment =>
-        encodeURIComponent(
-          segment
-        )
-      )
-      .join("/");
+  if (
+    typeof github.invoke ===
+    "function"
+  ) {
 
-  const result =
-    await githubRequest(
-      (
-        `/repos/${encodeURIComponent(repository.owner)}` +
-        `/${encodeURIComponent(repository.repository)}` +
-        `/contents/${encodedPath}`
-      ),
+    return await github.invoke(
+
+      "write-json",
+
       {
-        method:
-          "PUT",
 
-        headers: {
-          "Content-Type":
-            "application/json"
+        repository: {
+
+          owner:
+            "Ragnarok630",
+
+          repository:
+            "k630-public-data",
+
+          branch:
+            "main"
+
         },
 
-        body:
-          JSON.stringify(payload)
+        path,
+
+        data,
+
+        message
+
       }
-    ) as Record<
-      string,
-      unknown
-    >;
 
-  const content =
-    (
-      result.content &&
-      typeof result.content ===
-        "object"
-    )
-      ? result.content as Record<
-          string,
-          unknown
-        >
-      : {};
+    );
 
-  const commit =
-    (
-      result.commit &&
-      typeof result.commit ===
-        "object"
-    )
-      ? result.commit as Record<
-          string,
-          unknown
-        >
-      : {};
+  }
 
-  return {
-    success:
-      true,
+  throw new Error(
+    "No compatible GitHub write interface found."
+  );
 
-    path:
-      normalizeText(
-        content.path
-      ) ||
-      path,
-
-    sha:
-      normalizeText(
-        content.sha
-      ),
-
-    commitSha:
-      normalizeText(
-        commit.sha
-      ),
-
-    created:
-      !existingSha,
-
-    updated:
-      Boolean(existingSha),
-
-    message:
-      existingSha
-        ? "JSON file updated successfully."
-        : "JSON file created successfully.",
-
-    changedBy: {
-      email:
-        user.email,
-
-      role:
-        user.role
-    }
-  };
 }
 
 async function deleteFile(

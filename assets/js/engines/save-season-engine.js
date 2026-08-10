@@ -3136,32 +3136,6 @@ async function saveSeason(
 
 
         /* ============================================
-           MODULE 09
-           UPDATE OLD PLAYERS
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 09 — UPDATE OLD PLAYERS";
-
-        await updateOldPlayers(
-            context
-        );
-
-
-        /* ============================================
-           MODULE 10
-           UPDATE HOME
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 10 — UPDATE HOME";
-
-        await updateHome(
-            context
-        );
-
-
-        /* ============================================
            MODULE 11
            WRITE GENERATED FILES
            

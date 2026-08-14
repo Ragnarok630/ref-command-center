@@ -159,6 +159,14 @@
     "archiveOfficialDate",
     "validateSeasonArchiveBtn",
     "saveSeasonArchiveBtn",
+    "setSaveSeasonBtn",
+    "step7ABtn",
+    "step7BBtn",
+    "step7CBtn",
+    "step7DBtn",
+    "step7EBtn",
+    "step7FBtn",
+    "step7GBtn",
 
     "manualStatusPlayerId",
     "manualStatusReason",
@@ -217,33 +225,99 @@
     null;
 
   const workflowState = {
-    githubRead:
+
+  githubRead:
+    false,
+
+  githubWrite:
+    false,
+
+  foundation:
+    false,
+
+  matchmaking:
+    false,
+
+  seasonConfigured:
+    false,
+
+  seasonActive:
+    false,
+
+  weekData:
+    false,
+
+  websiteBuilt:
+    false,
+
+  archiveReady:
+    false,
+
+  saveSeason: {
+
+    active:
       false,
 
-    githubWrite:
-      false,
+    seasonNumber:
+      0,
 
-    foundation:
-      false,
+    officialDate:
+      "",
 
-    matchmaking:
-      false,
+    currentStep:
+      null,
 
-    seasonConfigured:
-      false,
+    status:
+      "waiting",
 
-    seasonActive:
-      false,
+    steps: {
 
-    weekData:
-      false,
+      "7A": {
+        status:
+          "waiting"
+      },
 
-    websiteBuilt:
-      false,
+      "7B": {
+        status:
+          "waiting"
+      },
 
-    archiveReady:
-      false
-  };
+      "7C": {
+        status:
+          "waiting"
+      },
+
+      "7D": {
+        status:
+          "waiting"
+      },
+
+      "7E": {
+        status:
+          "waiting"
+      },
+
+      "7F": {
+        status:
+          "waiting"
+      },
+
+      "7G": {
+        status:
+          "waiting"
+      }
+
+    },
+
+    updatedAt:
+      "",
+
+    updatedBy:
+      ""
+
+  }
+
+};
 
   /* =====================================================
      GENERAL HELPERS
@@ -548,6 +622,120 @@ async function loadAdminConfig() {
   }
 }
 
+/* =====================================================
+   SAVE SEASON ENGINE SYNCHRONIZATION
+========================================================= */
+
+function syncSaveSeasonEngine() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !engine
+  ) {
+
+    return false;
+
+  }
+
+
+  const saveSeason =
+    adminConfig?.saveSeason;
+
+
+  if (
+    !saveSeason?.active
+  ) {
+
+    return false;
+
+  }
+
+
+  const season =
+    Number(
+      saveSeason.seasonNumber
+    );
+
+
+  const officialDate =
+    normalizeText(
+      saveSeason.officialDate
+    );
+
+
+  if (
+    !Number.isInteger(
+      season
+    ) ||
+    season < 1 ||
+    !officialDate
+  ) {
+
+    return false;
+
+  }
+
+
+  /* -------------------------------------------------
+   CONFIGURE ENGINE
+------------------------------------------------- */
+
+if (
+  typeof engine.setSeason ===
+    "function"
+) {
+
+  engine.setSeason(
+    season,
+    officialDate
+  );
+
+}
+
+
+/* -------------------------------------------------
+   RESTORE PERSISTENT STEP STATE
+------------------------------------------------- */
+
+if (
+  typeof engine.restoreWorkflowState ===
+    "function"
+) {
+
+  engine.restoreWorkflowState(
+    saveSeason
+  );
+
+}
+
+  console.info(
+    "[K630 Admin Center] Save Season Engine synchronized.",
+    {
+      season:
+        season,
+
+      officialDate:
+        officialDate,
+
+      currentStep:
+        saveSeason.currentStep,
+
+      status:
+        saveSeason.status,
+
+      steps:
+        saveSeason.steps
+    }
+  );
+
+
+  return true;
+
+}
+
 function applyAdminConfigToState() {
   if (!adminConfig) {
     return;
@@ -600,6 +788,197 @@ function applyAdminConfigToState() {
       adminConfig.archive
         ?.ready
     );
+
+/* =====================================================
+   SAVE SEASON PERSISTENT WORKFLOW
+===================================================== */
+
+const savedSaveSeason =
+  adminConfig?.saveSeason ||
+  workflowState.saveSeason ||
+  null;
+
+
+/* -----------------------------------------------------
+   SAVE SEASON STATE
+----------------------------------------------------- */
+
+workflowState.saveSeason = {
+
+  active:
+    savedSaveSeason?.active ===
+    true,
+
+  seasonNumber:
+    Number(
+      savedSaveSeason?.seasonNumber
+    ) || 0,
+
+  officialDate:
+    normalizeText(
+      savedSaveSeason?.officialDate
+    ),
+
+  currentStep:
+    normalizeText(
+      savedSaveSeason?.currentStep
+    ) ||
+    null,
+
+  status:
+    normalizeLower(
+      savedSaveSeason?.status
+    ) ||
+    "waiting",
+
+  steps: {
+
+    "7A": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7A"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7B": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7B"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7C": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7C"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7D": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7D"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7E": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7E"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7F": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7F"]
+            ?.status
+        ) ||
+        "waiting"
+    },
+
+    "7G": {
+      status:
+        normalizeLower(
+          savedSaveSeason
+            ?.steps
+            ?.["7G"]
+            ?.status
+        ) ||
+        "waiting"
+    }
+
+  },
+
+  updatedAt:
+    normalizeText(
+      savedSaveSeason?.updatedAt
+    ),
+
+  updatedBy:
+    normalizeText(
+      savedSaveSeason?.updatedBy
+    )
+
+};
+
+
+/* -----------------------------------------------------
+   RESTORE SAVED SEASON NUMBER
+----------------------------------------------------- */
+
+const archiveSeasonInput =
+  getElement(
+    "archiveSeasonNumber"
+  );
+
+
+if (
+  archiveSeasonInput &&
+  workflowState.saveSeason
+    .seasonNumber >
+    0
+) {
+
+  archiveSeasonInput.value =
+    String(
+      workflowState.saveSeason
+        .seasonNumber
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   RESTORE SAVED OFFICIAL DATE
+----------------------------------------------------- */
+
+const archiveOfficialDateInput =
+  getElement(
+    "archiveOfficialDate"
+  );
+
+
+if (
+  archiveOfficialDateInput &&
+  workflowState.saveSeason
+    .officialDate
+) {
+
+  archiveOfficialDateInput.value =
+    workflowState.saveSeason
+      .officialDate;
+
+}
+
+
+/* -----------------------------------------------------
+   SYNCHRONIZE SAVE SEASON ENGINE
+----------------------------------------------------- */
+
+syncSaveSeasonEngine();
 
   selectedSeason =
     adminConfig.season
@@ -2960,6 +3339,1944 @@ if (
       </tr>
     `;
   }
+
+/* =====================================================
+   SAVE SEASON — SET SEASON
+========================================================= */
+
+async function setSaveSeason() {
+
+  const engine =
+    global.K630AdminConfigEngine;
+
+
+  const writer =
+    getWriter();
+
+
+  /* -------------------------------------------------
+     WRITE ACCESS
+  ------------------------------------------------- */
+
+  if (!canWrite()) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can configure Save Season.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     ENGINE
+  ------------------------------------------------- */
+
+  if (
+    !engine ||
+    typeof engine.updateSaveSeason !==
+      "function" ||
+    typeof engine.buildFile !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630AdminConfigEngine Save Season functions are unavailable.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     WRITER
+  ------------------------------------------------- */
+
+  if (
+    !writer ||
+    typeof writer.writeJson !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "GitHub writer is not available.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     READ VALUES
+  ------------------------------------------------- */
+
+  const season =
+    Number(
+      getElement(
+        "archiveSeasonNumber"
+      )?.value
+    );
+
+
+  const officialDate =
+    normalizeText(
+      getElement(
+        "archiveOfficialDate"
+      )?.value
+    );
+
+
+  /* -------------------------------------------------
+     VALIDATION
+  ------------------------------------------------- */
+
+  if (
+    !Number.isInteger(
+      season
+    ) ||
+    season < 1
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Enter a valid Season Number first.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !officialDate
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Select the official archive date first.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     DISABLE SET WHILE SAVING
+  ------------------------------------------------- */
+
+  setButtonEnabled(
+    "setSaveSeasonBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    `Saving Save Season configuration for Season ${season}...`,
+    "fa-spinner"
+  );
+
+
+  try {
+
+    const updatedAt =
+      nowIso();
+
+
+    const updatedBy =
+      getSession()?.email ||
+      getRole();
+
+
+    /* -------------------------------------------------
+       START NEW SAVE SEASON WORKFLOW
+    ------------------------------------------------- */
+
+    const nextConfig =
+      engine.updateSaveSeason(
+
+        adminConfig ||
+        createDefaultAdminConfig(),
+
+        {
+
+          active:
+            true,
+
+          seasonNumber:
+            season,
+
+          officialDate:
+            officialDate,
+
+          currentStep:
+            "7A",
+
+          status:
+            "waiting",
+
+          steps: {
+
+            "7A": {
+              status:
+                "waiting"
+            },
+
+            "7B": {
+              status:
+                "waiting"
+            },
+
+            "7C": {
+              status:
+                "waiting"
+            },
+
+            "7D": {
+              status:
+                "waiting"
+            },
+
+            "7E": {
+              status:
+                "waiting"
+            },
+
+            "7F": {
+              status:
+                "waiting"
+            },
+
+            "7G": {
+              status:
+                "waiting"
+            }
+
+          },
+
+          updatedAt:
+            updatedAt,
+
+          updatedBy:
+            updatedBy
+
+        },
+
+        {
+
+          updatedAt:
+            updatedAt,
+
+          updatedBy:
+            updatedBy
+
+        }
+
+      );
+
+
+    /* -------------------------------------------------
+       BUILD FINAL CONFIG FILE
+    ------------------------------------------------- */
+
+    const output =
+      engine.buildFile(
+        nextConfig,
+        {
+
+          updatedAt:
+            updatedAt,
+
+          updatedBy:
+            updatedBy
+
+        }
+      );
+
+
+    /* -------------------------------------------------
+       WRITE TO k630-public-data
+    ------------------------------------------------- */
+
+    await writer.writeJson(
+
+      ADMIN_CONFIG_WRITE_PATH,
+
+      output.data,
+
+      {
+
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          `Set Save Season ${season}`
+
+      }
+
+    );
+
+
+    /* -------------------------------------------------
+       UPDATE LOCAL ADMIN STATE
+    ------------------------------------------------- */
+
+    adminConfig =
+      output.data;
+
+
+    applyAdminConfigToState();
+
+
+    /* -------------------------------------------------
+       UPDATE OTHER SEASON FIELDS
+    ------------------------------------------------- */
+
+    const uploadSeason =
+      getElement(
+        "uploadSeasonNumber"
+      );
+
+
+    const matchmakingSeason =
+      getElement(
+        "matchmakingSeasonNumber"
+      );
+
+
+    if (
+      uploadSeason
+    ) {
+
+      uploadSeason.value =
+        String(
+          season
+        );
+
+    }
+
+
+    if (
+      matchmakingSeason
+    ) {
+
+      matchmakingSeason.value =
+        String(
+          season
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       ACTIVATE 7A ONLY
+    ------------------------------------------------- */
+
+    setButtonEnabled(
+      "step7ABtn",
+      canWrite()
+    );
+
+
+    setButtonEnabled(
+      "step7BBtn",
+      false
+    );
+
+    setButtonEnabled(
+      "step7CBtn",
+      false
+    );
+
+    setButtonEnabled(
+      "step7DBtn",
+      false
+    );
+
+    setButtonEnabled(
+      "step7EBtn",
+      false
+    );
+
+    setButtonEnabled(
+      "step7FBtn",
+      false
+    );
+
+    setButtonEnabled(
+      "step7GBtn",
+      false
+    );
+
+
+    /* -------------------------------------------------
+       SET BUTTON STAYS DISABLED WHILE ACTIVE
+    ------------------------------------------------- */
+
+    setButtonEnabled(
+      "setSaveSeasonBtn",
+      false
+    );
+
+
+    /* -------------------------------------------------
+       REFRESH WORKFLOW
+    ------------------------------------------------- */
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      `Season ${season} and archive date ${officialDate} are saved. STEP 7A is ready.`,
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season",
+      "success",
+      `Season ${season} configured. STEP 7A is ready.`
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "Save Season configuration could not be saved.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season",
+      "error",
+      error?.message ||
+      "Save Season configuration could not be saved."
+    );
+
+
+    /* -------------------------------------------------
+       ALLOW RETRY
+    ------------------------------------------------- */
+
+    setButtonEnabled(
+      "setSaveSeasonBtn",
+      canWrite()
+    );
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7A
+========================================================= */
+
+async function runSaveSeasonStep7A() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7AArchive !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7A is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  const season =
+    Number(
+      getElement(
+        "archiveSeasonNumber"
+      )?.value
+    );
+
+
+  const officialDate =
+    normalizeText(
+      getElement(
+        "archiveOfficialDate"
+      )?.value
+    );
+
+
+  if (
+    !Number.isInteger(
+      season
+    ) ||
+    season < 1
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Set a valid Season Number first.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !officialDate
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Set the Archive Official Date first.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7ABtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    `STEP 7A is archiving Season ${season}...`,
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7A"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7AStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7AArchive({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7A did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       UPDATE PERSISTENT ADMIN CONFIG AGAIN
+       The Save Season Engine already writes its own
+       7A status. Reload it so this Admin Center uses
+       the public repository as source of truth.
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `STEP 7A completed for Season ${season}. ` +
+        "Season Info and Server vs Server were archived."
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7A",
+      "success",
+      (
+        `Season ${season} archived successfully. ` +
+        "STEP 7B is now ready."
+      )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7A failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7A",
+      "error",
+      error?.message ||
+      "STEP 7A failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7B
+========================================================= */
+
+async function runSaveSeasonStep7B() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7BSeasonData !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7B is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7BBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7B is updating Season data in Active & Average...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7B"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7BStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7BSeasonData({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7B did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `STEP 7B completed for Season ` +
+        `${result.season}. ` +
+        `${result.playersUpdated} players were updated.`
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7B",
+      "success",
+      (
+        `Season ${result.season} data was updated successfully. ` +
+        "STEP 7C is now ready."
+      )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7B failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7B",
+      "error",
+      error?.message ||
+      "STEP 7B failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7C
+========================================================= */
+
+async function runSaveSeasonStep7C() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7CAverages !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7C is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7CBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7C is calculating Average Merits and Average Merits (%)...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7C"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7CStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7CAverages({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7C did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        "STEP 7C completed. " +
+        "Average Merits and Average Merits (%) were calculated."
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7C",
+      "success",
+      "Average Merits calculations completed. STEP 7D is now ready."
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7C failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7C",
+      "error",
+      error?.message ||
+      "STEP 7C failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7D
+========================================================= */
+
+async function runSaveSeasonStep7D() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7DUpdateNotes !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7D is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7DBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7D is updating player Notes...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7D"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7DStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7DUpdateNotes({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7D did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `STEP 7D completed. ` +
+        `${result.playersUpdated || 0} player Notes were updated.`
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7D",
+      "success",
+      "Player Notes were updated successfully. STEP 7E is now ready."
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7D failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7D",
+      "error",
+      error?.message ||
+      "STEP 7D failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7E
+========================================================= */
+
+async function runSaveSeasonStep7E() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7EServerStatus !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7E is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7EBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7E is updating Server Status levels...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7E"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7EStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7EServerStatus({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7E did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    const lv0Count =
+      result.summary
+        ?.lv0Players ||
+      0;
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      lv0Count > 0
+        ? "warning"
+        : "success",
+      lv0Count > 0
+        ? (
+            `STEP 7E completed. ` +
+            `${lv0Count} player(s) reached LV0 and must be removed in-game.`
+          )
+        : (
+            "STEP 7E completed. Server Status levels were updated successfully."
+          ),
+      lv0Count > 0
+        ? "fa-triangle-exclamation"
+        : "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7E",
+      lv0Count > 0
+        ? "warning"
+        : "success",
+      lv0Count > 0
+        ? (
+            `Server Status updated. ` +
+            `${lv0Count} LV0 player(s) require in-game removal. ` +
+            "STEP 7F is now ready."
+          )
+        : (
+            "Server Status updated successfully. STEP 7F is now ready."
+          )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7E failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7E",
+      "error",
+      error?.message ||
+      "STEP 7E failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7F
+========================================================= */
+
+async function runSaveSeasonStep7F() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7FSeasonColumns !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7F is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7FBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7F is creating the next Season columns...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7F"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7FStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7FSeasonColumns({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7F did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `STEP 7F completed. Season ` +
+        `${result.nextSeason} columns are ready.`
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7F",
+      "success",
+      (
+        `Season ${result.nextSeason} columns were created. ` +
+        "STEP 7G is now ready."
+      )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7F failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7F",
+      "error",
+      error?.message ||
+      "STEP 7F failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — STEP 7G
+========================================================= */
+
+async function runSaveSeasonStep7G() {
+
+  const engine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can execute Save Season steps.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !engine ||
+    typeof engine.step7GReset !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630SaveSeasonEngine STEP 7G is not loaded.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "step7GBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    "STEP 7G is resetting current Season data for the next Season...",
+    "fa-spinner"
+  );
+
+
+  const stepElement =
+    getElement(
+      "saveSeasonStep7G"
+    );
+
+
+  const stepStatus =
+    getElement(
+      "saveSeasonStep7GStatus"
+    );
+
+
+  if (
+    stepElement
+  ) {
+
+    stepElement.dataset.status =
+      "running";
+
+  }
+
+
+  if (
+    stepStatus
+  ) {
+
+    stepStatus.textContent =
+      "Running";
+
+    stepStatus.dataset.status =
+      "running";
+
+  }
+
+
+  try {
+
+    const result =
+      await engine.step7GReset({
+
+        updatedBy:
+          getSession()?.email ||
+          getRole()
+
+      });
+
+
+    if (
+      !result?.success
+    ) {
+
+      throw new Error(
+        "STEP 7G did not complete successfully."
+      );
+
+    }
+
+
+    /* -------------------------------------------------
+       RELOAD SHARED ADMIN CONFIG
+    ------------------------------------------------- */
+
+    await loadAdminConfig();
+
+
+    applyAdminConfigToState();
+
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `STEP 7G completed. ` +
+        `Season ${result.completedSeason} is closed and ` +
+        `Season ${result.nextSeason} is ready for new data.`
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7G",
+      "success",
+      (
+        `Season ${result.completedSeason} was reset successfully. ` +
+        `Current Season data is ready for Season ${result.nextSeason}.`
+      )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "error";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Error";
+
+      stepStatus.dataset.status =
+        "error";
+
+    }
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "STEP 7G failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season STEP 7G",
+      "error",
+      error?.message ||
+      "STEP 7G failed."
+    );
+
+
+  } finally {
+
+    updateWorkflow();
+
+  }
+
+}
 
   async function addSeason() {
   const year =
@@ -6015,6 +8332,600 @@ async function rebuildSeasonInfo() {
   }
 
   /* =====================================================
+   SAVE SEASON ARCHIVE — FINALIZE SEASON
+========================================================= */
+
+async function saveSeasonArchive() {
+
+  const configEngine =
+    global.K630AdminConfigEngine;
+
+
+  if (
+    !canWrite()
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "Only an Owner or Admin can finalize the Season Archive.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !configEngine ||
+    typeof configEngine.resetAfterSeasonArchive !==
+      "function" ||
+    typeof configEngine.buildFile !==
+      "function"
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "K630AdminConfigEngine archive reset functions are unavailable.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  const season =
+    Number(
+      getElement(
+        "archiveSeasonNumber"
+      )?.value
+    );
+
+
+  const officialDate =
+    normalizeText(
+      getElement(
+        "archiveOfficialDate"
+      )?.value
+    );
+
+
+  if (
+    !Number.isInteger(
+      season
+    ) ||
+    season < 1
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "A valid Season Number is required.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !officialDate
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "The Archive Official Date is required.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     SAFETY CHECK
+     ALL 7 STEPS MUST BE COMPLETE
+  ------------------------------------------------- */
+
+  const saveSeasonComplete =
+    [
+      "7A",
+      "7B",
+      "7C",
+      "7D",
+      "7E",
+      "7F",
+      "7G"
+    ].every(
+      step =>
+        workflowState
+          .saveSeason
+          ?.steps
+          ?.[step]
+          ?.status ===
+        "completed"
+    );
+
+
+  if (
+    !saveSeasonComplete
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      "STEP 7A through STEP 7G must all be completed before Save Season Archive.",
+      "fa-circle-xmark"
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------
+     CONFIRMATION
+  ------------------------------------------------- */
+
+  const confirmed =
+    window.confirm(
+      (
+        `Save Season Archive ${season}?\n\n` +
+        "The Season workflow will be closed and " +
+        "the next cycle will start again at Matchmaking."
+      )
+    );
+
+
+  if (
+    !confirmed
+  ) {
+
+    return;
+
+  }
+
+
+  setButtonEnabled(
+    "saveSeasonArchiveBtn",
+    false
+  );
+
+
+  setValidation(
+    "saveArchiveValidationBox",
+    "warning",
+    (
+      `Finalizing Season ${season} and resetting the workflow...`
+    ),
+    "fa-spinner"
+  );
+
+
+  try {
+
+    const updatedAt =
+      nowIso();
+
+
+    const updatedBy =
+      getSession()?.email ||
+      getRole();
+
+
+    /* -------------------------------------------------
+       RESET CONFIGURATION
+
+       GitHub remains intact.
+       Foundation remains intact.
+       Season / Matchmaking cycle is reset.
+       Save Season 7A–7G returns to waiting.
+    ------------------------------------------------- */
+
+    const resetConfig =
+      configEngine.resetAfterSeasonArchive(
+
+        adminConfig ||
+        createDefaultAdminConfig(),
+
+        {
+
+          seasonNumber:
+            season,
+
+          archivedAt:
+            `${officialDate}T23:59:59.000Z`,
+
+          websiteStatus:
+            adminConfig
+              ?.season
+              ?.websiteStatus
+
+        },
+
+        {
+
+          updatedBy:
+            updatedBy
+
+        }
+
+      );
+
+
+    /* -------------------------------------------------
+       BUILD FINAL CONFIG
+    ------------------------------------------------- */
+
+    const output =
+      configEngine.buildFile(
+        resetConfig,
+        {
+
+          updatedAt:
+            updatedAt,
+
+          updatedBy:
+            updatedBy
+
+        }
+      );
+
+
+    /* -------------------------------------------------
+       WRITE ADMIN CONFIG
+    ------------------------------------------------- */
+
+    const writer =
+      getWriter();
+
+
+    if (
+      !writer ||
+      typeof writer.writeJson !==
+        "function"
+    ) {
+
+      throw new Error(
+        "GitHub writer is not available."
+      );
+
+    }
+
+
+    await writer.writeJson(
+
+      ADMIN_CONFIG_WRITE_PATH,
+
+      output.data,
+
+      {
+
+        repository:
+          REPOSITORIES.data,
+
+        message:
+          `Finalize Season ${season} Archive`
+
+      }
+
+    );
+
+
+    /* -------------------------------------------------
+       UPDATE LOCAL STATE FROM PUBLIC CONFIG
+    ------------------------------------------------- */
+
+    adminConfig =
+      output.data;
+
+
+    applyAdminConfigToState();
+
+
+    /* -------------------------------------------------
+       RESET FORM / NEXT CYCLE
+    ------------------------------------------------- */
+
+    const nextSeason =
+      season +
+      1;
+
+
+    const matchmakingSeasonInput =
+      getElement(
+        "matchmakingSeasonNumber"
+      );
+
+
+    const uploadSeasonInput =
+      getElement(
+        "uploadSeasonNumber"
+      );
+
+
+    const archiveSeasonInput =
+      getElement(
+        "archiveSeasonNumber"
+      );
+
+
+    if (
+      matchmakingSeasonInput
+    ) {
+
+      matchmakingSeasonInput.value =
+        String(
+          nextSeason
+        );
+
+    }
+
+
+    if (
+      uploadSeasonInput
+    ) {
+
+      uploadSeasonInput.value =
+        String(
+          nextSeason
+        );
+
+    }
+
+
+    if (
+      archiveSeasonInput
+    ) {
+
+      archiveSeasonInput.value =
+        "";
+
+    }
+
+
+    const archiveDateInput =
+      getElement(
+        "archiveOfficialDate"
+      );
+
+
+    if (
+      archiveDateInput
+    ) {
+
+      archiveDateInput.value =
+        "";
+
+    }
+
+
+    /* -------------------------------------------------
+       REFRESH ADMIN WORKFLOW
+    ------------------------------------------------- */
+
+    updateMatchmakingDestination();
+
+    updateUploadDestination();
+
+    updateWorkflow();
+
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "success",
+      (
+        `Season ${season} Archive is complete. ` +
+        `The workflow is reset and ready to begin Season ${nextSeason} at Matchmaking.`
+      ),
+      "fa-circle-check"
+    );
+
+
+    appendLog(
+      "Save Season Archive",
+      "success",
+      (
+        `Season ${season} was finalized. ` +
+        `GitHub and Foundation remain ready. ` +
+        `Season ${nextSeason} can now begin at Matchmaking.`
+      )
+    );
+
+
+  } catch (
+    error
+  ) {
+
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+      "Save Season Archive failed.",
+      "fa-circle-xmark"
+    );
+
+
+    appendLog(
+      "Save Season Archive",
+      "error",
+      error?.message ||
+      "Save Season Archive failed."
+    );
+
+
+    setButtonEnabled(
+      "saveSeasonArchiveBtn",
+      canWrite() &&
+      workflowState.saveSeasonComplete
+    );
+
+  }
+
+}
+
+/* =====================================================
+   SAVE SEASON — RENDER STEP STATUS
+========================================================= */
+
+function renderSaveSeasonSteps() {
+
+  const saveSeason =
+    workflowState.saveSeason;
+
+
+  const steps = [
+    "7A",
+    "7B",
+    "7C",
+    "7D",
+    "7E",
+    "7F",
+    "7G"
+  ];
+
+
+  steps.forEach(
+    step => {
+
+      const stepData =
+        saveSeason
+          ?.steps
+          ?.[step];
+
+
+      const status =
+        normalizeLower(
+          stepData?.status
+        ) ||
+        "waiting";
+
+
+      const stepElement =
+        getElement(
+          `saveSeasonStep${step}`
+        );
+
+
+      const statusElement =
+        getElement(
+          `saveSeasonStep${step}Status`
+        );
+
+
+      const buttonElement =
+        getElement(
+          `step${step}Btn`
+        );
+
+
+      /* -------------------------------------------------
+         STATUS ON STEP CONTAINER
+      ------------------------------------------------- */
+
+      if (
+        stepElement
+      ) {
+
+        stepElement.dataset.status =
+          status;
+
+      }
+
+
+      /* -------------------------------------------------
+         STATUS TEXT
+      ------------------------------------------------- */
+
+      if (
+        statusElement
+      ) {
+
+        statusElement.dataset.status =
+          status;
+
+
+        statusElement.textContent =
+          (
+            status ===
+              "completed"
+
+              ? "Completed"
+
+              : status ===
+                "running"
+
+                ? "Running"
+
+                : status ===
+                  "error"
+
+                  ? "Error"
+
+                  : "Waiting"
+          );
+
+      }
+
+      /* -------------------------------------------------
+         DETERMINE NEXT STEP
+      ------------------------------------------------- */
+
+      const stepIndex =
+        steps.indexOf(
+          step
+        );
+
+
+      const previousStep =
+        stepIndex > 0
+          ? steps[
+              stepIndex - 1
+            ]
+          : null;
+
+
+      const previousCompleted =
+        !previousStep ||
+        saveSeason
+          ?.steps
+          ?.[previousStep]
+          ?.status ===
+        "completed";
+
+
+      /* -------------------------------------------------
+   STEP BUTTON ENABLE RULE
+------------------------------------------------- */
+
+const enabled =
+  canWrite() &&
+  saveSeason?.active ===
+    true &&
+  status !==
+    "completed" &&
+  status !==
+    "running" &&
+  previousCompleted;
+
+
+setButtonEnabled(
+  `step${step}Btn`,
+  enabled
+);
+
+    }
+  );
+
+}
+
+  /* =====================================================
      WORKFLOW
   ===================================================== */
 
@@ -6039,19 +8950,242 @@ async function rebuildSeasonInfo() {
     );
 
   const archiveReady =
-    Boolean(
-      adminConfig?.archive?.ready === true ||
-      workflowState.archiveReady
+  Boolean(
+    adminConfig?.archive?.ready === true ||
+    workflowState.archiveReady
+  );
+
+
+/* =====================================================
+   SAVE SEASON PERSISTENT WORKFLOW
+===================================================== */
+
+const saveSeason =
+  adminConfig?.saveSeason ||
+  workflowState.saveSeason ||
+  null;
+
+
+if (
+  saveSeason
+) {
+
+  workflowState.saveSeason = {
+
+    active:
+      saveSeason.active ===
+      true,
+
+    seasonNumber:
+      Number(
+        saveSeason.seasonNumber
+      ) || 0,
+
+    officialDate:
+      normalizeText(
+        saveSeason.officialDate
+      ),
+
+    currentStep:
+      normalizeText(
+        saveSeason.currentStep
+      ) ||
+      null,
+
+    status:
+      normalizeLower(
+        saveSeason.status
+      ) ||
+      "waiting",
+
+    steps:
+      {
+        "7A":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7A"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7B":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7B"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7C":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7C"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7D":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7D"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7E":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7E"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7F":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7F"]
+                  ?.status
+              ) ||
+              "waiting"
+          },
+
+        "7G":
+          {
+            status:
+              normalizeLower(
+                saveSeason.steps
+                  ?.["7G"]
+                  ?.status
+              ) ||
+              "waiting"
+          }
+      },
+
+    updatedAt:
+      normalizeText(
+        saveSeason.updatedAt
+      ),
+
+    updatedBy:
+      normalizeText(
+        saveSeason.updatedBy
+      )
+
+  };
+
+  syncSaveSeasonEngine();
+
+
+  /* =====================================================
+     SAVE SEASON — SYNC ENGINE COMPLETION INTO UI
+  ===================================================== */
+
+  const saveSeasonEngine =
+    global.K630SaveSeasonEngine;
+
+
+  if (
+    saveSeasonEngine &&
+    typeof saveSeasonEngine.getState ===
+      "function"
+  ) {
+
+    const engineState =
+      saveSeasonEngine.getState();
+
+
+    const saveSeasonSteps = [
+      "7A",
+      "7B",
+      "7C",
+      "7D",
+      "7E",
+      "7F",
+      "7G"
+    ];
+
+
+    saveSeasonSteps.forEach(
+      step => {
+
+        const engineStepCompleted =
+          engineState[
+            `step${step}`
+          ] ===
+          true;
+
+
+        if (
+          engineStepCompleted
+        ) {
+
+          workflowState
+            .saveSeason
+            .steps[step]
+            .status =
+              "completed";
+
+        }
+
+      }
     );
 
-  workflowState.weekData =
-    weekDataReady;
+  }
 
-  workflowState.websiteBuilt =
-    websiteBuiltReady;
+  }
 
-  workflowState.archiveReady =
-    archiveReady;
+workflowState.weekData =
+  weekDataReady;
+
+workflowState.websiteBuilt =
+  websiteBuiltReady;
+
+workflowState.archiveReady =
+  archiveReady;
+
+  /* =====================================================
+   SAVE SEASON STATUS HELPERS
+===================================================== */
+
+const saveSeasonComplete =
+  [
+    "7A",
+    "7B",
+    "7C",
+    "7D",
+    "7E",
+    "7F",
+    "7G"
+  ].every(
+    step =>
+      workflowState
+        .saveSeason
+        ?.steps
+        ?.[step]
+        ?.status ===
+      "completed"
+  );
+
+
+workflowState.saveSeasonComplete =
+  saveSeasonComplete;
 
   const updateReady =
     Boolean(
@@ -6136,6 +9270,44 @@ async function rebuildSeasonInfo() {
       : "Locked"
   );
 
+/* =====================================================
+   SAVE SEASON — SET BUTTON STATE
+========================================================= */
+
+const archiveSeasonValue =
+  Number(
+    getElement(
+      "archiveSeasonNumber"
+    )?.value
+  );
+
+
+const archiveDateValue =
+  normalizeText(
+    getElement(
+      "archiveOfficialDate"
+    )?.value
+  );
+
+
+const saveSeasonCanBeSet =
+  canWrite() &&
+  Number.isInteger(
+    archiveSeasonValue
+  ) &&
+  archiveSeasonValue > 0 &&
+  Boolean(
+    archiveDateValue
+  ) &&
+  workflowState.saveSeason?.active !==
+    true;
+
+
+setButtonEnabled(
+  "setSaveSeasonBtn",
+  saveSeasonCanBeSet
+);
+
   setButtonEnabled(
     "activateSeasonBtn",
     canWrite() &&
@@ -6169,17 +9341,27 @@ async function rebuildSeasonInfo() {
     );
   });
 
-  setButtonEnabled(
+    setButtonEnabled(
     "validateSeasonArchiveBtn",
     canWrite() &&
     websiteBuiltReady
   );
 
+
   setButtonEnabled(
     "saveSeasonArchiveBtn",
     canWrite() &&
-    archiveReady
+    archiveReady &&
+    workflowState.saveSeasonComplete
   );
+
+
+  /* =====================================================
+     SAVE SEASON — REFRESH STEP UI
+  ===================================================== */
+
+  renderSaveSeasonSteps();
+
 }
 
   /* =====================================================
@@ -6299,6 +9481,56 @@ async function rebuildSeasonInfo() {
     );
 
     bindClick(
+  "setSaveSeasonBtn",
+  setSaveSeason
+);
+
+bindClick(
+  "step7ABtn",
+  runSaveSeasonStep7A
+);
+
+bindClick(
+  "step7BBtn",
+  runSaveSeasonStep7B
+);
+
+bindClick(
+  "step7CBtn",
+  runSaveSeasonStep7C
+);
+
+bindClick(
+  "step7DBtn",
+  runSaveSeasonStep7D
+);
+
+bindClick(
+  "step7EBtn",
+  runSaveSeasonStep7E
+);
+
+bindClick(
+  "step7FBtn",
+  runSaveSeasonStep7F
+);
+
+bindClick(
+  "step7GBtn",
+  runSaveSeasonStep7G
+);
+
+bindChange(
+  "archiveSeasonNumber",
+  updateWorkflow
+);
+
+bindChange(
+  "archiveOfficialDate",
+  updateWorkflow
+);
+
+bindClick(
   "addSeasonToLibraryBtn",
   addSeason
 );
@@ -6409,6 +9641,11 @@ bindClick(
     bindClick(
       "validateSeasonArchiveBtn",
       validateArchive
+    );
+
+    bindClick(
+     "saveSeasonArchiveBtn",
+     saveSeasonArchive
     );
 
     bindClick(
@@ -6618,4 +9855,5 @@ function updateMeritConfigurationTable() {
 
   global.K630AdminCore =
     publicApi;
+
 })(window);

@@ -1214,9 +1214,7 @@
   width: max-content;
 
   min-width:
-    calc(
-      var(--aa-season-group-width) * 2
-    );
+    var(--aa-season-group-width);
 }
 
 /* =========================================================

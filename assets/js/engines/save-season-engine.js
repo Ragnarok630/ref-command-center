@@ -1,232 +1,169 @@
-/*!
- * =====================================================
- * Kingdom 630 Save Season Engine
- * =====================================================
- *
- * Version : 630.2.0
- * Project : Kingdom 630 – Rebels of Fury
- * Module  : Save Season Engine
- *
- * =====================================================
- *
- * FINAL ENGINE OF THE COMPLETE KINGDOM CYCLE
- *
- * This engine is the FINAL step after:
- *
- * Foundation
- * Matchmaking
- * Week 0
- * Week 1
- * Week 2
- * Week 3
- * Week 4
- * Week 5
- * Week 6
- *
- * After Week 6 this engine performs the complete
- * Season Finalization.
- *
- * -----------------------------------------------------
- *
- * SINGLE SOURCE OF TRUTH
- *
- * ALL DATA IS READ FROM
- *
- * k630-public-data
- *
- * ALL DATA IS WRITTEN TO
- *
- * k630-public-data
- *
- * No gameplay data is stored locally.
- *
- * The ONLY exception is the Player ID search history,
- * which may use browser cache/localStorage.
- *
- * -----------------------------------------------------
- *
- * WEBSITE PRINCIPLE
- *
- * Pages NEVER calculate data.
- *
- * Pages ONLY load generated JSON files.
- *
- * Every generated JSON file is produced by this
- * engine or another dedicated engine.
- *
- /* =====================================================
-   MODULE INDEX
-=====================================================
+/* =========================================================
+   KINGDOM 630 — SAVE SEASON ENGINE
+=========================================================
 
-   MODULE 01 — HELPER FUNCTIONS
-   -----------------------------------------------------
-   Algemene hulpfuncties voor de volledige engine.
+Version:
+    630.2.0
 
+Project:
+    Kingdom 630 — Rebels of Fury
 
-   MODULE 02 — PATH CONFIGURATION
-   -----------------------------------------------------
-   Centrale configuratie van alle paden binnen
-   k630-public-data.
+Purpose:
+    Final Season Archive workflow.
 
+=========================================================
+SINGLE SOURCE OF TRUTH
+=========================================================
 
-   MODULE 03 — CONTEXT
-   -----------------------------------------------------
-   Centrale gegevensstructuur voor Save Season.
+ALL DATA IS READ FROM:
 
+    Ragnarok630/k630-public-data
 
-   MODULE 04 — LOAD FINAL SEASON DATA
-   -----------------------------------------------------
-   Haalt de actuele einddatasets rechtstreeks op
-   vanaf k630-public-data.
+ALL DATA IS WRITTEN TO:
 
-   Save Season haalt hier alleen de datasets op
-   die voor de laatste seizoensafhandeling nodig zijn.
+    Ragnarok630/k630-public-data
 
-   W0 t/m W5 worden hier NIET opnieuw verwerkt.
+The website does not store gameplay data locally.
 
-   W6 wordt gebruikt vanuit Season Info.
+The Save Season Engine does not use localStorage
+for gameplay data.
 
+=========================================================
+SAVE SEASON WORKFLOW
+=========================================================
 
-   MODULE 05 — ARCHIVE SEASON INFO
-   -----------------------------------------------------
-   Maakt een letterlijke kopie van de actuele
-   Season Info en slaat deze op als afgesloten
-   seizoen.
+STEP 7
+    SAVE SEASON ARCHIVE
 
+    7A
+        Archive Season Info
+        Archive Server vs Server
 
-   MODULE 06 — ARCHIVE SERVER VS SERVER
-   -----------------------------------------------------
-   Maakt een letterlijke kopie van de actuele
-   Server vs Server dataset en slaat deze op
-   als afgesloten seizoen.
+    7B
+        Update Season Data
 
+    7C
+        Calculate Averages
 
-   MODULE 07 — REBUILD ACTIVE & AVERAGE
-   -----------------------------------------------------
-   Gebruikt de W6-eindgegevens uit Season Info
-   om Active & Average definitief bij te werken.
+    7D
+        Update Notes
 
+    7E
+        Update Server Status
 
-   MODULE 08 — UPDATE ARCHIVE INDEX
-   -----------------------------------------------------
-   Werkt de archive-index bij zodat Old Seasons
-   de opgeslagen seizoenen kan vinden.
+    7F
+        Create Next Season Columns
 
+    7G
+        Reset Current Season Data
 
-   MODULE 09 — UPDATE OLD PLAYERS
-   -----------------------------------------------------
-   Bouwt de actuele Old Players dataset.
+=========================================================
+IMPORTANT
+=========================================================
 
+Each step can be executed independently.
 
-   MODULE 10 — UPDATE HOME
-   -----------------------------------------------------
-   Bouwt de actuele Home dataset.
+The Admin Center will later call:
 
+    step7AArchive()
+    step7BSeasonData()
+    step7CAverages()
+    step7DNote()
+    step7EServerStatus()
+    step7FSeasonColumns()
+    step7GReset()
 
-   MODULE 11 — WRITE GENERATED FILES
-   -----------------------------------------------------
-   Schrijft alle gewijzigde datasets terug naar
-   k630-public-data.
+The final Save Season button will execute them
+in the correct order.
 
+========================================================= */
 
-   MODULE 12 — RESET NEXT SEASON
-   -----------------------------------------------------
-   Zet de status klaar voor de volgende
-   Kingdom 630 season cycle.
-
-
-   MODULE 13 — SAVE SEASON ORCHESTRATOR
-   -----------------------------------------------------
-   Voert de Save Season modules in de juiste
-   volgorde uit.
-
-
-   MODULE 14 — PUBLIC API
-   -----------------------------------------------------
-   Maakt K630SaveSeasonEngine beschikbaar voor
-   de website en Admin Center.
-
-
-===================================================== */
-
-(function () {
-
-"use strict";
-
-/* =====================================================
-   ENGINE INFORMATION
-===================================================== */
-
-const ENGINE_NAME =
-    "K630SaveSeasonEngine";
-
-const ENGINE_VERSION =
-    "630.2.0";
-
-const LOG_PREFIX =
-    "[Save Season]";
-
-console.info(
-    `${LOG_PREFIX} ${ENGINE_NAME} ${ENGINE_VERSION} Loaded`
-);
-/* =====================================================
-   MODULE 01 — HELPER FUNCTIONS
-=====================================================
-
-PURPOSE
--------
-General helper functions used by every module.
-
-This module contains only reusable functions.
-
-No season-specific processing happens here.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   LOGGING
------------------------------------------------------ */
-
-function log(
-    ...messages
+(function initializeK630SaveSeasonEngine(
+    global
 ) {
 
-    console.log(
-        LOG_PREFIX,
-        ...messages
-    );
-
-}
+    "use strict";
 
 
-function warning(
-    ...messages
-) {
+    /* =====================================================
+       ENGINE INFORMATION
+    ===================================================== */
 
-    console.warn(
-        LOG_PREFIX,
-        ...messages
-    );
+    const ENGINE_NAME =
+        "K630 Save Season Engine";
 
-}
-
-
-function error(
-    ...messages
-) {
-
-    console.error(
-        LOG_PREFIX,
-        ...messages
-    );
-
-}
+    const ENGINE_VERSION =
+        "630.2.0";
 
 
-/* -----------------------------------------------------
-   CLONE OBJECT
------------------------------------------------------ */
+    const LOG_PREFIX =
+        "[K630 Save Season]";
+
+
+    /* =====================================================
+       DATA ROOT
+    =====================================================
+
+       Every read goes to k630-public-data.
+
+       DATA_ROOT is the RAW GitHub data root.
+    ===================================================== */
+
+    const DATA_ROOT =
+        global.K630Paths?.DATA_ROOT ??
+        "https://raw.githubusercontent.com/" +
+        "Ragnarok630/k630-public-data/main/assets/data";
+
+
+    /* =====================================================
+       CURRENT DATA PATHS
+    ===================================================== */
+
+    const PATHS = Object.freeze({
+
+        SEASON_INFO:
+            `${DATA_ROOT}/generated/season-info/current.json`,
+
+        SERVER_VS_SERVER:
+            `${DATA_ROOT}/generated/server-vs-server/current.json`,
+
+        ACTIVE_AVERAGE:
+            `${DATA_ROOT}/generated/active-average/current.json`,
+
+        OLD_PLAYERS:
+            `${DATA_ROOT}/generated/old-players/current.json`,
+
+        ADMIN_CONFIG:
+            `${DATA_ROOT}/config/admin-config.json`,
+
+        ARCHIVE_ROOT:
+            `${DATA_ROOT}/archive`
+
+    });
+
+
+    /* =====================================================
+       REPOSITORY INFORMATION
+    ===================================================== */
+
+    const GITHUB_REPOSITORY =
+        Object.freeze({
+
+            owner:
+                "Ragnarok630",
+
+            repository:
+                "k630-public-data",
+
+            branch:
+                "main"
+
+        });
+
+
+    /* =====================================================
+   GENERAL HELPERS
+===================================================== */
 
 function clone(
     value
@@ -241,44 +178,26 @@ function clone(
 }
 
 
-/* -----------------------------------------------------
-   DATE & TIME
------------------------------------------------------ */
-
-function isoNow() {
-
-    return new Date()
-        .toISOString();
-
-}
-
-
-function pad2(
+function normalizeText(
     value
 ) {
 
     return String(
-        value
-    ).padStart(
-        2,
-        "0"
-    );
+        value ??
+        ""
+    ).trim();
 
 }
 
 
-function todayString() {
+/* -----------------------------------------------------
+   CURRENT ISO DATETIME
+----------------------------------------------------- */
 
-    const now =
-        new Date();
+function nowIso() {
 
-    return (
-        `${now.getFullYear()}-${pad2(
-            now.getMonth() + 1
-        )}-${pad2(
-            now.getDate()
-        )}`
-    );
+    return new Date()
+        .toISOString();
 
 }
 
@@ -287,29 +206,78 @@ function todayString() {
    SEASON NUMBER
 ----------------------------------------------------- */
 
-function normalizeSeasonNumber(
-    season
+function normalizeSeason(
+    value
 ) {
 
-    return Math.max(
+    const season =
+        Number(
+            value
+        );
 
-        1,
-
-        Math.trunc(
-
-            Number(
-                season
-            ) || 1
-
+    if (
+        !Number.isFinite(
+            season
         )
+    ) {
 
+        throw new Error(
+            "Invalid Season Number."
+        );
+
+    }
+
+    if (
+        season < 1
+    ) {
+
+        throw new Error(
+            "Season Number must be 1 or higher."
+        );
+
+    }
+
+    return Math.trunc(
+        season
     );
 
 }
 
 
 /* -----------------------------------------------------
-   VALIDATION
+   ARCHIVE DATE
+----------------------------------------------------- */
+
+function normalizeDate(
+    value
+) {
+
+    const date =
+        normalizeText(
+            value
+        );
+
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            date
+        )
+    ) {
+
+        throw new Error(
+            "Archive Date must use YYYY-MM-DD."
+        );
+
+    }
+
+
+    return date;
+
+}
+
+
+/* -----------------------------------------------------
+   REQUIRED VALUE
 ----------------------------------------------------- */
 
 function requireValue(
@@ -318,13 +286,10 @@ function requireValue(
 ) {
 
     if (
-
         value ===
             undefined ||
-
         value ===
             null
-
     ) {
 
         throw new Error(
@@ -337,2864 +302,3366 @@ function requireValue(
 
 }
 
-/* -----------------------------------------------------
-   READ JSON FROM k630-public-data
------------------------------------------------------ */
+    /* =====================================================
+       READ JSON
+    =====================================================
 
-async function readJson(
-    url
-) {
+       This is the ONLY generic JSON reader used by
+       Save Season.
 
-    const finalUrl =
-        /^https?:\/\//i.test(
-            url
-        )
-            ? url
-            : `${DATA_ROOT}/${url.replace(
-                /^assets\/data\//,
-                ""
-            )}`;
+       Relative paths are resolved against DATA_ROOT.
 
+       Absolute HTTP URLs are allowed when another
+       k630-public-data URL is already supplied.
+    ===================================================== */
 
-    const response =
-        await fetch(
-            finalUrl,
-            {
-                method:
-                    "GET",
-
-                cache:
-                    "no-store",
-
-                headers: {
-                    Accept:
-                        "application/json"
-                }
-            }
-        );
-
-
-    if (
-        !response.ok
+    async function readJson(
+        url
     ) {
 
-        throw new Error(
-            `Unable to load ${finalUrl}. HTTP ${response.status}.`
-        );
-
-    }
-
-
-    const data =
-        await response.json();
-
-
-    if (
-        !data ||
-        typeof data !==
-            "object"
-    ) {
-
-        throw new Error(
-            `Invalid JSON data received from ${finalUrl}.`
-        );
-
-    }
-
-
-    return data;
-
-}
-
-/* =====================================================
-   MODULE 02 — PATH CONFIGURATION
-=====================================================
-
-PURPOSE
--------
-Central configuration for every location used by
-the Save Season Engine.
-
-SINGLE SOURCE OF TRUTH
-----------------------
-All application data is stored in:
-
-k630-public-data
-
-The Save Season Engine reads from and writes to
-this repository.
-
-IMPORTANT
----------
-Save Season does NOT reload W0 through W5.
-
-The previous engines have already processed those
-weeks.
-
-The final W6 information required by Save Season is
-contained inside the current Season Info dataset.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   DATA ROOT
------------------------------------------------------ */
-
-const DATA_ROOT =
-
-    window.K630Paths?.DATA_ROOT ??
-
-    "https://raw.githubusercontent.com/" +
-    "Ragnarok630/k630-public-data/main/assets/data";
-
-
-/* -----------------------------------------------------
-   CURRENT GENERATED DATA
------------------------------------------------------ */
-
-const PATHS = Object.freeze({
-
-    /* ================================================
-       CURRENT SEASON INFO
-    ================================================ */
-
-    SEASON_INFO:
-        `${DATA_ROOT}/generated/season-info/current.json`,
-
-
-    /* ================================================
-       CURRENT ACTIVE & AVERAGE
-    ================================================ */
-
-    ACTIVE_AVERAGE:
-        `${DATA_ROOT}/generated/active-average/current.json`,
-
-
-    /* ================================================
-       CURRENT SERVER VS SERVER
-    ================================================ */
-
-    SERVER_VS_SERVER:
-        `${DATA_ROOT}/generated/server-vs-server/current.json`,
-
-
-    /* ================================================
-       CURRENT HOME
-       
-       Used later when the final Home dataset needs
-       to be rebuilt.
-    ================================================ */
-
-    HOME:
-        `${DATA_ROOT}/generated/home/current.json`,
-
-
-    /* ================================================
-       CURRENT OLD PLAYERS
-       
-       Used later when Old Players needs to be rebuilt.
-    ================================================ */
-
-    OLD_PLAYERS:
-        `${DATA_ROOT}/generated/old-players/current.json`,
-
-
-    /* ================================================
-       ADMIN CONFIGURATION
-    ================================================ */
-
-    ADMIN_CONFIG:
-        `${DATA_ROOT}/config/admin-config.json`,
-
-
-    /* ================================================
-       ARCHIVE ROOT
-    ================================================ */
-
-    ARCHIVE_ROOT:
-        `${DATA_ROOT}/archive`
-
-});
-
-
-/* -----------------------------------------------------
-   ARCHIVE SEASON PATH
------------------------------------------------------ */
-
-function getArchiveSeasonPath(
-    season
-) {
-
-    const seasonNumber =
-        normalizeSeasonNumber(
-            season
-        );
-
-    return (
-        `${PATHS.ARCHIVE_ROOT}/season-${seasonNumber}`
-    );
-
-}
-
-/* =====================================================
-   MODULE 03 — CONTEXT
-=====================================================
-
-PURPOSE
--------
-Creates the central Save Season context.
-
-The context is the single working object shared by
-all Save Season modules.
-
-IMPORTANT
----------
-Save Season runs AFTER Week 6.
-
-Therefore:
-
-- W0 is not loaded here.
-- W1 is not loaded here.
-- W2 is not loaded here.
-- W3 is not loaded here.
-- W4 is not loaded here.
-- W5 is not loaded here.
-- W6 is NOT loaded as a separate file.
-
-The final W6 information required by Save Season
-already exists inside:
-
-generated/season-info/current.json
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   CREATE CONTEXT
------------------------------------------------------ */
-
-function createContext(
-    options = {}
-) {
-
-    const season =
-        normalizeSeasonNumber(
-            options.season ?? 1
-        );
-
-
-    return {
-
-        /* ================================================
-           ENGINE INFORMATION
-        ================================================ */
-
-        engine: {
-
-            name:
-                ENGINE_NAME,
-
-            version:
-                ENGINE_VERSION,
-
-            started:
-                isoNow(),
-
-            today:
-                todayString()
-
-        },
-
-
-        /* ================================================
-           SETTINGS
-        ================================================ */
-
-        season,
-
-        github:
-            options.github ??
-            window.K630GitHubWriter ??
-            null,
-
-
-        /* ================================================
-           SOURCE DATA
-           
-           These datasets are read directly from
-           k630-public-data.
-        ================================================ */
-
-        source: {
-
-            adminConfig:
-                null
-
-        },
-
-
-        /* ================================================
-           CURRENT GENERATED DATA
-           
-           These are the current JSON datasets that
-           already exist on k630-public-data.
-           
-           Save Season reads these first.
-        ================================================ */
-
-        generated: {
-
-            seasonInfo:
-                null,
-
-            activeAverage:
-                null,
-
-            serverVsServer:
-                null,
-
-            home:
-                null,
-
-            oldPlayers:
-                null,
-
-            archiveIndex:
-                null
-
-        },
-
-
-        /* ================================================
-           ARCHIVE
-           
-           Information about the season that is currently
-           being finalized.
-        ================================================ */
-
-        archive: {
-
-            season:
-                season,
-
-            seasonPath:
-                null,
-
-            files:
-                [],
-
-            written:
-                false
-
-        },
-
-
-        /* ================================================
-           GENERATED RESULTS
-           
-           New versions produced during this Save Season
-           operation.
-        ================================================ */
-
-        results: {
-
-            activeAverage:
-                null,
-
-            home:
-                null,
-
-            oldPlayers:
-                null,
-
-            archiveIndex:
-                null
-
-        },
-
-
-        /* ================================================
-           WRITE QUEUE
-           
-           Files are prepared here first.
-           
-           Module 11 performs the actual GitHub writes.
-        ================================================ */
-
-        writeQueue:
-            [],
-
-
-        /* ================================================
-           STATUS
-        ================================================ */
-
-        status: {
-
-            completedModules:
-                [],
-
-            currentModule:
-                null,
-
-            failed:
-                false,
-
-            finished:
-                false
-
-        }
-
-    };
-
-}
-
-    /* ===============================================
-       SEASON INFO
-    ================================================ */
-
-    context.generated.seasonInfo =
-        await readJson(
-            PATHS.SEASON_INFO
-        );
-
-
-    /* ================================================
-       ACTIVE & AVERAGE
-    ================================================ */
-
-    context.generated.activeAverage =
-        await readJson(
-            PATHS.ACTIVE_AVERAGE
-        );
-
-
-    /* ================================================
-       SERVER VS SERVER
-    ================================================ */
-
-    context.generated.serverVsServer =
-        await readJson(
-            PATHS.SERVER_VS_SERVER
-        );
-
-
-    /* ================================================
-       ADMIN CONFIGURATION
-    ================================================ */
-
-    context.source.adminConfig =
-        await readJson(
-            PATHS.ADMIN_CONFIG
-        );
-
-
-    /* ================================================
-       VALIDATE SEASON INFO
-    ================================================ */
-
-    if (
-        !context.generated.seasonInfo ||
-        typeof context.generated.seasonInfo !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Season Info data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE ACTIVE & AVERAGE
-    ================================================ */
-
-    if (
-        !context.generated.activeAverage ||
-        typeof context.generated.activeAverage !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Active & Average data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE SERVER VS SERVER
-    ================================================ */
-
-    if (
-        !context.generated.serverVsServer ||
-        typeof context.generated.serverVsServer !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Server vs Server data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE ADMIN CONFIG
-    ================================================ */
-
-    if (
-        !context.source.adminConfig ||
-        typeof context.source.adminConfig !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Admin configuration is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       STORE ARCHIVE SEASON PATH
-    ================================================ */
-
-    context.archive.seasonPath =
-        getArchiveSeasonPath(
-            context.season
-        );
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 04 — LOAD FINAL SEASON DATA"
-    );
-
-
-    log(
-        "Final Season data loaded successfully."
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 05 — ARCHIVE SEASON INFO
-=====================================================
-
-PURPOSE
--------
-Archives the completed Season Info dataset.
-
-SOURCE
-------
-generated/season-info/current.json
-
-DESTINATION
------------
-archive/season-{season}/season-info.json
-
-IMPORTANT
----------
-This is the final Season Info dataset.
-
-The data is NOT rebuilt here.
-
-The existing Season Info dataset is copied into
-the archive for the completed season.
-
-The archive is required by the Old Seasons page.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   ARCHIVE SEASON INFO
------------------------------------------------------ */
-
-async function archiveSeasonInfo(
-    context
-) {
-
-    log(
-        `Archiving Season ${context.season} Season Info...`
-    );
-
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    if (
-        !context.generated ||
-        !context.generated.seasonInfo
-    ) {
-
-        throw new Error(
-            "Season Info data has not been loaded."
-        );
-
-    }
-
-
-    /* ================================================
-       ARCHIVE PATH
-    ================================================ */
-
-    const archivePath =
-        `${context.archive.seasonPath}/season-info.json`;
-
-
-    /* ================================================
-       CREATE ARCHIVE ENTRY
-       
-       The dataset itself is copied.
-       
-       No recalculation takes place here.
-    ================================================ */
-
-    const archiveEntry = {
-
-        path:
-            archivePath,
-
-        data:
-            clone(
-                context.generated.seasonInfo
-            ),
-
-        source:
-            PATHS.SEASON_INFO,
-
-        type:
-            "season-info",
-
-        season:
-            context.season
-
-    };
-
-
-    /* ================================================
-       ADD TO WRITE QUEUE
-    ================================================ */
-
-    context.writeQueue.push(
-        archiveEntry
-    );
-
-
-    /* ================================================
-       STORE ARCHIVE INFORMATION
-    ================================================ */
-
-    context.archive.files.push(
-        archivePath
-    );
-
-
-    context.archive.seasonInfo =
-        archiveEntry;
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 05 — ARCHIVE SEASON INFO"
-    );
-
-
-    log(
-        `Season ${context.season} Season Info prepared for archive:`,
-        archivePath
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 06 — ARCHIVE SERVER VS SERVER
-=====================================================
-
-PURPOSE
--------
-Archives the completed Server vs Server dataset.
-
-SOURCE
-------
-generated/server-vs-server/current.json
-
-DESTINATION
------------
-archive/season-{season}/server-vs-server.json
-
-IMPORTANT
----------
-The Server vs Server dataset has already been built
-by the Server vs Server engines.
-
-Save Season does NOT rebuild the data here.
-
-This module only prepares a complete copy of the
-current dataset for the completed season.
-
-The archived file is used by the Old Seasons page.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   ARCHIVE SERVER VS SERVER
------------------------------------------------------ */
-
-async function archiveServerVsServer(
-    context
-) {
-
-    log(
-        `Archiving Season ${context.season} Server vs Server...`
-    );
-
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    if (
-        !context.generated ||
-        !context.generated.serverVsServer
-    ) {
-
-        throw new Error(
-            "Server vs Server data has not been loaded."
-        );
-
-    }
-
-
-    /* ================================================
-       ARCHIVE PATH
-    ================================================ */
-
-    const archivePath =
-        `${context.archive.seasonPath}/server-vs-server.json`;
-
-
-    /* ================================================
-       CREATE ARCHIVE ENTRY
-       
-       The complete current dataset is copied.
-       
-       No recalculation takes place here.
-    ================================================ */
-
-    const archiveEntry = {
-
-        path:
-            archivePath,
-
-        data:
-            clone(
-                context.generated.serverVsServer
-            ),
-
-        source:
-            PATHS.SERVER_VS_SERVER,
-
-        type:
-            "server-vs-server",
-
-        season:
-            context.season
-
-    };
-
-
-    /* ================================================
-       ADD TO WRITE QUEUE
-    ================================================ */
-
-    context.writeQueue.push(
-        archiveEntry
-    );
-
-
-    /* ================================================
-       STORE ARCHIVE INFORMATION
-    ================================================ */
-
-    context.archive.files.push(
-        archivePath
-    );
-
-
-    context.archive.serverVsServer =
-        archiveEntry;
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 06 — ARCHIVE SERVER VS SERVER"
-    );
-
-
-    log(
-        `Season ${context.season} Server vs Server prepared for archive:`,
-        archivePath
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 07 — REBUILD ACTIVE & AVERAGE
-=====================================================
-
-PURPOSE
--------
-Rebuilds the final Active & Average dataset for the
-completed season.
-
-INPUT
------
-1. Current Active & Average
-2. Current Season Info
-3. W6 final data stored inside Season Info
-4. Admin configuration
-
-IMPORTANT
----------
-Save Season does NOT reload W0 through W6.
-
-The previous weekly engines have already completed
-those processing steps.
-
-The final W6 data needed here is read directly from:
-
-generated/season-info/current.json
-
-Specifically:
-
-seasonInfo.server630WeekData
-
-PROCESS
--------
-Current Active & Average
-        +
-Season Info
-        +
-W6 final data
-        ↓
-K630WeeklyPlayerStateEngine
-        ↓
-New Active & Average dataset
-
-OUTPUT
-------
-context.results.activeAverage
-
-The actual GitHub write happens later in:
-
-MODULE 11 — WRITE GENERATED FILES
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   REBUILD ACTIVE & AVERAGE
------------------------------------------------------ */
-
-async function rebuildActiveAverage(
-    context
-) {
-
-    log(
-        "Rebuilding Active & Average..."
-    );
-
-
-    /* ================================================
-       VALIDATE CONTEXT
-    ================================================ */
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE CURRENT ACTIVE & AVERAGE
-    ================================================ */
-
-    if (
-        !context.generated ||
-        !context.generated.activeAverage
-    ) {
-
-        throw new Error(
-            "Current Active & Average data has not been loaded."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE SEASON INFO
-    ================================================ */
-
-    if (
-        !context.generated ||
-        !context.generated.seasonInfo
-    ) {
-
-        throw new Error(
-            "Current Season Info data has not been loaded."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE WEEKLY PLAYER STATE ENGINE
-    ================================================ */
-
-    if (
-        !window.K630WeeklyPlayerStateEngine
-    ) {
-
-        throw new Error(
-            "K630WeeklyPlayerStateEngine not found."
-        );
-
-    }
-
-
-    /* ================================================
-       READ W6 FROM SEASON INFO
-       
-       Save Season does NOT load a separate W6 file.
-       
-       The final W6 data is already stored inside
-       Season Info.
-    ================================================ */
-
-    const server630WeekData =
-        Array.isArray(
-            context.generated
-                .seasonInfo
-                ?.server630WeekData
-        )
-
-            ? clone(
-                context.generated
-                    .seasonInfo
-                    .server630WeekData
-            )
-
-            : [];
-
-
-    /* ================================================
-       VALIDATE W6 DATA
-    ================================================ */
-
-    if (
-        !server630WeekData.length
-    ) {
-
-        throw new Error(
-            "Season Info does not contain final W6 server630WeekData."
-        );
-
-    }
-
-
-    log(
-        "Final W6 data loaded from Season Info:",
-        server630WeekData.length,
-        "records."
-    );
-
-
-    /* ================================================
-       BUILD FINAL ACTIVE & AVERAGE
-    ================================================ */
-
-    const result =
-        await window
-            .K630WeeklyPlayerStateEngine
-            .build(
-
-                clone(
-                    context.generated
-                        .activeAverage
-                ),
-
-                clone(
-                    context.generated
-                        .seasonInfo
-                ),
-
-                server630WeekData,
-
-                {
-
-                    seasonNumber:
-                        context.season,
-
-                    weekNumber:
-                        6,
-
-                    officialDate:
-                        context.engine
-                            .today,
-
-                    generatedAt:
-                        context.engine
-                            .started,
-
-                    generatedBy:
-                        ENGINE_NAME,
-
-                    meritConfiguration:
-                        context.source
-                            .adminConfig
-                            ?.meritConfiguration ??
-                        null
-
-                }
-
+        const input =
+            normalizeText(
+                url
             );
 
-
-    /* ================================================
-       VALIDATE ENGINE RESULT
-    ================================================ */
-
-    if (
-        !result ||
-        typeof result !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Weekly Player State Engine returned an invalid result."
-        );
-
-    }
-
-
-    if (
-        !result.data ||
-        typeof result.data !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Weekly Player State Engine returned no Active & Average data."
-        );
-
-    }
-
-
-    /* ================================================
-       STORE RESULT
-    ================================================ */
-
-    context.results.activeAverage =
-        result.data;
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 07 — REBUILD ACTIVE & AVERAGE"
-    );
-
-
-    log(
-        "Active & Average rebuild finished."
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 08 — UPDATE ARCHIVE INDEX
-=====================================================
-
-PURPOSE
--------
-Updates the central archive index used by the
-Old Seasons page.
-
-SOURCE
-------
-archive/index.json
-
-ARCHIVED FILES
---------------
-archive/season-{season}/season-info.json
-archive/season-{season}/server-vs-server.json
-
-PROCESS
--------
-1. Load the existing archive index.
-2. Remove an existing entry for this season.
-3. Add the completed season.
-4. Sort newest season first.
-5. Prepare the new index for Module 11.
-
-IMPORTANT
----------
-This module does NOT write to GitHub.
-
-The actual write happens in:
-
-MODULE 11 — WRITE GENERATED FILES
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   UPDATE ARCHIVE INDEX
------------------------------------------------------ */
-
-async function updateArchiveIndex(
-    context
-) {
-
-    log(
-        `Updating Archive Index for Season ${context.season}...`
-    );
-
-
-    /* ================================================
-       VALIDATE CONTEXT
-    ================================================ */
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    /* ================================================
-       ARCHIVE INDEX PATH
-    ================================================ */
-
-    const indexPath =
-        `${PATHS.ARCHIVE_ROOT}/index.json`;
-
-
-    /* ================================================
-       LOAD EXISTING INDEX
-       
-       If no index exists yet, start with an empty
-       archive list.
-    ================================================ */
-
-    let index = [];
-
-    try {
-
-        index =
-            await readJson(
-                indexPath
-            );
 
         if (
-            !Array.isArray(
-                index
-            )
+            !input
         ) {
 
-            index = [];
+            throw new Error(
+                "readJson() received an empty URL."
+            );
 
         }
 
-    } catch (
-        indexError
-    ) {
 
-        warning(
-            "Archive index could not be loaded.",
-            "Starting a new archive index.",
-            indexError
-        );
-
-        index = [];
-
-    }
-
-
-    /* ================================================
-       REMOVE EXISTING ENTRY FOR THIS SEASON
-       
-       This prevents duplicate Season 1 / Season 2
-       entries when Save Season is run again.
-    ================================================ */
-
-    index =
-        index.filter(
-            entry =>
-
-                normalizeSeasonNumber(
-                    entry?.season
-                ) !==
-                context.season
-
-        );
-
-
-    /* ================================================
-       CREATE ARCHIVE PATHS
-    ================================================ */
-
-    const seasonPath =
-        getArchiveSeasonPath(
-            context.season
-        );
-
-
-    const seasonInfoPath =
-        `${seasonPath}/season-info.json`;
-
-
-    const serverVsServerPath =
-        `${seasonPath}/server-vs-server.json`;
-
-
-    /* ================================================
-       ADD COMPLETED SEASON
-    ================================================ */
-
-    index.push({
-
-        season:
-            context.season,
-
-        archivedAt:
-            context.engine.started,
-
-        seasonInfo:
-            seasonInfoPath,
-
-        serverVsServer:
-            serverVsServerPath
-
-    });
-
-
-    /* ================================================
-       SORT NEWEST SEASON FIRST
-    ================================================ */
-
-    index.sort(
-        (
-            first,
-            second
-        ) =>
-
-            normalizeSeasonNumber(
-                second?.season
-            ) -
-            normalizeSeasonNumber(
-                first?.season
+        const finalUrl =
+            /^https?:\/\//i.test(
+                input
             )
-
-    );
-
-
-    /* ================================================
-       STORE RESULT
-    ================================================ */
-
-    context.results.archiveIndex =
-        index;
+                ? input
+                : `${DATA_ROOT}/${input.replace(
+                    /^assets\/data\//,
+                    ""
+                )}`;
 
 
-    /* ================================================
-       PREPARE WRITE QUEUE ENTRY
-       
-       Module 11 will perform the actual write.
-    ================================================ */
-
-    context.writeQueue.push({
-
-        path:
-            indexPath,
-
-        data:
-            clone(
-                index
-            ),
-
-        source:
-            indexPath,
-
-        type:
-            "archive-index",
-
-        season:
-            context.season
-
-    });
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 08 — UPDATE ARCHIVE INDEX"
-    );
-
-
-    log(
-        "Archive Index prepared.",
-        index
-    );
-
-
-    return context;
-
-}
-
-/* -----------------------------------------------------
-   LOAD FINAL SEASON DATA
------------------------------------------------------ */
-
-async function loadFinalSeasonData(
-    context
-) {
-
-    log(
-        "Loading final Season data..."
-    );
-
-
-    /* ================================================
-       VALIDATE CONTEXT
-    ================================================ */
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    /* ================================================
-       SEASON INFO
-    ================================================ */
-
-    context.generated.seasonInfo =
-        await readJson(
-            PATHS.SEASON_INFO
+        console.info(
+            `${LOG_PREFIX} READ:`,
+            finalUrl
         );
 
 
-    /* ================================================
-       ACTIVE & AVERAGE
-    ================================================ */
-
-    context.generated.activeAverage =
-        await readJson(
-            PATHS.ACTIVE_AVERAGE
-        );
-
-
-    /* ================================================
-       SERVER VS SERVER
-    ================================================ */
-
-    context.generated.serverVsServer =
-        await readJson(
-            PATHS.SERVER_VS_SERVER
-        );
-
-
-    /* ================================================
-       HOME
-    ================================================ */
-
-    context.generated.home =
-        await readJson(
-            PATHS.HOME
-        );
-
-
-    /* ================================================
-       OLD PLAYERS
-    ================================================ */
-
-    context.generated.oldPlayers =
-        await readJson(
-            PATHS.OLD_PLAYERS
-        );
-
-
-    /* ================================================
-       ADMIN CONFIGURATION
-    ================================================ */
-
-    context.source.adminConfig =
-        await readJson(
-            PATHS.ADMIN_CONFIG
-        );
-
-
-    /* ================================================
-       VALIDATE SEASON INFO
-    ================================================ */
-
-    if (
-        !context.generated.seasonInfo ||
-        typeof context.generated.seasonInfo !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Season Info data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE ACTIVE & AVERAGE
-    ================================================ */
-
-    if (
-        !context.generated.activeAverage ||
-        typeof context.generated.activeAverage !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Active & Average data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE SERVER VS SERVER
-    ================================================ */
-
-    if (
-        !context.generated.serverVsServer ||
-        typeof context.generated.serverVsServer !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Server vs Server data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE HOME
-    ================================================ */
-
-    if (
-        !context.generated.home ||
-        typeof context.generated.home !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Home data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE OLD PLAYERS
-    ================================================ */
-
-    if (
-        !context.generated.oldPlayers ||
-        typeof context.generated.oldPlayers !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Old Players data is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE ADMIN CONFIG
-    ================================================ */
-
-    if (
-        !context.source.adminConfig ||
-        typeof context.source.adminConfig !==
-            "object"
-    ) {
-
-        throw new Error(
-            "Admin configuration is invalid."
-        );
-
-    }
-
-
-    /* ================================================
-       STORE ARCHIVE SEASON PATH
-    ================================================ */
-
-    context.archive.seasonPath =
-        getArchiveSeasonPath(
-            context.season
-        );
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 04 — LOAD FINAL SEASON DATA"
-    );
-
-
-    log(
-        "Final Season data loaded successfully."
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 10 — UPDATE HOME
-=====================================================
-
-PURPOSE
--------
-Rebuilds the current Home dataset after Save Season.
-
-SOURCE
-------
-- Final Active & Average
-- Final Season Info
-- Existing Home dataset
-
-PROCESS
--------
-1. Take the final Active & Average data.
-2. Take the final Season Info week data.
-3. Rebuild the Home dataset.
-4. Preserve the Home structure expected by the page.
-5. Prepare the new Home JSON for Module 11.
-
-IMPORTANT
----------
-This module does NOT write directly to GitHub.
-
-The final write is performed by:
-
-MODULE 11 — WRITE GENERATED FILES
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   UPDATE HOME
------------------------------------------------------ */
-
-async function updateHome(
-    context
-) {
-
-    log(
-        `Updating Home for Season ${context.season}...`
-    );
-
-
-    /* ================================================
-       VALIDATE CONTEXT
-    ================================================ */
-
-    if (
-        !context
-    ) {
-
-        throw new Error(
-            "Save Season context is required."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE FINAL ACTIVE & AVERAGE
-    ================================================ */
-
-    if (
-        !context.results?.activeAverage
-    ) {
-
-        throw new Error(
-            "Final Active & Average data is missing."
-        );
-
-    }
-
-
-    /* ================================================
-       VALIDATE FINAL SEASON INFO
-    ================================================ */
-
-    if (
-        !context.generated?.seasonInfo
-    ) {
-
-        throw new Error(
-            "Season Info data is missing."
-        );
-
-    }
-
-
-    /* ================================================
-       READ FINAL PLAYERS
-    ================================================ */
-
-    const players =
-        Array.isArray(
-            context.results
-                .activeAverage
-                ?.players
-        )
-
-            ? context.results
-                .activeAverage
-                .players
-
-            : [];
-
-
-    /* ================================================
-       READ SEASON INFO
-    ================================================ */
-
-    const seasonInfo =
-        context.generated
-            .seasonInfo;
-
-
-    /* ================================================
-       PARTICIPATING SERVERS
-    ================================================ */
-
-    const participatingServers =
-        Array.isArray(
-            seasonInfo
-                ?.participatingServers
-        )
-
-            ? clone(
-                seasonInfo
-                    .participatingServers
-            )
-
-            : [];
-
-
-    /* ================================================
-       SERVER 630 WEEK DATA
-    ================================================ */
-
-    const server630WeekData =
-        Array.isArray(
-            seasonInfo
-                ?.server630WeekData
-        )
-
-            ? clone(
-                seasonInfo
-                    .server630WeekData
-            )
-
-            : [];
-
-
-    /* ================================================
-       PARTICIPATING SERVER WEEK DATA
-    ================================================ */
-
-    const participatingServerWeekData =
-        Array.isArray(
-            seasonInfo
-                ?.participatingServerWeekData
-        )
-
-            ? clone(
-                seasonInfo
-                    .participatingServerWeekData
-            )
-
-            : [];
-
-
-    /* ================================================
-       CALCULATE BASIC HOME TOTALS
-    ================================================ */
-
-    const activePlayers =
-        players.length;
-
-
-    const warriors =
-        players.filter(
-
-            player =>
-                Number(
-                    player?.historicalPower ??
-                    player?.topPower ??
-                    player?.power ??
-                    0
-                ) > 20000000
-
-        ).length;
-
-
-    const farmers =
-        players.filter(
-
-            player =>
-                Number(
-                    player?.historicalPower ??
-                    player?.topPower ??
-                    player?.power ??
-                    0
-                ) < 20000000
-
-        ).length;
-
-
-    const serverPower =
-        players.reduce(
-
-            (
-                total,
-                player
-            ) =>
-
-                total +
-
-                Number(
-                    player?.historicalPower ??
-                    player?.topPower ??
-                    player?.power ??
-                    0
-                ),
-
-            0
-
-        );
-
-
-    /* ================================================
-       MERITS
-    ================================================ */
-
-    const serverMerits =
-        players.reduce(
-
-            (
-                total,
-                player
-            ) =>
-
-                total +
-
-                Number(
-                    player?.topMerits ??
-                    player?.merits ??
-                    0
-                ),
-
-            0
-
-        );
-
-
-    /* ================================================
-       KILLS
-    ================================================ */
-
-    const serverKills =
-        players.reduce(
-
-            (
-                total,
-                player
-            ) =>
-
-                total +
-
-                Number(
-                    player?.topKills ??
-                    player?.kills ??
-                    0
-                ),
-
-            0
-
-        );
-
-
-    /* ================================================
-       BUILD HOME DATASET
-    ================================================ */
-
-    const homeData = {
-
-        schemaVersion:
-            context.generated
-                .home
-                ?.schemaVersion ??
-            1,
-
-        kingdom:
-            context.generated
-                .home
-                ?.kingdom ??
-            630,
-
-        dataset:
-            "home",
-
-        generatedAt:
-            context.engine.started,
-
-        currentSeason:
-            context.season,
-
-        currentWeek:
-            6,
-
-        officialDate:
-            context.engine.today,
-
-        activePlayers:
-            activePlayers,
-
-        warriors:
-            warriors,
-
-        farmers:
-            farmers,
-
-        serverPower:
-            serverPower,
-
-        serverMerits:
-            serverMerits,
-
-        serverKills:
-            serverKills,
-
-        participatingServers:
-            participatingServers,
-
-        server630WeekData:
-            server630WeekData,
-
-        participatingServerWeekData:
-            participatingServerWeekData
-
-    };
-
-
-    /* ================================================
-       STORE RESULT
-    ================================================ */
-
-    context.results.home =
-        homeData;
-
-
-    /* ================================================
-       WRITE QUEUE
-    ================================================ */
-
-    context.writeQueue.push({
-
-        path:
-            PATHS.HOME,
-
-        data:
-            clone(
-                homeData
-            ),
-
-        source:
-            PATHS.HOME,
-
-        type:
-            "home",
-
-        season:
-            context.season
-
-    });
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 10 — UPDATE HOME"
-    );
-
-
-    log(
-        "Home update prepared."
-    );
-
-    log(
-        "Active Players:",
-        activePlayers
-    );
-
-    log(
-        "Warriors:",
-        warriors
-    );
-
-    log(
-        "Farmers:",
-        farmers
-    );
-
-    log(
-        "Server Power:",
-        serverPower
-    );
-
-    log(
-        "Server Merits:",
-        serverMerits
-    );
-
-    log(
-        "Server Kills:",
-        serverKills
-    );
-
-
-    return context;
-
-}
-
-/* =====================================================
-   MODULE 11 — WRITE GENERATED FILES
-=====================================================
-
-PURPOSE
--------
-Writes all final Save Season datasets to
-k630-public-data.
-
-SINGLE WRITE POINT
-------------------
-This is the only module responsible for the final
-Save Season writes.
-
-DATA WRITTEN
-------------
-1. Archived Season Info
-2. Archived Server vs Server
-3. Archive Index
-4. Active & Average
-5. Old Players
-6. Home
-
-REPOSITORY
-----------
-Ragnarok630/k630-public-data
-
-BRANCH
-------
-main
-
-IMPORTANT
----------
-All previous modules only prepare data.
-
-This module performs the actual writes.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   WRITE ONE JSON FILE
------------------------------------------------------ */
-
-async function writeSaveSeasonJson(
-    context,
-    path,
-    data,
-    message
-) {
-
-    requireValue(
-        context?.github,
-        "GitHub writer is required."
-    );
-
-
-    /* ================================================
-       WRITER METHOD
-       
-       Preferred method.
-    ================================================ */
-
-    if (
-        typeof context.github.writeJson ===
-        "function"
-    ) {
-
-        return await context
-            .github
-            .writeJson(
-                path,
-                data,
-                message
-            );
-
-    }
-
-
-    /* ================================================
-       INVOKE METHOD
-       
-       Fallback for the K630 GitHub Writer.
-    ================================================ */
-
-    if (
-        typeof context.github.invoke ===
-        "function"
-    ) {
-
-        return await context
-            .github
-            .invoke(
-
-                "write-json",
-
+        const response =
+            await fetch(
+                finalUrl,
                 {
 
-                    repository: {
+                    method:
+                        "GET",
 
-                        owner:
-                            "Ragnarok630",
+                    cache:
+                        "no-store",
 
-                        repository:
-                            "k630-public-data",
+                    headers: {
 
-                        branch:
-                            "main"
+                        Accept:
+                            "application/json"
 
-                    },
-
-                    path:
-
-                        path.replace(
-                            /^assets\/data\//,
-                            ""
-                        ),
-
-                    data:
-                        clone(
-                            data
-                        ),
-
-                    message:
-                        message
+                    }
 
                 }
-
             );
+
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                `Unable to load ${finalUrl}. HTTP ${response.status}.`
+            );
+
+        }
+
+
+        return await response.json();
 
     }
 
 
-    /* ================================================
-       NO WRITER AVAILABLE
-    ================================================ */
+    /* =====================================================
+       ARCHIVE PATH
+    ===================================================== */
 
-    throw new Error(
-        "GitHub writer does not provide writeJson() or invoke()."
-    );
+    function getArchiveSeasonPath(
+        season
+    ) {
 
-}
+        const seasonNumber =
+            normalizeSeason(
+                season
+            );
 
 
-/* -----------------------------------------------------
-   WRITE GENERATED FILES
------------------------------------------------------ */
+        return (
+            `${PATHS.ARCHIVE_ROOT}/season-${seasonNumber}`
+        );
 
-async function writeGeneratedFiles(
-    context
+    }
+
+
+    /* =====================================================
+   REPOSITORY PATH
+========================================================= */
+
+/*
+    Normalize every Save Season write path so the
+    GitHub writer always receives a path inside:
+
+        assets/data/
+
+    Accepted input:
+        assets/data/...
+        /assets/data/...
+        https://raw.githubusercontent.com/.../assets/data/...
+        archive/season-1/...
+
+    Output:
+        assets/data/...
+*/
+
+function toRepositoryPath(
+    path
 ) {
 
-    log(
-        `Writing Season ${context.season} data to k630-public-data...`
-    );
+    const value =
+        String(
+            path ??
+            ""
+        ).trim();
 
-
-    /* ================================================
-       VALIDATE CONTEXT
-    ================================================ */
 
     if (
-        !context
+        !value
     ) {
 
         throw new Error(
-            "Save Season context is required."
+            "GitHub write path is empty."
         );
 
     }
 
 
-    /* ================================================
-       VALIDATE GITHUB WRITER
-    ================================================ */
+    const marker =
+        "/assets/data/";
 
-    requireValue(
-        context.github,
-        "GitHub writer is required before Save Season can write data."
+
+    const markerIndex =
+        value.indexOf(
+            marker
+        );
+
+
+    /* -------------------------------------------------
+       FULL GITHUB / RAW URL
+    ------------------------------------------------- */
+
+    if (
+        markerIndex >= 0
+    ) {
+
+        return (
+            "assets/data/" +
+            value.slice(
+                markerIndex +
+                marker.length
+            )
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       ALREADY NORMALIZED PATH
+    ------------------------------------------------- */
+
+    if (
+        value.startsWith(
+            "assets/data/"
+        )
+    ) {
+
+        return value;
+
+    }
+
+
+    /* -------------------------------------------------
+       ROOT-RELATIVE ASSETS/DATA PATH
+    ------------------------------------------------- */
+
+    const normalized =
+        value
+            .replace(
+                /^\/+/,
+                ""
+            )
+            .replace(
+                /^assets\/data\//,
+                ""
+            );
+
+
+    /* -------------------------------------------------
+       SAVE-SEASON DATA MAY ONLY EXIST INSIDE
+       assets/data
+    ------------------------------------------------- */
+
+    return (
+        "assets/data/" +
+        normalized
     );
-
-
-    /* ================================================
-       WRITE ARCHIVED SEASON INFO
-    ================================================ */
-
-    if (
-        context.archive?.seasonInfo
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            context.archive
-                .seasonInfo
-                .path,
-
-            context.archive
-                .seasonInfo
-                .data,
-
-            `Save Season ${context.season} - Archive Season Info`
-
-        );
-
-        log(
-            "Archived Season Info written."
-        );
-
-    }
-
-
-    /* ================================================
-       WRITE ARCHIVED SERVER VS SERVER
-    ================================================ */
-
-    if (
-        context.archive?.serverVsServer
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            context.archive
-                .serverVsServer
-                .path,
-
-            context.archive
-                .serverVsServer
-                .data,
-
-            `Save Season ${context.season} - Archive Server vs Server`
-
-        );
-
-        log(
-            "Archived Server vs Server written."
-        );
-
-    }
-
-
-    /* ================================================
-       WRITE ACTIVE & AVERAGE
-    ================================================ */
-
-    if (
-        context.results?.activeAverage
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            PATHS.ACTIVE_AVERAGE,
-
-            context.results
-                .activeAverage,
-
-            `Save Season ${context.season} - Active & Average`
-
-        );
-
-        log(
-            "Active & Average written."
-        );
-
-    }
-
-
-    /* ================================================
-       WRITE OLD PLAYERS
-    ================================================ */
-
-    if (
-        context.results?.oldPlayers
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            PATHS.OLD_PLAYERS,
-
-            context.results
-                .oldPlayers,
-
-            `Save Season ${context.season} - Old Players`
-
-        );
-
-        log(
-            "Old Players written."
-        );
-
-    }
-
-
-    /* ================================================
-       WRITE HOME
-    ================================================ */
-
-    if (
-        context.results?.home
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            PATHS.HOME,
-
-            context.results
-                .home,
-
-            `Save Season ${context.season} - Home`
-
-        );
-
-        log(
-            "Home written."
-        );
-
-    }
-
-
-    /* ================================================
-       WRITE ARCHIVE INDEX
-    ================================================ */
-
-    if (
-        context.results?.archiveIndex
-    ) {
-
-        await writeSaveSeasonJson(
-
-            context,
-
-            `${PATHS.ARCHIVE_ROOT}/index.json`,
-
-            context.results
-                .archiveIndex,
-
-            `Save Season ${context.season} - Archive Index`
-
-        );
-
-        log(
-            "Archive Index written."
-        );
-
-    }
-
-
-    /* ================================================
-       MARK ARCHIVE AS WRITTEN
-    ================================================ */
-
-    context.archive.written =
-        true;
-
-
-    /* ================================================
-       STATUS
-    ================================================ */
-
-    context.status.completedModules.push(
-        "MODULE 11 — WRITE GENERATED FILES"
-    );
-
-
-    log(
-        `Season ${context.season} data successfully written to k630-public-data.`
-    );
-
-
-    return context;
 
 }
 
-/* =====================================================
-   MODULE 12 — RESET NEXT SEASON
-=====================================================
+    /* =====================================================
+       STEP 7 STATE
+    ===================================================== */
 
-PURPOSE
--------
-Prepare the system for the next Kingdom 630 season.
+    const state = {
 
-IMPORTANT
----------
-This module does NOT delete archived season data.
-
-Archived data remains permanently available in:
-
-k630-public-data
-
-Only the CURRENT season state is advanced.
-
-===================================================== */
-
-
-/* -----------------------------------------------------
-   RESET / PREPARE NEXT SEASON
------------------------------------------------------ */
-
-async function resetNextSeason(
-    context
-) {
-
-    log(
-        `Preparing next season after Season ${context.season}...`
-    );
-
-
-    /* ================================================
-       VALIDATE CURRENT SEASON
-    ================================================ */
-
-    const currentSeason =
-        normalizeSeasonNumber(
-            context.season
-        );
-
-
-    /* ================================================
-       CALCULATE NEXT SEASON
-    ================================================ */
-
-    const nextSeason =
-        currentSeason + 1;
-
-
-    context.nextSeason =
-        nextSeason;
-
-
-    log(
-        `Current Season: ${currentSeason}`
-    );
-
-    log(
-        `Next Season: ${nextSeason}`
-    );
-
-
-    /* ================================================
-       RESET CURRENT WEEK
-    ================================================ */
-
-    context.currentWeek =
-        0;
-
-
-    /* ================================================
-       RESET WEEK STATUS
-    ================================================ */
-
-    context.weekStatus = {
-
-        w0:
+        configured:
             false,
 
-        w1:
+        season:
+            null,
+
+        officialDate:
+            null,
+
+        step7A:
             false,
 
-        w2:
+        step7B:
             false,
 
-        w3:
+        step7C:
             false,
 
-        w4:
+        step7D:
             false,
 
-        w5:
+        step7E:
             false,
 
-        w6:
+        step7F:
+            false,
+
+        step7G:
             false
 
     };
 
 
-    /* ================================================
-       RESET PARTICIPATING SERVER WEEK DATA
-    ================================================ */
+    /* =====================================================
+       ENGINE READY MESSAGE
+    ===================================================== */
 
-    context.participatingServerWeekData =
-        [];
-
-
-    /* ================================================
-       RESET SERVER 630 WEEK DATA
-    ================================================ */
-
-    context.server630WeekData =
-        [];
-
-
-    /* ================================================
-       RESET PARTICIPATING SERVERS
-    ================================================ */
-
-    context.participatingServers =
-        [];
-
-
-    /* ================================================
-       PREPARE NEXT SEASON STATUS
-       
-       This object is kept in memory for the
-       Save Season result.
-
-       The actual persistent Admin Center /
-       website status is handled by the
-       appropriate status writer.
-    ================================================ */
-
-    context.nextSeasonStatus = {
-
-        season:
-            nextSeason,
-
-        currentWeek:
-            0,
-
-        foundation:
-            false,
-
-        matchmaking:
-            false,
-
-        weeks: {
-
-            w0:
-                false,
-
-            w1:
-                false,
-
-            w2:
-                false,
-
-            w3:
-                false,
-
-            w4:
-                false,
-
-            w5:
-                false,
-
-            w6:
-                false
-
-        },
-
-        readyForNextSeason:
-            true
-
-    };
-
-
-    /* ================================================
-       RESET SEASON-SPECIFIC RESULT STATE
-    ================================================ */
-
-    context.activeAverageResult =
-        null;
-
-    context.seasonInfoResult =
-        null;
-
-    context.homeResult =
-        null;
-
-
-    /* ================================================
-       RESET TEMPORARY ARCHIVE STATE
-    ================================================ */
-
-    context.archive =
-        context.archive ??
-        {};
-
-    context.archive.written =
-        true;
-
-
-    /* ================================================
-       COMPLETION STATUS
-    ================================================ */
-
-    context.status =
-        context.status ??
-        {};
-
-    context.status.completedModules =
-        context.status.completedModules ??
-        [];
-
-    context.status.completedModules.push(
-        "MODULE 12 — RESET NEXT SEASON"
+    console.info(
+        `${LOG_PREFIX} ${ENGINE_NAME} ${ENGINE_VERSION} loaded.`
     );
 
 
-    context.status.nextSeason =
-        nextSeason;
+    /* =====================================================
+   STEP 7 — SET SEASON
+=====================================================
+
+   Stores the Season Number and Official Archive Date
+   for the current Save Season operation.
+
+   Nothing is written to GitHub here.
+
+   Nothing is archived here.
+
+   This step only configures the engine.
+
+========================================================= */
+
+function setSeason(
+    season,
+    officialDate
+) {
+
+    /* -------------------------------------------------
+       NORMALIZE INPUT
+    ------------------------------------------------- */
+
+    const seasonNumber =
+        normalizeSeason(
+            season
+        );
+
+    const archiveDate =
+        normalizeDate(
+            officialDate
+        );
 
 
-    context.status.readyForNextSeason =
+    /* -------------------------------------------------
+       STORE CONFIGURATION
+    ------------------------------------------------- */
+
+    state.season =
+        seasonNumber;
+
+    state.officialDate =
+        archiveDate;
+
+    state.configured =
         true;
 
 
-    /* ================================================
+    /* -------------------------------------------------
+       RESET STEP STATUS
+    -------------------------------------------------
+
+       Changing the Season or Official Date creates
+       a completely new Save Season operation.
+
+       Therefore all previous Step 7 completion flags
+       must be cleared.
+    ------------------------------------------------- */
+
+    state.step7A =
+        false;
+
+    state.step7B =
+        false;
+
+    state.step7C =
+        false;
+
+    state.step7D =
+        false;
+
+    state.step7E =
+        false;
+
+    state.step7F =
+        false;
+
+    state.step7G =
+        false;
+
+
+    /* -------------------------------------------------
        LOG
-    ================================================ */
+    ------------------------------------------------- */
 
-    log(
-        `Season ${currentSeason} finalized.`
+    console.info(
+        `${LOG_PREFIX} STEP 7 configured.`,
+        {
+            season:
+                state.season,
+
+            officialDate:
+                state.officialDate
+        }
     );
 
-    log(
-        `System prepared for Season ${nextSeason}.`
+
+    /* -------------------------------------------------
+       RETURN COPY
+    ------------------------------------------------- */
+
+    return getState();
+
+}
+
+
+/* =====================================================
+   GET STATE
+========================================================= */
+
+function getState() {
+
+    return clone(
+        state
+    );
+
+}
+
+
+/* =====================================================
+   REQUIRE CONFIGURATION
+=========================================================
+
+   Every Step 7 operation will use this guard.
+
+   No archive/write step is allowed to run before
+   Season Number and Official Archive Date are set.
+========================================================= */
+
+function requireConfigured() {
+
+    if (
+        !state.configured
+    ) {
+
+        throw new Error(
+            "Save Season is not configured. " +
+            "Set Season Number and Official Archive Date first."
+        );
+
+    }
+
+
+    requireValue(
+        state.season,
+        "Save Season Number is missing."
     );
 
 
-    return context;
+    requireValue(
+        state.officialDate,
+        "Save Season Official Date is missing."
+    );
+
+
+    return true;
+
+}
+
+
+/* =====================================================
+   RESET ENGINE
+=========================================================
+
+   Clears the current Step 7 configuration.
+
+   This does NOT modify GitHub data.
+========================================================= */
+
+function reset() {
+
+    state.configured =
+        false;
+
+    state.season =
+        null;
+
+    state.officialDate =
+        null;
+
+    state.step7A =
+        false;
+
+    state.step7B =
+        false;
+
+    state.step7C =
+        false;
+
+    state.step7D =
+        false;
+
+    state.step7E =
+        false;
+
+    state.step7F =
+        false;
+
+    state.step7G =
+        false;
+
+
+    console.info(
+        `${LOG_PREFIX} STEP 7 state reset.`
+    );
+
+
+    return getState();
 
 }
 
 /* =====================================================
-   MODULE 13 — SAVE SEASON ORCHESTRATOR
-=====================================================
+   STEP 7A — ARCHIVE
+=========================================================
 
 PURPOSE
 -------
-Runs the complete Save Season finalization cycle.
+Create the permanent archive copies for the selected
+Season.
 
-THIS MODULE DOES NOT CONTAIN DATA LOGIC.
+STEP 7A ARCHIVES:
 
-It only controls the order in which the Save Season
-modules execute.
+    Season Info
+    Server vs Server
 
-FINAL SEASON FLOW
------------------
-MODULE 04
-Load final data
+SOURCE
+------
+All source data is read directly from:
 
-MODULE 05
-Archive Season Info
+    k630-public-data
 
-MODULE 06
-Archive Server vs Server
+SOURCE FILES:
 
-MODULE 07
-Rebuild Active & Average using W6 from Season Info
+    generated/season-info/current.json
 
-MODULE 08
-Update Archive Index
+    generated/server-vs-server/current.json
 
-MODULE 09
-Update Old Players
+DESTINATION
+-----------
+The completed Season is stored in:
 
-MODULE 10
-Update Home
+    archive/season-{season}/
 
-MODULE 11
-Write everything to k630-public-data
+FILES:
 
-MODULE 12
-Prepare the next season
+    season-info.json
 
-===================================================== */
+    server-vs-server.json
+
+IMPORTANT
+---------
+The source current.json files are NOT changed here.
+
+They remain available for the following steps.
+
+STEP 7G is responsible for resetting the current
+files for the next Season.
+
+This step performs the actual GitHub writes.
+
+========================================================= */
 
 
 /* -----------------------------------------------------
-   SAVE SEASON
+   GET GITHUB WRITER
 ----------------------------------------------------- */
 
-async function saveSeason(
-    options = {}
+function getGitHubWriter() {
+
+    const writer =
+        global.K630GitHubWriter;
+
+
+    if (
+        !writer ||
+        typeof writer.writeJson !==
+            "function"
+    ) {
+
+        throw new Error(
+            "K630GitHubWriter is not available."
+        );
+
+    }
+
+
+    return writer;
+
+}
+
+
+/* -----------------------------------------------------
+   WRITE JSON TO k630-public-data
+----------------------------------------------------- */
+
+async function writePublicDataJson(
+    path,
+    data,
+    message
 ) {
 
-    /* ================================================
-       CREATE CONTEXT
-    ================================================ */
+    const writer =
+        getGitHubWriter();
 
-    const context =
-        createContext(
-            options
+
+    if (
+        !path
+    ) {
+
+        throw new Error(
+            "GitHub write path is missing."
+        );
+
+    }
+
+
+    if (
+        data ===
+        undefined
+    ) {
+
+        throw new Error(
+            `GitHub write data is missing for ${path}.`
+        );
+
+    }
+
+
+    const repositoryPath =
+        toRepositoryPath(
+            path
         );
 
 
-    log(
-        "================================================="
+    console.info(
+        `${LOG_PREFIX} WRITE:`,
+        repositoryPath
     );
 
-    log(
-        "SAVE SEASON STARTED"
+
+    return await writer.writeJson(
+
+        repositoryPath,
+
+        clone(
+            data
+        ),
+
+        message
+
     );
 
-    log(
-        `Season: ${context.season}`
+}
+
+/* =====================================================
+   PERSIST SAVE SEASON STEP STATUS
+=========================================================
+
+PURPOSE
+-------
+Persist the Save Season workflow state to:
+
+    k630-public-data
+    assets/data/config/admin-config.json
+
+This is the permanent shared workflow state.
+
+No localStorage.
+No sessionStorage.
+No browser cache.
+
+Every Admin Center instance reads the same state.
+
+========================================================= */
+
+async function persistSaveSeasonStep(
+    step,
+    status,
+    options = {}
+) {
+
+    const normalizedStep =
+        normalizeText(
+            step
+        ).toUpperCase();
+
+
+    if (
+        !/^7[A-G]$/.test(
+            normalizedStep
+        )
+    ) {
+
+        throw new Error(
+            `Invalid Save Season step: ${step}`
+        );
+
+    }
+
+
+    const normalizedStatus =
+        normalizeText(
+            status
+        ).toLowerCase();
+
+
+    if (
+        ![
+            "waiting",
+            "running",
+            "completed",
+            "error"
+        ].includes(
+            normalizedStatus
+        )
+    ) {
+
+        throw new Error(
+            `Invalid Save Season status: ${status}`
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       READ CURRENT ADMIN CONFIG
+    ------------------------------------------------- */
+
+    const currentConfig =
+        await readJson(
+            PATHS.ADMIN_CONFIG
+        );
+
+
+    if (
+        !currentConfig ||
+        typeof currentConfig !==
+            "object"
+    ) {
+
+        throw new Error(
+            "Save Season progress could not be saved: admin-config.json is empty or invalid."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       ADMIN CONFIG ENGINE
+    ------------------------------------------------- */
+
+    const configEngine =
+        global.K630AdminConfigEngine;
+
+
+    if (
+        !configEngine ||
+        typeof configEngine.updateSaveSeason !==
+            "function"
+    ) {
+
+        throw new Error(
+            "K630AdminConfigEngine.updateSaveSeason() is not available."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       DETERMINE CURRENT STEP
+    ------------------------------------------------- */
+
+    let currentStep =
+        normalizedStep;
+
+
+    if (
+        normalizedStatus ===
+        "completed"
+    ) {
+
+        const nextStep =
+            normalizeText(
+                options.nextStep
+            ).toUpperCase();
+
+
+        if (
+            /^7[A-G]$/.test(
+                nextStep
+            )
+        ) {
+
+            currentStep =
+                nextStep;
+
+        } else {
+
+            currentStep =
+                normalizedStep;
+
+        }
+
+    }
+
+
+    /* -------------------------------------------------
+       OVERALL SAVE SEASON STATUS
+    ------------------------------------------------- */
+
+    let overallStatus =
+        "running";
+
+
+    if (
+        normalizedStatus ===
+        "error"
+    ) {
+
+        overallStatus =
+            "error";
+
+    }
+
+
+    if (
+        normalizedStep ===
+            "7G" &&
+        normalizedStatus ===
+            "completed"
+    ) {
+
+        overallStatus =
+            "completed";
+
+    }
+
+
+    /* -------------------------------------------------
+       UPDATE ADMIN CONFIG
+    ------------------------------------------------- */
+
+    const nextConfig =
+        configEngine.updateSaveSeason(
+            currentConfig,
+            {
+
+                active:
+                    true,
+
+                seasonNumber:
+                    normalizeSeason(
+                        state.season
+                    ),
+
+                officialDate:
+                    state.officialDate,
+
+                currentStep,
+
+                status:
+                    overallStatus,
+
+                step:
+                    normalizedStep,
+
+                stepStatus:
+                    normalizedStatus,
+
+                updatedAt:
+                    nowIso(),
+
+                updatedBy:
+                    normalizeText(
+                        options.updatedBy
+                    )
+
+            },
+            {
+
+                updatedBy:
+                    normalizeText(
+                        options.updatedBy
+                    )
+
+            }
+        );
+
+
+    /* -------------------------------------------------
+       WRITE TO k630-public-data
+    ------------------------------------------------- */
+
+    await writePublicDataJson(
+
+        PATHS.ADMIN_CONFIG,
+
+        nextConfig,
+
+        (
+            `K630 Save Season ${state.season} ` +
+            `${normalizedStep} ${normalizedStatus}`
+        )
+
     );
 
-    log(
-        `Engine: ${ENGINE_NAME} ${ENGINE_VERSION}`
+
+    console.info(
+        `${LOG_PREFIX} Persistent workflow state saved:`,
+        normalizedStep,
+        normalizedStatus
     );
 
-    log(
-        "================================================="
+
+    return nextConfig;
+
+}
+
+/* =====================================================
+   STEP 7A — ARCHIVE SEASON
+========================================================= */
+
+async function step7AArchive(
+    options = {}
+) {
+
+    /* -------------------------------------------------
+       REQUIRE STEP 7 SET
+    ------------------------------------------------- */
+
+    if (
+        !state.configured
+    ) {
+
+        throw new Error(
+            "STEP 7A cannot start. " +
+            "Set the Season Number and Official Archive Date first."
+        );
+
+    }
+
+    await persistSaveSeasonStep(
+    "7A",
+    "running",
+    {
+        updatedBy:
+            options.updatedBy
+    }
+);
+
+    const season =
+        state.season;
+
+
+    /* -------------------------------------------------
+       SOURCE PATHS
+    ------------------------------------------------- */
+
+    const seasonInfoSource =
+        PATHS.SEASON_INFO;
+
+
+    const serverVsServerSource =
+        PATHS.SERVER_VS_SERVER;
+
+
+    /* -------------------------------------------------
+       ARCHIVE PATH
+    ------------------------------------------------- */
+
+    const archiveSeasonPath =
+        getArchiveSeasonPath(
+            season
+        );
+
+
+    const seasonInfoArchivePath =
+        `${archiveSeasonPath}/season-info.json`;
+
+
+    const serverVsServerArchivePath =
+        `${archiveSeasonPath}/server-vs-server.json`;
+
+
+    /* -------------------------------------------------
+       LOG START
+    ------------------------------------------------- */
+
+    console.info(
+        `${LOG_PREFIX} STEP 7A STARTED.`
+    );
+
+
+    console.info(
+        `${LOG_PREFIX} Season:`,
+        season
+    );
+
+
+    console.info(
+        `${LOG_PREFIX} Archive Date:`,
+        state.officialDate
+    );
+
+
+    /* =================================================
+       READ SEASON INFO
+    ================================================= */
+
+    console.info(
+        `${LOG_PREFIX} STEP 7A — Reading Season Info...`
+    );
+
+
+    const seasonInfo =
+        await readJson(
+            seasonInfoSource
+        );
+
+
+    if (
+        !seasonInfo ||
+        typeof seasonInfo !==
+            "object"
+    ) {
+
+        throw new Error(
+            "STEP 7A failed: Season Info is empty or invalid."
+        );
+
+    }
+
+
+    /* =================================================
+       READ SERVER VS SERVER
+    ================================================= */
+
+    console.info(
+        `${LOG_PREFIX} STEP 7A — Reading Server vs Server...`
+    );
+
+
+    const serverVsServer =
+        await readJson(
+            serverVsServerSource
+        );
+
+
+    if (
+        !serverVsServer ||
+        typeof serverVsServer !==
+            "object"
+    ) {
+
+        throw new Error(
+            "STEP 7A failed: Server vs Server is empty or invalid."
+        );
+
+    }
+
+
+    /* =================================================
+       WRITE SEASON INFO ARCHIVE
+    ================================================= */
+
+    await writePublicDataJson(
+
+        seasonInfoArchivePath,
+
+        seasonInfo,
+
+        `K630 Season ${season} - Archive Season Info`
+
+    );
+
+
+    console.info(
+        `${LOG_PREFIX} Season Info archived:`,
+        seasonInfoArchivePath
+    );
+
+
+    /* =================================================
+       WRITE SERVER VS SERVER ARCHIVE
+    ================================================= */
+
+    await writePublicDataJson(
+
+        serverVsServerArchivePath,
+
+        serverVsServer,
+
+        `K630 Season ${season} - Archive Server vs Server`
+
+    );
+
+    /* =================================================
+   UPDATE ARCHIVE INDEX
+================================================= */
+
+const archiveIndexPath =
+    `${PATHS.ARCHIVE_ROOT}/index.json`;
+
+
+let archiveIndex = [];
+
+
+/* -------------------------------------------------
+   READ EXISTING ARCHIVE INDEX
+------------------------------------------------- */
+
+try {
+
+    archiveIndex =
+        await readJson(
+            archiveIndexPath
+        );
+
+
+    if (
+        !Array.isArray(
+            archiveIndex
+        )
+    ) {
+
+        archiveIndex =
+            [];
+
+    }
+
+} catch (
+    error
+) {
+
+    console.warn(
+        `${LOG_PREFIX} Archive index could not be loaded. ` +
+        `Creating a new index.`,
+        error
+    );
+
+
+    archiveIndex =
+        [];
+
+}
+
+
+/* -------------------------------------------------
+   REMOVE EXISTING ENTRY FOR THIS SEASON
+------------------------------------------------- */
+
+archiveIndex =
+    archiveIndex.filter(
+        entry =>
+            normalizeSeasonNumber(
+                entry?.season
+            ) !==
+            season
+    );
+
+
+/* -------------------------------------------------
+   ADD CURRENT SEASON
+------------------------------------------------- */
+
+archiveIndex.push({
+
+    season:
+        season,
+
+    archivedAt:
+    state.officialDate,
+
+    seasonInfo:
+        seasonInfoArchivePath,
+
+    serverVsServer:
+        serverVsServerArchivePath
+
+});
+
+
+/* -------------------------------------------------
+   SORT NEWEST SEASON FIRST
+------------------------------------------------- */
+
+archiveIndex.sort(
+
+    (
+        first,
+        second
+    ) =>
+
+        normalizeSeasonNumber(
+            second?.season
+        ) -
+
+        normalizeSeasonNumber(
+            first?.season
+        )
+
+);
+
+
+/* -------------------------------------------------
+   WRITE ARCHIVE INDEX
+------------------------------------------------- */
+
+await writePublicDataJson(
+
+    archiveIndexPath,
+
+    archiveIndex,
+
+    `K630 Season ${season} - Archive Index`
+
+);
+
+
+console.info(
+    `${LOG_PREFIX} Archive index updated:`,
+    archiveIndex
+);
+
+
+    console.info(
+        `${LOG_PREFIX} Server vs Server archived:`,
+        serverVsServerArchivePath
+    );
+
+/* =================================================
+   MARK STEP COMPLETE
+================================================= */
+
+state.step7A =
+    true;
+
+await persistSaveSeasonStep(
+    "7A",
+    "completed",
+    {
+        nextStep:
+            "7B",
+
+        updatedBy:
+            options.updatedBy
+    }
+);
+
+    console.info(
+        `${LOG_PREFIX} STEP 7A COMPLETED.`
+    );
+
+
+    return {
+
+        success:
+            true,
+
+        step:
+            "7A",
+
+        season:
+            season,
+
+        officialDate:
+            state.officialDate,
+
+        seasonInfo:
+            seasonInfoArchivePath,
+
+        serverVsServer:
+            serverVsServerArchivePath
+
+    };
+
+}
+
+/* =====================================================
+   SELECT LAST AVAILABLE WEEK
+========================================================= */
+
+function selectLastAvailableWeek(
+    seasonPlayer
+) {
+
+    if (
+        !seasonPlayer ||
+        typeof seasonPlayer !==
+            "object"
+    ) {
+
+        return null;
+
+    }
+
+
+    const weeks =
+        seasonPlayer.weeks;
+
+
+    if (
+        !weeks ||
+        typeof weeks !==
+            "object"
+    ) {
+
+        return null;
+
+    }
+
+
+    for (
+        let weekNumber = 6;
+        weekNumber >= 0;
+        weekNumber -= 1
+    ) {
+
+        const weekKey =
+            `W${weekNumber}`;
+
+
+        const weekData =
+            weeks[
+                weekKey
+            ];
+
+
+        if (
+            weekData &&
+            weekData.available ===
+                true
+        ) {
+
+            return {
+
+                week:
+                    weekKey,
+
+                weekNumber:
+                    weekNumber,
+
+                data:
+                    weekData
+
+            };
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+/* =====================================================
+   STEP 7B — UPDATE SEASON DATA
+========================================================= */
+
+async function step7BSeasonData(
+    options = {}
+) {
+    /* -------------------------------------------------
+       STEP 7A MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7A
+    ) {
+
+        throw new Error(
+            "STEP 7B cannot start. " +
+            "STEP 7A — Archive must be completed first."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7B RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7B",
+        "running",
+        {
+            updatedBy:
+                options.updatedBy
+        }
     );
 
 
     try {
 
+        /* -------------------------------------------------
+           READ SEASON INFO
+        ------------------------------------------------- */
 
-        /* ============================================
-           MODULE 04
-           LOAD FINAL SEASON DATA
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 04 — LOAD FINAL SEASON DATA";
-
-        await loadFinalSeasonData(
-            context
+        console.info(
+            `${LOG_PREFIX} STEP 7B — Reading Season Info...`
         );
 
 
-        /* ============================================
-           MODULE 05
-           ARCHIVE SEASON INFO
-        ============================================ */
+        const seasonInfo =
+            await readJson(
+                PATHS.SEASON_INFO
+            );
 
-        context.status.currentModule =
-            "MODULE 05 — ARCHIVE SEASON INFO";
 
-        await archiveSeasonInfo(
-            context
+        if (
+            !seasonInfo ||
+            typeof seasonInfo !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7B failed: Season Info is empty or invalid."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           READ ACTIVE & AVERAGE
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7B — Reading Active & Average...`
         );
 
 
-        /* ============================================
-           MODULE 06
-           ARCHIVE SERVER VS SERVER
-        ============================================ */
+        const activeAverage =
+            await readJson(
+                PATHS.ACTIVE_AVERAGE
+            );
 
-        context.status.currentModule =
-            "MODULE 06 — ARCHIVE SERVER VS SERVER";
 
-        await archiveServerVsServer(
-            context
+        if (
+            !activeAverage ||
+            typeof activeAverage !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7B failed: Active & Average is empty or invalid."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           GET PLAYER ARRAYS
+        ------------------------------------------------- */
+
+        const seasonPlayers =
+            Array.isArray(
+                seasonInfo.players
+            )
+                ? seasonInfo.players
+                : [];
+
+
+        const activePlayers =
+            Array.isArray(
+                activeAverage.players
+            )
+                ? activeAverage.players
+                : [];
+
+
+        if (
+            !seasonPlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7B failed: Season Info contains no players."
+            );
+
+        }
+
+
+        if (
+            !activePlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7B failed: Active & Average contains no players."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           SEASON NUMBER
+        ------------------------------------------------- */
+
+        const seasonNumber =
+            normalizeSeason(
+                state.season
+            );
+
+
+        /* -------------------------------------------------
+           BUILD ACTIVE PLAYER LOOKUP
+        ------------------------------------------------- */
+
+        const activePlayerById =
+            new Map();
+
+
+        for (
+            const player of
+            activePlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    player?.id
+                );
+
+
+            if (
+                id
+            ) {
+
+                activePlayerById.set(
+                    id,
+                    player
+                );
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           RESULT COUNTERS
+        ------------------------------------------------- */
+
+        let updatedPlayers =
+            0;
+
+        let selectedW6 =
+            0;
+
+        let selectedW5 =
+            0;
+
+        let selectedW4 =
+            0;
+
+        let selectedW3 =
+            0;
+
+        let selectedW2 =
+            0;
+
+        let selectedW1 =
+            0;
+
+        let selectedW0 =
+            0;
+
+
+        /* -------------------------------------------------
+           TEMPORARY SELECTED DATA
+        ------------------------------------------------- */
+
+        const selectedSeasonData =
+            [];
+
+
+        /* =================================================
+           PROCESS EVERY SEASON INFO PLAYER
+        ================================================= */
+
+        for (
+            const seasonPlayer of
+            seasonPlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    seasonPlayer?.id
+                );
+
+
+            if (
+                !id
+            ) {
+
+                continue;
+
+            }
+
+
+            /* ---------------------------------------------
+               FIND SAME ID IN ACTIVE & AVERAGE
+            --------------------------------------------- */
+
+            const activePlayer =
+                activePlayerById.get(
+                    id
+                );
+
+
+            if (
+                !activePlayer
+            ) {
+
+                throw new Error(
+                    `STEP 7B failed: ID ${id} exists in Season Info ` +
+                    `but does not exist in Active & Average.`
+                );
+
+            }
+
+
+            /* ---------------------------------------------
+               SELECT LAST AVAILABLE WEEK
+            --------------------------------------------- */
+
+            const selected =
+                selectLastAvailableWeek(
+                    seasonPlayer
+                );
+
+
+            if (
+                !selected
+            ) {
+
+                throw new Error(
+                    `STEP 7B failed: ID ${id} has no available ` +
+                    `Season week from W6 through W0.`
+                );
+
+            }
+
+
+            const weekData =
+                selected.data;
+
+
+            /* ---------------------------------------------
+               COUNT SELECTED WEEK
+            --------------------------------------------- */
+
+            switch (
+                selected.weekNumber
+            ) {
+
+                case 6:
+
+                    selectedW6 +=
+                        1;
+
+                    break;
+
+
+                case 5:
+
+                    selectedW5 +=
+                        1;
+
+                    break;
+
+
+                case 4:
+
+                    selectedW4 +=
+                        1;
+
+                    break;
+
+
+                case 3:
+
+                    selectedW3 +=
+                        1;
+
+                    break;
+
+
+                case 2:
+
+                    selectedW2 +=
+                        1;
+
+                    break;
+
+
+                case 1:
+
+                    selectedW1 +=
+                        1;
+
+                    break;
+
+
+                case 0:
+
+                    selectedW0 +=
+                        1;
+
+                    break;
+
+            }
+
+
+            /* ---------------------------------------------
+               HISTORICAL POWER
+            ---------------------------------------------
+
+               Season Power comes from Active &
+               Average Historical Power.
+
+               It does NOT come from weekly Power.
+            --------------------------------------------- */
+
+            const historicalPower =
+                Number(
+                    activePlayer
+                        ?.historicalPower
+                );
+
+
+            if (
+                !Number.isFinite(
+                    historicalPower
+                )
+            ) {
+
+                throw new Error(
+                    `STEP 7B failed: ID ${id} has no valid Historical Power ` +
+                    `in Active & Average.`
+                );
+
+            }
+
+
+            /* ---------------------------------------------
+               CREATE / PRESERVE SEASONS OBJECT
+            --------------------------------------------- */
+
+            if (
+                !activePlayer.seasons ||
+                typeof activePlayer.seasons !==
+                    "object" ||
+                Array.isArray(
+                    activePlayer.seasons
+                )
+            ) {
+
+                activePlayer.seasons =
+                    {};
+
+            }
+
+
+            /* ---------------------------------------------
+               WRITE CURRENT SEASON
+            ---------------------------------------------
+
+               Existing previous Seasons remain untouched.
+
+               Only the selected Season is created or
+               updated.
+            --------------------------------------------- */
+
+            activePlayer.seasons[
+                String(
+                    seasonNumber
+                )
+            ] = {
+
+                season:
+                    seasonNumber,
+
+                currentPower:
+                    historicalPower,
+
+                merits:
+                    weekData?.merits ??
+                    0,
+
+                meritPowerPercentage:
+                    weekData
+                        ?.meritPowerPercentage ??
+                    null
+
+            };
+
+
+            /* ---------------------------------------------
+               KEEP CURRENT SEASON MARKER
+            --------------------------------------------- */
+
+            activePlayer.currentSeason =
+                seasonNumber;
+
+
+            /* ---------------------------------------------
+               STORE SELECTED DATA FOR LATER STEPS
+            --------------------------------------------- */
+
+            selectedSeasonData.push({
+
+                id:
+                    id,
+
+                name:
+                    seasonPlayer?.name ??
+                    activePlayer?.name ??
+                    "",
+
+                selectedWeek:
+                    selected.week,
+
+                selectedWeekNumber:
+                    selected.weekNumber,
+
+                merits:
+                    weekData?.merits ??
+                    0,
+
+                meritPowerPercentage:
+                    weekData
+                        ?.meritPowerPercentage ??
+                    null,
+
+                rank:
+                    weekData?.rank ??
+                    null,
+
+                meritRank:
+                    weekData?.meritRank ??
+                    null,
+
+                historicalPower:
+                    historicalPower,
+
+                activePlayer:
+                    activePlayer
+
+            });
+
+
+            updatedPlayers +=
+                1;
+
+        }
+
+
+        /* =================================================
+           STORE UPDATED ACTIVE & AVERAGE
+        ================================================= */
+
+        state.activeAverageData =
+            clone(
+                activeAverage
+            );
+
+/* -------------------------------------------------
+   WRITE UPDATED ACTIVE & AVERAGE
+   TO k630-public-data
+------------------------------------------------- */
+
+console.info(
+    `${LOG_PREFIX} STEP 7B — Writing Active & Average...`
+);
+
+
+await writePublicDataJson(
+
+    PATHS.ACTIVE_AVERAGE,
+
+    activeAverage,
+
+    `K630 Season ${seasonNumber} - STEP 7B Active & Average`
+
+);
+
+        /* -------------------------------------------------
+           KEEP SELECTED DATA FOR 7D / 7E
+        ------------------------------------------------- */
+
+        state.selectedSeasonData =
+            selectedSeasonData;
+
+
+        state.seasonInfo =
+            clone(
+                seasonInfo
+            );
+
+
+        /* -------------------------------------------------
+           KEEP FINAL WEEK DATA AVAILABLE
+        ------------------------------------------------- */
+
+        state.server630WeekData =
+            Array.isArray(
+                seasonInfo
+                    .server630WeekData
+            )
+                ? clone(
+                    seasonInfo
+                        .server630WeekData
+                )
+                : [];
+
+
+        /* =================================================
+           LOG SUMMARY
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7B — Season Data updated.`
         );
 
 
-        /* ============================================
-           MODULE 07
-           REBUILD ACTIVE & AVERAGE
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 07 — REBUILD ACTIVE & AVERAGE";
-
-        await rebuildActiveAverage(
-            context
+        console.info(
+            `${LOG_PREFIX} Season:`,
+            seasonNumber
         );
 
 
-        /* ============================================
-           MODULE 08
-           UPDATE ARCHIVE INDEX
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 08 — UPDATE ARCHIVE INDEX";
-
-        await updateArchiveIndex(
-            context
+        console.info(
+            `${LOG_PREFIX} Players updated:`,
+            updatedPlayers
         );
 
 
-        /* ============================================
-           MODULE 11
-           WRITE GENERATED FILES
-           
-           This is the actual write to
-           k630-public-data.
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 11 — WRITE GENERATED FILES";
-
-        await writeGeneratedFiles(
-            context
+        console.info(
+            `${LOG_PREFIX} Selected W6:`,
+            selectedW6
         );
 
 
-        /* ============================================
-           MODULE 12
-           RESET NEXT SEASON
-           
-           This happens AFTER the completed season
-           has been written successfully.
-        ============================================ */
-
-        context.status.currentModule =
-            "MODULE 12 — RESET NEXT SEASON";
-
-        await resetNextSeason(
-            context
+        console.info(
+            `${LOG_PREFIX} Selected W5:`,
+            selectedW5
         );
 
 
-        /* ============================================
-           FINAL STATUS
-        ============================================ */
+        console.info(
+            `${LOG_PREFIX} Selected W4:`,
+            selectedW4
+        );
 
-        context.status.currentModule =
-            null;
 
-        context.status.finished =
+        console.info(
+            `${LOG_PREFIX} Selected W3:`,
+            selectedW3
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Selected W2:`,
+            selectedW2
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Selected W1:`,
+            selectedW1
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Selected W0:`,
+            selectedW0
+        );
+
+
+        /* =================================================
+           MARK STEP COMPLETE
+        ================================================= */
+
+        state.step7B =
             true;
 
-        context.status.failed =
-            false;
 
+        /* -------------------------------------------------
+           PERSIST — STEP 7B COMPLETED
+           NEXT STEP = 7C
+        ------------------------------------------------- */
 
-        log(
-            "================================================="
+        await persistSaveSeasonStep(
+            "7B",
+            "completed",
+            {
+                nextStep:
+                    "7C",
+
+                updatedBy:
+                    options.updatedBy
+            }
         );
 
-        log(
-            `SAVE SEASON ${context.season} COMPLETED`
+
+        console.info(
+            `${LOG_PREFIX} STEP 7B COMPLETED.`
         );
 
-        log(
-            `NEXT SEASON: ${context.nextSeason}`
+
+        /* =================================================
+           RETURN RESULT
+        ================================================= */
+
+        return {
+
+            success:
+                true,
+
+            step:
+                "7B",
+
+            season:
+                seasonNumber,
+
+            playersUpdated:
+                updatedPlayers,
+
+            selectedWeeks: {
+
+                W6:
+                    selectedW6,
+
+                W5:
+                    selectedW5,
+
+                W4:
+                    selectedW4,
+
+                W3:
+                    selectedW3,
+
+                W2:
+                    selectedW2,
+
+                W1:
+                    selectedW1,
+
+                W0:
+                    selectedW0
+
+            },
+
+            data:
+                clone(
+                    activeAverage
+                )
+
+        };
+
+    } catch (
+        error
+    ) {
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7B ERROR
+        ------------------------------------------------- */
+
+        try {
+
+            await persistSaveSeasonStep(
+                "7B",
+                "error",
+                {
+                    updatedBy:
+                        options.updatedBy
+                }
+            );
+
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7B error status could not be persisted:`,
+                persistError
+            );
+
+        }
+
+
+        console.error(
+            `${LOG_PREFIX} STEP 7B FAILED:`,
+            error
         );
 
-        log(
-            "================================================="
+
+        throw error;
+
+    }
+
+}
+
+/* =====================================================
+   STEP 7C — AVERAGE MERITS
+=========================================================
+
+PURPOSE
+-------
+Calculate the player's Average Merits values after
+the completed Season has been added to Active & Average.
+
+CALCULATIONS
+------------
+
+Average Merits (V):
+
+    SUM of all available Season Merits
+    -----------------------------------
+    number of Seasons with data
+
+
+Average Merits (%):
+
+    SUM of all available Season M-P (%)
+    ------------------------------------
+    number of Seasons with data
+
+
+IMPORTANT
+---------
+A player does NOT have to participate in every Season.
+
+Example:
+
+    Season 3
+    Season 4
+    Season 5
+
+participated in 3 Seasons.
+
+Therefore:
+
+    Average = total / 3
+
+
+Another example:
+
+    Season 2
+    Season 3
+    Season 6
+    Season 7
+    Season 8
+
+participated in 5 Seasons.
+
+Therefore:
+
+    Average = total / 5
+
+
+IMPORTANT ZERO RULE
+-------------------
+0 IS VALID DATA.
+
+Example:
+
+    Season 3 Merits = 0
+
+This Season DOES count as a participating Season.
+
+Only:
+
+    null
+    undefined
+    missing Season entry
+
+means that the player has no data for that Season.
+
+SOURCE
+------
+Current Active & Average:
+
+    k630-public-data
+    generated/active-average/current.json
+
+The complete dataset is kept intact.
+
+STEP 7C only changes:
+
+    averageMeritsValue
+
+    averageMeritsPercentage
+
+The actual GitHub write is performed by the later
+Save Season write step.
+
+========================================================= */
+
+
+/* -----------------------------------------------------
+   CHECK WHETHER A SEASON VALUE IS VALID
+----------------------------------------------------- */
+
+function isValidSeasonAverageValue(
+    value
+) {
+
+    /*
+     * null and undefined mean:
+     *
+     * no Season data
+     */
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return false;
+
+    }
+
+
+    /*
+     * Empty strings are also treated as
+     * missing data.
+     */
+
+    if (
+        typeof value ===
+            "string" &&
+        value.trim() ===
+            ""
+    ) {
+
+        return false;
+
+    }
+
+
+    /*
+     * Zero is VALID.
+     */
+
+    const numericValue =
+        Number(
+            value
+        );
+
+
+    return Number.isFinite(
+        numericValue
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   CALCULATE PLAYER AVERAGES
+----------------------------------------------------- */
+
+function calculatePlayerSeasonAverages(
+    player
+) {
+
+    const seasons =
+        player?.seasons;
+
+
+    /*
+     * No season object.
+     */
+
+    if (
+        !seasons ||
+        typeof seasons !==
+            "object"
+    ) {
+
+        return {
+
+            averageMeritsValue:
+                null,
+
+            averageMeritsPercentage:
+                null,
+
+            seasonsPlayedForAverage:
+                0
+
+        };
+
+    }
+
+
+    let meritsTotal =
+        0;
+
+    let meritsCount =
+        0;
+
+
+    let percentageTotal =
+        0;
+
+    let percentageCount =
+        0;
+
+
+    /*
+     * Read every Season dynamically.
+     *
+     * We do NOT hard-code:
+     *
+     * Season 1
+     * Season 2
+     * Season 3
+     *
+     * etc.
+     *
+     * This allows the engine to continue working
+     * when future Seasons are added.
+     */
+
+    Object.entries(
+        seasons
+    ).forEach(
+        (
+            [
+                seasonNumber,
+                seasonData
+            ]
+        ) => {
+
+            if (
+                !seasonData ||
+                typeof seasonData !==
+                    "object"
+            ) {
+
+                return;
+
+            }
+
+
+            /* -----------------------------------------
+               MERITS
+            ----------------------------------------- */
+
+            if (
+                isValidSeasonAverageValue(
+                    seasonData.merits
+                )
+            ) {
+
+                meritsTotal +=
+                    Number(
+                        seasonData.merits
+                    );
+
+                meritsCount +=
+                    1;
+
+            }
+
+
+            /* -----------------------------------------
+               MERITS %
+            ----------------------------------------- */
+
+            if (
+                isValidSeasonAverageValue(
+                    seasonData
+                        .meritPowerPercentage
+                )
+            ) {
+
+                percentageTotal +=
+                    Number(
+                        seasonData
+                            .meritPowerPercentage
+                    );
+
+                percentageCount +=
+                    1;
+
+            }
+
+        }
+    );
+
+
+    /* -----------------------------------------------
+       AVERAGE MERITS VALUE
+    ----------------------------------------------- */
+
+    const averageMeritsValue =
+        meritsCount >
+        0
+
+            ? Math.round(
+                meritsTotal /
+                meritsCount
+            )
+
+            : null;
+
+
+    /* -----------------------------------------------
+       AVERAGE MERITS %
+    ----------------------------------------------- */
+
+    const averageMeritsPercentage =
+        percentageCount >
+        0
+
+            ? Number(
+                (
+                    percentageTotal /
+                    percentageCount
+                ).toFixed(
+                    2
+                )
+            )
+
+            : null;
+
+
+    return {
+
+        averageMeritsValue,
+
+        averageMeritsPercentage,
+
+        seasonsPlayedForAverage:
+            Math.max(
+                meritsCount,
+                percentageCount
+            ),
+
+        meritsSeasonCount:
+            meritsCount,
+
+        percentageSeasonCount:
+            percentageCount
+
+    };
+
+}
+
+/* =====================================================
+   STEP 7C — CALCULATE AVERAGES
+========================================================= */
+
+async function step7CAverages() {
+
+    /* -------------------------------------------------
+       STEP 7B MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7B
+    ) {
+
+        throw new Error(
+            "STEP 7C cannot start. " +
+            "STEP 7B — Season Data must be completed first."
+        );
+
+    }
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7C RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7C",
+        "running",
+        {
+            updatedBy:
+                arguments?.[0]?.updatedBy
+        }
+    );
+
+    try {
+
+        /* -------------------------------------------------
+           LOAD ACTIVE & AVERAGE
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7C — Reading Active & Average...`
+        );
+
+        const activeAverage =
+            await readJson(
+                PATHS.ACTIVE_AVERAGE
+            );
+
+
+        if (
+            !activeAverage ||
+            typeof activeAverage !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7C failed: Active & Average is empty or invalid."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           READ PLAYERS
+        ------------------------------------------------- */
+
+        const players =
+            Array.isArray(
+                activeAverage.players
+            )
+
+                ? activeAverage.players
+
+                : [];
+
+
+        if (
+            !players.length
+        ) {
+
+            throw new Error(
+                "STEP 7C failed: Active & Average contains no players."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           CALCULATE AVERAGE FOR EVERY PLAYER
+        ------------------------------------------------- */
+
+        let playersWithAverage =
+            0;
+
+        let playersWithoutSeasonData =
+            0;
+
+        let totalSeasonEntriesUsed =
+            0;
+
+
+        for (
+            const player of
+            players
+        ) {
+
+            if (
+                !player ||
+                typeof player !==
+                    "object"
+            ) {
+
+                continue;
+
+            }
+
+
+            const averages =
+                calculatePlayerSeasonAverages(
+                    player
+                );
+
+
+            /* ---------------------------------------------
+               SAVE AVERAGE MERITS
+            --------------------------------------------- */
+
+            player.averageMeritsValue =
+                averages
+                    .averageMeritsValue;
+
+
+            /* ---------------------------------------------
+               SAVE AVERAGE MERITS %
+            --------------------------------------------- */
+
+            player.averageMeritsPercentage =
+                averages
+                    .averageMeritsPercentage;
+
+
+            /* ---------------------------------------------
+               COUNT
+            --------------------------------------------- */
+
+            if (
+                averages
+                    .seasonsPlayedForAverage >
+                0
+            ) {
+
+                playersWithAverage +=
+                    1;
+
+                totalSeasonEntriesUsed +=
+                    averages
+                        .seasonsPlayedForAverage;
+
+            } else {
+
+                playersWithoutSeasonData +=
+                    1;
+
+            }
+
+        }
+
+
+        /* =================================================
+           WRITE UPDATED ACTIVE & AVERAGE
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7C — Writing updated Active & Average...`
+        );
+
+
+        await writePublicDataJson(
+
+            PATHS.ACTIVE_AVERAGE,
+
+            activeAverage,
+
+            `K630 Season ${state.season} - Calculate Averages`
+
+        );
+
+
+        /* -------------------------------------------------
+           REFRESH ACTIVE & AVERAGE PAGE
+        ------------------------------------------------- */
+
+        try {
+
+            document.dispatchEvent(
+                new CustomEvent(
+                    "k630:active-average-refresh"
+                )
+            );
+
+        } catch (
+            refreshError
+        ) {
+
+            console.warn(
+                `${LOG_PREFIX} Active & Average refresh event could not be dispatched:`,
+                refreshError
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           STORE UPDATED DATA IN ENGINE STATE
+        ------------------------------------------------- */
+
+        state.activeAverageData =
+            clone(
+                activeAverage
+            );
+
+
+        state.activeAverageResult = {
+
+            success:
+                true,
+
+            data:
+                clone(
+                    activeAverage
+                ),
+
+            summary: {
+
+                playerCount:
+                    players.length,
+
+                playersWithAverage:
+                    playersWithAverage,
+
+                playersWithoutSeasonData:
+                    playersWithoutSeasonData,
+
+                totalSeasonEntriesUsed:
+                    totalSeasonEntriesUsed
+
+            }
+
+        };
+
+
+        /* -------------------------------------------------
+           LOG SUMMARY
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7C — Average calculations completed.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players:`,
+            players.length
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players with average:`,
+            playersWithAverage
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players without season data:`,
+            playersWithoutSeasonData
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Season entries used:`,
+            totalSeasonEntriesUsed
+        );
+
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7C COMPLETED
+        ------------------------------------------------- */
+
+        await persistSaveSeasonStep(
+            "7C",
+            "completed",
+            {
+                updatedBy:
+                    arguments?.[0]?.updatedBy
+            }
+        );
+
+
+        /* -------------------------------------------------
+           MARK STEP COMPLETE
+        ------------------------------------------------- */
+
+        state.step7C =
+            true;
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7C COMPLETED.`
+        );
+
+
+        /* -------------------------------------------------
+           RETURN RESULT
+        ------------------------------------------------- */
+
+        return {
+
+            success:
+                true,
+
+            step:
+                "7C",
+
+            summary:
+                clone(
+                    state.activeAverageResult
+                        .summary
+                )
+
+        };
+
+
+    } catch (
+        error
+    ) {
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7C ERROR
+        ------------------------------------------------- */
+
+        try {
+
+            await persistSaveSeasonStep(
+                "7C",
+                "error",
+                {
+                    updatedBy:
+                        arguments?.[0]?.updatedBy
+                }
+            );
+
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7C error status could not be persisted:`,
+                persistError
+            );
+
+        }
+
+
+        console.error(
+            `${LOG_PREFIX} STEP 7C FAILED:`,
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+/* =====================================================
+   STEP 7D — UPDATE NOTE
+=========================================================
+
+PURPOSE
+-------
+Copy the Note information from the completed Season
+Info dataset to the matching ID in Active & Average.
+
+SOURCE
+------
+k630-public-data
+
+    generated/season-info/current.json
+
+TARGET
+------
+k630-public-data
+
+    generated/active-average/current.json
+
+MATCH
+-----
+Players are matched by ID.
+
+NOTE DATA
+---------
+The existing Season Info Note structure is copied:
+
+    notes
+
+    noteFlags.new
+
+    noteFlags.left
+
+    noteFlags.afk
+
+    leftDuringSeason
+
+    dateLeftKingdom
+
+IMPORTANT
+---------
+The Note symbols are NOT recreated here.
+
+They already exist in Season Info.
+
+For example:
+
+    noteFlags.left = true
+
+is copied to Active & Average.
+
+The Active & Average page can then display the
+corresponding triangle symbol.
+
+IMPORTANT
+---------
+STEP 7D does not calculate Server Status.
+
+STEP 7D does not calculate averages.
+
+STEP 7D does not create Season columns.
+
+STEP 7D only updates Note information.
+
+/* =====================================================
+   STEP 7D — UPDATE NOTES
+========================================================= */
+
+async function step7DUpdateNotes(
+    options = {}
+) {
+
+    /* -------------------------------------------------
+       STEP 7C MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7C
+    ) {
+
+        throw new Error(
+            "STEP 7D cannot start. " +
+            "STEP 7C — Averages must be completed first."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7D RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7D",
+        "running",
+        {
+            updatedBy:
+                options.updatedBy
+        }
+    );
+
+
+    try {
+
+        /* -------------------------------------------------
+           READ ACTIVE & AVERAGE
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7D — Reading Active & Average...`
+        );
+
+
+        const activeAverage =
+            await readJson(
+                PATHS.ACTIVE_AVERAGE
+            );
+
+
+        if (
+            !activeAverage ||
+            typeof activeAverage !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7D failed: Active & Average is empty or invalid."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           READ SEASON INFO
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7D — Reading Season Info...`
+        );
+
+
+        const seasonInfo =
+            await readJson(
+                PATHS.SEASON_INFO
+            );
+
+
+        if (
+            !seasonInfo ||
+            typeof seasonInfo !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7D failed: Season Info is empty or invalid."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           PLAYER ARRAYS
+        ------------------------------------------------- */
+
+        const seasonPlayers =
+            Array.isArray(
+                seasonInfo.players
+            )
+                ? seasonInfo.players
+                : [];
+
+
+        const activePlayers =
+            Array.isArray(
+                activeAverage.players
+            )
+                ? activeAverage.players
+                : [];
+
+
+        if (
+            !seasonPlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7D failed: Season Info contains no players."
+            );
+
+        }
+
+
+        if (
+            !activePlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7D failed: Active & Average contains no players."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           BUILD SEASON INFO LOOKUP
+        ------------------------------------------------- */
+
+        const seasonPlayerById =
+            new Map();
+
+
+        for (
+            const player of
+            seasonPlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    player?.id
+                );
+
+
+            if (
+                id
+            ) {
+
+                seasonPlayerById.set(
+                    id,
+                    player
+                );
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           COUNTERS
+        ------------------------------------------------- */
+
+        let updatedPlayers =
+            0;
+
+        let playersWithNote =
+            0;
+
+        let playersWithoutNote =
+            0;
+
+        let playersMarkedLeft =
+            0;
+
+
+        /* =================================================
+           PROCESS EVERY ACTIVE PLAYER
+        ================================================= */
+
+        for (
+            const activePlayer of
+            activePlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    activePlayer?.id
+                );
+
+
+            if (
+                !id
+            ) {
+
+                continue;
+
+            }
+
+
+            const seasonPlayer =
+                seasonPlayerById.get(
+                    id
+                );
+
+
+            /* =================================================
+               PLAYER STILL EXISTS IN SEASON INFO
+            ================================================= */
+
+            if (
+                seasonPlayer
+            ) {
+
+                /* ---------------------------------------------
+                   COPY NOTES
+                --------------------------------------------- */
+
+                activePlayer.notes =
+                    Array.isArray(
+                        seasonPlayer.notes
+                    )
+                        ? clone(
+                            seasonPlayer.notes
+                        )
+                        : [];
+
+
+                /* ---------------------------------------------
+                   COPY SYMBOL FLAGS
+                   
+                   new  = STAR
+                   left = TRIANGLE
+                   afk  = AFK SYMBOL
+                --------------------------------------------- */
+
+                const sourceNoteFlags =
+                    seasonPlayer.noteFlags ||
+                    {};
+
+
+                activePlayer.noteFlags = {
+
+                    new:
+                        sourceNoteFlags.new ===
+                        true,
+
+                    left:
+                        sourceNoteFlags.left ===
+                        true,
+
+                    afk:
+                        sourceNoteFlags.afk ===
+                        true
+
+                };
+
+
+                /* ---------------------------------------------
+                   LEFT DURING SEASON
+                --------------------------------------------- */
+
+                activePlayer.leftDuringSeason =
+                    seasonPlayer.leftDuringSeason ===
+                    true ||
+                    activePlayer.noteFlags.left ===
+                    true;
+
+
+                /* ---------------------------------------------
+                   DATE LEFT KINGDOM
+                --------------------------------------------- */
+
+                activePlayer.dateLeftKingdom =
+                    normalizeText(
+                        seasonPlayer.dateLeftKingdom
+                    ) ||
+                    null;
+
+
+                updatedPlayers +=
+                    1;
+
+
+            } else {
+
+                /* =================================================
+                   PLAYER DISAPPEARED FROM SEASON INFO
+                   
+                   Mark as LEFT.
+                   This creates the TRIANGLE symbol.
+                ================================================= */
+
+                activePlayer.notes = [
+                    "leftDuringSeason"
+                ];
+
+
+                activePlayer.noteFlags = {
+
+                    new:
+                        false,
+
+                    left:
+                        true,
+
+                    afk:
+                        false
+
+                };
+
+
+                activePlayer.leftDuringSeason =
+                    true;
+
+
+                activePlayer.dateLeftKingdom =
+                    state.officialDate;
+
+
+                playersMarkedLeft +=
+                    1;
+
+                updatedPlayers +=
+                    1;
+
+            }
+
+
+            /* -------------------------------------------------
+               COUNT RESULT
+            ------------------------------------------------- */
+
+            const hasNote =
+                activePlayer.noteFlags?.new ===
+                    true ||
+
+                activePlayer.noteFlags?.left ===
+                    true ||
+
+                activePlayer.noteFlags?.afk ===
+                    true ||
+
+                (
+                    Array.isArray(
+                        activePlayer.notes
+                    ) &&
+                    activePlayer.notes.length >
+                        0
+                );
+
+
+            if (
+                hasNote
+            ) {
+
+                playersWithNote +=
+                    1;
+
+            } else {
+
+                playersWithoutNote +=
+                    1;
+
+            }
+
+        }
+
+
+        /* =================================================
+           STORE UPDATED DATA
+        ================================================= */
+
+        state.activeAverageData =
+            clone(
+                activeAverage
+            );
+
+
+        /* =================================================
+           WRITE ACTIVE & AVERAGE
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7D — Writing updated Active & Average...`
+        );
+
+
+        await writePublicDataJson(
+
+            PATHS.ACTIVE_AVERAGE,
+
+            activeAverage,
+
+            `K630 Season ${state.season} - STEP 7D Update Notes`
+
+        );
+
+
+        /* -------------------------------------------------
+           REFRESH ACTIVE & AVERAGE PAGE
+        ------------------------------------------------- */
+
+        try {
+
+            document.dispatchEvent(
+                new CustomEvent(
+                    "k630:active-average-refresh"
+                )
+            );
+
+        } catch (
+            refreshError
+        ) {
+
+            console.warn(
+                `${LOG_PREFIX} Active & Average refresh event could not be dispatched:`,
+                refreshError
+            );
+
+        }
+
+
+        /* =================================================
+           LOG SUMMARY
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7D — Notes updated.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players updated:`,
+            updatedPlayers
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players with Note:`,
+            playersWithNote
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players without Note:`,
+            playersWithoutNote
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Players marked Left:`,
+            playersMarkedLeft
+        );
+
+
+        /* =================================================
+           MARK STEP COMPLETE
+        ================================================= */
+
+        state.step7D =
+            true;
+
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7D COMPLETED
+           NEXT STEP = 7E
+        ------------------------------------------------- */
+
+        await persistSaveSeasonStep(
+            "7D",
+            "completed",
+            {
+                nextStep:
+                    "7E",
+
+                updatedBy:
+                    options.updatedBy
+            }
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7D COMPLETED.`
         );
 
 
@@ -3203,88 +3670,2870 @@ async function saveSeason(
             success:
                 true,
 
-            season:
-                context.season,
+            step:
+                "7D",
 
-            nextSeason:
-                context.nextSeason,
+            playersUpdated:
+                updatedPlayers,
 
-            status:
-                clone(
-                    context.status
-                ),
+            playersWithNote:
+                playersWithNote,
 
-            archive:
-                clone(
-                    context.archive
-                ),
+            playersWithoutNote:
+                playersWithoutNote,
 
-            results:
-                clone(
-                    context.results
-                )
+            playersMarkedLeft:
+                playersMarkedLeft
 
         };
 
+
     } catch (
-        saveSeasonError
+        error
     ) {
 
+        /* -------------------------------------------------
+           PERSIST — STEP 7D ERROR
+        ------------------------------------------------- */
 
-        /* ============================================
-           ERROR STATUS
-        ============================================ */
+        try {
 
-        context.status.failed =
-            true;
+            await persistSaveSeasonStep(
+                "7D",
+                "error",
+                {
+                    updatedBy:
+                        options.updatedBy
+                }
+            );
 
-        context.status.finished =
-            false;
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7D error status could not be persisted:`,
+                persistError
+            );
+
+        }
 
 
-        error(
-            "SAVE SEASON FAILED."
+        console.error(
+            `${LOG_PREFIX} STEP 7D FAILED:`,
+            error
         );
 
-        error(
-            saveSeasonError
-        );
 
-
-        throw saveSeasonError;
+        throw error;
 
     }
 
 }
 
 /* =====================================================
-   MODULE 14 — PUBLIC API
-=====================================================
+   STEP 7E — UPDATE SERVER STATUS
+=========================================================
 
 PURPOSE
 -------
-Expose the Save Season Engine to the website.
+Determine the player's new Server Status LV after
+the completed Season.
 
-PUBLIC OBJECT
--------------
-window.K630SaveSeasonEngine
+SOURCE
+------
+1. Active & Average
+2. Season Info
+3. Admin Config
 
-PUBLIC METHODS
---------------
-saveSeason(options)
+---------------------------------------------------------
+SERVER STATUS RULES
+---------------------------------------------------------
 
-===================================================== */
+NEW ID
+-------
+Every new ID starts at:
+
+    LV2
+
+
+REJOIN ID
+---------
+Every rejoin ID starts at:
+
+    LV2
+
+
+LV2
+---
+Rank Move:
+    LV2 -> LV1
+
+Rank 1:
+    LV2 -> LV2
+
+Rank 2:
+    LV2 -> LV2
+
+Rank 3:
+    LV2 -> LV2
+
+Rank 3 + required Merit %:
+    LV2 -> LV3
+
+
+LV1
+---
+Rank Move:
+    LV1 -> LV0
+
+Rank 1:
+    LV1 -> LV1
+
+Rank 2:
+    LV1 -> LV2
+
+Rank 3:
+    LV1 -> LV2
+
+
+LV0
+---
+LV0 cannot participate in the next Season.
+
+The player is NOT deleted by this engine.
+
+The engine reports the player so the Admin/Owner
+can remove the ID from the Kingdom in-game.
+
+
+---------------------------------------------------------
+LV3 MERIT RULE
+---------------------------------------------------------
+
+LV3 is only possible for:
+
+    LV2 + Rank 3
+
+The LV3 threshold is:
+
+    Rank 3 target + 8 percentage points
+
+
+EXAMPLE T5
+-----------
+
+Rank 3 target:
+
+    12%
+
+LV3 threshold:
+
+    12% + 8%
+    = 20%
+
+
+EXAMPLE FUTURE CONFIGURATION
+----------------------------
+
+Rank 3 target:
+
+    16%
+
+LV3 threshold:
+
+    16% + 8%
+    = 24%
+
+
+Therefore:
+
+    Rank 3 + 19.99%
+        -> LV2
+
+    Rank 3 + 20.00%
+        -> LV3
+
+when the Rank 3 target is 12%.
+
+
+---------------------------------------------------------
+IMPORTANT
+---------------------------------------------------------
+
+The Rank 3 target comes from Admin Config.
+
+The +8 percentage points are the fixed K630
+LV3 promotion rule.
+
+STEP 7E does not delete LV0 players.
+
+STEP 7E only updates the calculated Server Status.
+
+========================================================= */
 
 
 /* -----------------------------------------------------
-   PUBLIC API
+   NORMALIZE SERVER STATUS LEVEL
 ----------------------------------------------------- */
 
-window.K630SaveSeasonEngine = {
+function normalizeServerStatusLevel(
+    value
+) {
 
-    /* ================================================
-       ENGINE INFORMATION
-    ================================================ */
+    const text =
+        normalizeText(
+            value
+        ).toUpperCase();
+
+
+    const match =
+        text.match(
+            /LV\s*(\d+)/
+        );
+
+
+    if (
+        !match
+    ) {
+
+        return 2;
+
+    }
+
+
+    const level =
+        Number(
+            match[1]
+        );
+
+
+    if (
+        !Number.isFinite(
+            level
+        )
+    ) {
+
+        return 2;
+
+    }
+
+
+    return Math.max(
+        0,
+        Math.min(
+            3,
+            Math.trunc(
+                level
+            )
+        )
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   FORMAT SERVER STATUS
+----------------------------------------------------- */
+
+function formatServerStatusLevel(
+    level
+) {
+
+    return `LV${Math.max(
+        0,
+        Math.min(
+            3,
+            Math.trunc(
+                Number(level) || 0
+            )
+        )
+    )}`;
+
+}
+
+
+/* -----------------------------------------------------
+   NORMALIZE SEASON RANK
+----------------------------------------------------- */
+
+function normalizeSeasonRank(
+    value
+) {
+
+    const text =
+        normalizeText(
+            value
+        ).toUpperCase();
+
+
+    /* -------------------------------------------------
+       MOVE
+    ------------------------------------------------- */
+
+    if (
+        text ===
+        "MOVE"
+    ) {
+
+        return "MOVE";
+
+    }
+
+
+    /* -------------------------------------------------
+       CONVERT TO NUMBER
+    ------------------------------------------------- */
+
+    const number =
+        Number(
+            text
+        );
+
+
+    /* -------------------------------------------------
+       NO MERIT RANK
+       
+       0 = player participated,
+           but did not achieve enough merits.
+
+       Internally this becomes -1:
+       no Server Status change.
+    ------------------------------------------------- */
+
+    if (
+        number ===
+        0
+    ) {
+
+        return "-1";
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 1
+    ------------------------------------------------- */
+
+    if (
+        number ===
+        1
+    ) {
+
+        return "1";
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 2
+    ------------------------------------------------- */
+
+    if (
+        number ===
+        2
+    ) {
+
+        return "2";
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 3
+    ------------------------------------------------- */
+
+    if (
+        number ===
+        3
+    ) {
+
+        return "3";
+
+    }
+
+
+    /* -------------------------------------------------
+       UNKNOWN / EMPTY
+    ------------------------------------------------- */
+
+    return text;
+
+}
+
+
+/* -----------------------------------------------------
+   GET TROOP TIER
+----------------------------------------------------- */
+
+function normalizeTroopTier(
+    player
+) {
+
+    const directTier =
+        normalizeText(
+            player?.troopTier
+        ).toUpperCase();
+
+
+    if (
+        directTier ===
+            "T4" ||
+        directTier ===
+            "T5"
+    ) {
+
+        return directTier;
+
+    }
+
+
+    const tierValue =
+        Number(
+            player?.troopTier
+        );
+
+
+    if (
+        tierValue ===
+        4
+    ) {
+
+        return "T4";
+
+    }
+
+
+    if (
+        tierValue ===
+        5
+    ) {
+
+        return "T5";
+
+    }
+
+
+    return "T4";
+
+}
+
+
+/* -----------------------------------------------------
+   GET RANK 3 TARGET FROM ADMIN CONFIG
+----------------------------------------------------- */
+
+function getRank3MeritTarget(
+    adminConfig,
+    troopTier
+) {
+
+    const target =
+        Number(
+            adminConfig
+                ?.meritConfiguration
+                ?.w6
+                ?.[troopTier]
+                ?.rank3
+        );
+
+
+    if (
+        !Number.isFinite(
+            target
+        )
+    ) {
+
+        throw new Error(
+            `STEP 7E failed: No Rank 3 Merit target configured for ${troopTier}.`
+        );
+
+    }
+
+
+    return target;
+
+}
+
+
+/* -----------------------------------------------------
+   CALCULATE LV3 MERIT THRESHOLD
+----------------------------------------------------- */
+
+function calculateLv3MeritThreshold(
+    rank3Target
+) {
+
+    /*
+     * FIXED K630 RULE:
+     *
+     * Rank 3 target + 8 percentage points.
+     *
+     * 12% -> 20%
+     * 16% -> 24%
+     */
+
+    return (
+        Number(
+            rank3Target
+        ) +
+        8
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   DETECT NEW / REJOIN
+----------------------------------------------------- */
+
+function isNewOrRejoinPlayer(
+    player
+) {
+
+    const noteFlags =
+        player?.noteFlags;
+
+
+    const isNew =
+        noteFlags?.new ===
+        true;
+
+
+    const hasRejoinDate =
+        Boolean(
+            normalizeText(
+                player?.rejoinDate
+            )
+        );
+
+
+    return (
+        isNew ||
+        hasRejoinDate
+    );
+
+}
+
+
+/* =====================================================
+   CALCULATE NEXT SERVER STATUS
+========================================================= */
+
+/* =====================================================
+   CALCULATE NEXT SERVER STATUS
+========================================================= */
+
+function calculateNextServerStatus(
+    player,
+    selectedSeasonData,
+    adminConfig
+) {
+
+    /* -------------------------------------------------
+       NEW / REJOIN
+    ------------------------------------------------- */
+
+    if (
+        isNewOrRejoinPlayer(
+            player
+        )
+    ) {
+
+        return {
+
+            previousLevel:
+                normalizeServerStatusLevel(
+                    player?.serverStatus
+                ),
+
+            newLevel:
+                2,
+
+            newStatus:
+                "LV2",
+
+            reason:
+                "NEW_OR_REJOIN"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       CURRENT LEVEL
+    ------------------------------------------------- */
+
+    const currentLevel =
+        normalizeServerStatusLevel(
+            player?.serverStatus
+        );
+
+
+    /* -------------------------------------------------
+       SEASON RANK
+    ------------------------------------------------- */
+
+    const rank =
+        normalizeSeasonRank(
+            selectedSeasonData?.rank
+        );
+
+
+    /* -------------------------------------------------
+       MERIT POWER PERCENTAGE
+    ------------------------------------------------- */
+
+    const meritPercentage =
+        Number(
+            selectedSeasonData
+                ?.meritPowerPercentage
+        );
+
+
+    const hasMeritPercentage =
+        Number.isFinite(
+            meritPercentage
+        );
+
+
+    /* -------------------------------------------------
+       ALREADY LV0
+    ------------------------------------------------- */
+
+    if (
+        currentLevel <=
+        0
+    ) {
+
+        return {
+
+            previousLevel:
+                0,
+
+            newLevel:
+                0,
+
+            newStatus:
+                "LV0",
+
+            reason:
+                "ALREADY_LV0"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK -1
+       
+       Player participated but did not
+       achieve enough merits.
+       
+       KEEP CURRENT STATUS.
+    ------------------------------------------------- */
+
+    if (
+        rank ===
+        "-1"
+    ) {
+
+        return {
+
+            previousLevel:
+                currentLevel,
+
+            newLevel:
+                currentLevel,
+
+            newStatus:
+                formatServerStatusLevel(
+                    currentLevel
+                ),
+
+            reason:
+                "NO_MERIT_RANK"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK MOVE
+    ------------------------------------------------- */
+
+    if (
+        rank ===
+        "MOVE"
+    ) {
+
+        const newLevel =
+            Math.max(
+                0,
+                currentLevel - 1
+            );
+
+
+        return {
+
+            previousLevel:
+                currentLevel,
+
+            newLevel:
+                newLevel,
+
+            newStatus:
+                formatServerStatusLevel(
+                    newLevel
+                ),
+
+            reason:
+                "RANK_MOVE"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 1
+    ------------------------------------------------- */
+
+    if (
+        rank ===
+        "1"
+    ) {
+
+        return {
+
+            previousLevel:
+                currentLevel,
+
+            newLevel:
+                currentLevel,
+
+            newStatus:
+                formatServerStatusLevel(
+                    currentLevel
+                ),
+
+            reason:
+                "RANK_1"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 2
+    ------------------------------------------------- */
+
+    if (
+        rank ===
+        "2"
+    ) {
+
+        const newLevel =
+            currentLevel ===
+                1
+                ? 2
+                : currentLevel;
+
+
+        return {
+
+            previousLevel:
+                currentLevel,
+
+            newLevel:
+                newLevel,
+
+            newStatus:
+                formatServerStatusLevel(
+                    newLevel
+                ),
+
+            reason:
+                "RANK_2"
+
+        };
+
+    }
+
+
+    /* -------------------------------------------------
+       RANK 3
+    ------------------------------------------------- */
+
+    if (
+        rank ===
+        "3"
+    ) {
+
+        /* ---------------------------------------------
+           LV1 + RANK 3 -> LV2
+        --------------------------------------------- */
+
+        if (
+            currentLevel ===
+            1
+        ) {
+
+            return {
+
+                previousLevel:
+                    1,
+
+                newLevel:
+                    2,
+
+                newStatus:
+                    "LV2",
+
+                reason:
+                    "LV1_RANK_3"
+
+            };
+
+        }
+
+
+        /* ---------------------------------------------
+           LV2 + RANK 3
+           
+           IMPORTANT:
+           Use the merit target directly from
+           Season Info for the selected week.
+        --------------------------------------------- */
+
+        if (
+            currentLevel ===
+            2
+        ) {
+
+            const troopTier =
+                normalizeTroopTier(
+                    player
+                );
+
+
+            const rank3Target =
+                Number(
+                    selectedSeasonData
+                        ?.meritTargets
+                        ?.rank3
+                );
+
+
+            /* -----------------------------------------
+               NO RANK 3 TARGET
+               
+               Do NOT crash the workflow.
+               Keep current status.
+            ----------------------------------------- */
+
+            if (
+                !Number.isFinite(
+                    rank3Target
+                )
+            ) {
+
+                return {
+
+                    previousLevel:
+                        2,
+
+                    newLevel:
+                        2,
+
+                    newStatus:
+                        "LV2",
+
+                    reason:
+                        "NO_RANK3_TARGET",
+
+                    troopTier:
+                        troopTier,
+
+                    rank3Target:
+                        null,
+
+                    meritPercentage:
+                        hasMeritPercentage
+                            ? meritPercentage
+                            : null
+
+                };
+
+            }
+
+
+            const lv3Threshold =
+                calculateLv3MeritThreshold(
+                    rank3Target
+                );
+
+
+            /* -----------------------------------------
+               LV3 REQUIREMENT
+            ----------------------------------------- */
+
+            if (
+                hasMeritPercentage &&
+                meritPercentage >=
+                    lv3Threshold
+            ) {
+
+                return {
+
+                    previousLevel:
+                        2,
+
+                    newLevel:
+                        3,
+
+                    newStatus:
+                        "LV3",
+
+                    reason:
+                        "LV2_RANK_3_LV3_THRESHOLD",
+
+                    troopTier:
+                        troopTier,
+
+                    rank3Target:
+                        rank3Target,
+
+                    lv3Threshold:
+                        lv3Threshold,
+
+                    meritPercentage:
+                        meritPercentage
+
+                };
+
+            }
+
+
+            /* -----------------------------------------
+               REMAIN LV2
+            ----------------------------------------- */
+
+            return {
+
+                previousLevel:
+                    2,
+
+                newLevel:
+                    2,
+
+                newStatus:
+                    "LV2",
+
+                reason:
+                    "LV2_RANK_3_BELOW_LV3_THRESHOLD",
+
+                troopTier:
+                    troopTier,
+
+                rank3Target:
+                    rank3Target,
+
+                lv3Threshold:
+                    lv3Threshold,
+
+                meritPercentage:
+                    hasMeritPercentage
+                        ? meritPercentage
+                        : null
+
+            };
+
+        }
+
+    }
+
+
+    /* -------------------------------------------------
+       UNKNOWN RANK
+    ------------------------------------------------- */
+
+    throw new Error(
+        `STEP 7E failed: ID ${player?.id ?? "UNKNOWN"} ` +
+        `has an unsupported Season rank: ${rank}.`
+    );
+
+}
+
+
+/* =====================================================
+   STEP 7E — UPDATE SERVER STATUS
+========================================================= */
+
+/* =====================================================
+   STEP 7E — UPDATE SERVER STATUS
+========================================================= */
+
+async function step7EServerStatus(
+    options = {}
+) {
+
+    /* -------------------------------------------------
+       STEP 7D MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7D
+    ) {
+
+        throw new Error(
+            "STEP 7E cannot start. " +
+            "STEP 7D — Note must be completed first."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7E RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7E",
+        "running",
+        {
+            updatedBy:
+                options.updatedBy
+        }
+    );
+
+
+    try {
+
+        /* -------------------------------------------------
+           /* -------------------------------------------------
+   READ CURRENT ACTIVE & AVERAGE
+------------------------------------------------- */
+
+console.info(
+    `${LOG_PREFIX} STEP 7E — Reading Active & Average...`
+);
+
+const activeAverage =
+    await readJson(
+        PATHS.ACTIVE_AVERAGE
+    );
+
+
+if (
+    !activeAverage ||
+    typeof activeAverage !==
+        "object"
+) {
+
+    throw new Error(
+        "STEP 7E failed: Active & Average is empty or invalid."
+    );
+
+}
+
+
+/* -------------------------------------------------
+   READ CURRENT SEASON INFO
+------------------------------------------------- */
+
+console.info(
+    `${LOG_PREFIX} STEP 7E — Reading Season Info...`
+);
+
+const seasonInfo =
+    await readJson(
+        PATHS.SEASON_INFO
+    );
+
+
+if (
+    !seasonInfo ||
+    typeof seasonInfo !==
+        "object"
+) {
+
+    throw new Error(
+        "STEP 7E failed: Season Info is empty or invalid."
+    );
+
+}
+
+        /* -------------------------------------------------
+           ADMIN CONFIG
+        ------------------------------------------------- */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7E — Reading Admin Config...`
+        );
+
+
+        const adminConfig =
+            await readJson(
+                PATHS.ADMIN_CONFIG
+            );
+
+
+        if (
+            !adminConfig ||
+            typeof adminConfig !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7E failed: Admin Config is empty or invalid."
+            );
+
+        }
+
+
+        if (
+            !adminConfig
+                .meritConfiguration
+                ?.w6
+        ) {
+
+            throw new Error(
+                "STEP 7E failed: Admin Config contains no W6 Merit Configuration."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           SEASON PLAYERS
+        ------------------------------------------------- */
+
+        const seasonPlayers =
+            Array.isArray(
+                seasonInfo.players
+            )
+                ? seasonInfo.players
+                : [];
+
+
+        const activePlayers =
+            Array.isArray(
+                activeAverage.players
+            )
+                ? activeAverage.players
+                : [];
+
+
+        if (
+            !seasonPlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7E failed: Season Info contains no players."
+            );
+
+        }
+
+
+        if (
+            !activePlayers.length
+        ) {
+
+            throw new Error(
+                "STEP 7E failed: Active & Average contains no players."
+            );
+
+        }
+
+
+        /* -------------------------------------------------
+           SELECTED SEASON DATA LOOKUP
+        ------------------------------------------------- */
+
+        const selectedDataById =
+            new Map();
+
+
+        if (
+            Array.isArray(
+                state.selectedSeasonData
+            )
+        ) {
+
+            for (
+                const entry of
+                state.selectedSeasonData
+            ) {
+
+                const id =
+                    normalizeText(
+                        entry?.id
+                    );
+
+
+                if (
+                    id
+                ) {
+
+                    selectedDataById.set(
+                        id,
+                        entry
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           SEASON PLAYER LOOKUP
+        ------------------------------------------------- */
+
+        const seasonPlayerById =
+            new Map();
+
+
+        for (
+            const player of
+            seasonPlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    player?.id
+                );
+
+
+            if (
+                id
+            ) {
+
+                seasonPlayerById.set(
+                    id,
+                    player
+                );
+
+            }
+
+        }
+
+
+        /* -------------------------------------------------
+           RESULT COUNTERS
+        ------------------------------------------------- */
+
+        let updatedPlayers =
+            0;
+
+        let lv3Players =
+            0;
+
+        let lv2Players =
+            0;
+
+        let lv1Players =
+            0;
+
+        let lv0Players =
+            0;
+
+        let newPlayers =
+            0;
+
+        let rejoinPlayers =
+            0;
+
+        let movePlayers =
+            0;
+
+
+        const lv0Warnings =
+            [];
+
+
+        /* =================================================
+           UPDATE PLAYERS
+        ================================================= */
+
+        for (
+            const activePlayer of
+            activePlayers
+        ) {
+
+            const id =
+                normalizeText(
+                    activePlayer?.id
+                );
+
+
+            if (
+                !id
+            ) {
+
+                continue;
+
+            }
+
+
+            const seasonPlayer =
+                seasonPlayerById.get(
+                    id
+                );
+
+
+            if (
+                !seasonPlayer
+            ) {
+
+                continue;
+
+            }
+
+/* ---------------------------------------------
+   SERVER STATUS ONLY FOR ELIGIBLE WARRIORS
+--------------------------------------------- */
+
+/*
+   Server Status is NOT recalculated for:
+
+   1. Farmers
+      Historical Power < 20,000,000
+
+   2. AFK players
+      noteFlags.afk === true
+
+   Their existing Server Status and
+   Server Status Level remain untouched.
+*/
+
+const historicalPower =
+    Number(
+        activePlayer?.historicalPower
+    );
+
+const isAfk =
+    activePlayer?.noteFlags?.afk ===
+    true ||
+    seasonPlayer?.noteFlags?.afk ===
+    true;
+
+
+/* ---------------------------------------------
+   FARMER
+--------------------------------------------- */
+
+if (
+    !Number.isFinite(
+        historicalPower
+    ) ||
+    historicalPower < 20000000
+) {
+
+    continue;
+
+}
+
+
+/* ---------------------------------------------
+   AFK
+--------------------------------------------- */
+
+if (
+    isAfk
+) {
+
+    continue;
+
+}
+
+/* -------------------------------------------------
+   GET LAST AVAILABLE SEASON WEEK
+------------------------------------------------- */
+
+const lastAvailableWeek =
+    selectLastAvailableWeek(
+        seasonPlayer
+    );
+
+
+/* -------------------------------------------------
+   NO VALID SEASON DATA
+   = PLAYER DID NOTHING THIS SEASON
+   = NO STATUS CHANGE
+------------------------------------------------- */
+
+if (
+    !lastAvailableWeek ||
+    !lastAvailableWeek.data
+) {
+
+    console.info(
+        `${LOG_PREFIX} STEP 7E — ID ${id}: no available Season week. ` +
+        `No Server Status change.`
+    );
+
+    continue;
+
+}
+
+
+const selectedSeasonData =
+    lastAvailableWeek.data;
+
+
+/* -------------------------------------------------
+   NO VALID RANK
+   = PLAYER DID NOTHING
+   = NO STATUS CHANGE
+------------------------------------------------- */
+
+const seasonRank =
+    normalizeSeasonRank(
+        selectedSeasonData?.rank
+    );
+
+
+if (
+    !seasonRank ||
+    seasonRank ===
+        "-1"
+) {
+
+    console.info(
+        `${LOG_PREFIX} STEP 7E — ID ${id}: no action/rank (-1). ` +
+        `No Server Status change.`
+    );
+
+    continue;
+
+}
+
+
+            /* ---------------------------------------------
+               CALCULATE STATUS
+            --------------------------------------------- */
+
+            const result =
+                calculateNextServerStatus(
+                    activePlayer,
+                    selectedSeasonData,
+                    adminConfig
+                );
+
+
+            /* ---------------------------------------------
+               WRITE STATUS
+            --------------------------------------------- */
+
+            activePlayer.serverStatus =
+                result.newStatus;
+
+
+            activePlayer.serverStatusLevel =
+                result.newLevel;
+
+
+            /* ---------------------------------------------
+               STATUS UPDATE RECORD
+            --------------------------------------------- */
+
+            activePlayer.serverStatusUpdate = {
+
+                season:
+                    normalizeSeason(
+                        state.season
+                    ),
+
+                previous:
+                    result.previousLevel,
+
+                current:
+                    result.newLevel,
+
+                reason:
+                    result.reason
+
+            };
+
+
+            updatedPlayers +=
+                1;
+
+
+            /* ---------------------------------------------
+               COUNT LEVEL
+            --------------------------------------------- */
+
+            switch (
+                result.newLevel
+            ) {
+
+                case 3:
+
+                    lv3Players +=
+                        1;
+
+                    break;
+
+
+                case 2:
+
+                    lv2Players +=
+                        1;
+
+                    break;
+
+
+                case 1:
+
+                    lv1Players +=
+                        1;
+
+                    break;
+
+
+                case 0:
+
+                    lv0Players +=
+                        1;
+
+
+                    lv0Warnings.push({
+
+                        id:
+                            id,
+
+                        name:
+                            activePlayer?.name ??
+                            "",
+
+                        rank:
+                            selectedSeasonData
+                                ?.rank ??
+                            "",
+
+                        meritPowerPercentage:
+                            selectedSeasonData
+                                ?.meritPowerPercentage ??
+                            null,
+
+                        reason:
+                            result.reason
+
+                    });
+
+                    break;
+
+            }
+
+
+            /* ---------------------------------------------
+               NEW / REJOIN COUNTERS
+            --------------------------------------------- */
+
+            if (
+                seasonPlayer
+                    ?.noteFlags
+                    ?.new ===
+                true
+            ) {
+
+                newPlayers +=
+                    1;
+
+            }
+
+
+            if (
+                normalizeText(
+                    seasonPlayer
+                        ?.rejoinDate
+                )
+            ) {
+
+                rejoinPlayers +=
+                    1;
+
+            }
+
+
+            if (
+                result.reason ===
+                "RANK_MOVE"
+            ) {
+
+                movePlayers +=
+                    1;
+
+            }
+
+        }
+
+/* =================================================
+   WRITE UPDATED ACTIVE & AVERAGE
+================================================ */
+
+console.info(
+    `${LOG_PREFIX} STEP 7E — Writing updated Active & Average...`
+);
+
+
+await writePublicDataJson(
+
+    PATHS.ACTIVE_AVERAGE,
+
+    activeAverage,
+
+    `K630 Season ${state.season} - STEP 7E Server Status`
+
+);
+
+
+/* -------------------------------------------------
+   REFRESH ACTIVE & AVERAGE PAGE
+------------------------------------------------- */
+
+try {
+
+    document.dispatchEvent(
+        new CustomEvent(
+            "k630:active-average-refresh"
+        )
+    );
+
+} catch (
+    refreshError
+) {
+
+    console.warn(
+        `${LOG_PREFIX} STEP 7E Active & Average refresh event failed:`,
+        refreshError
+    );
+
+}
+
+
+/* =================================================
+   STORE UPDATED DATA
+================================================ */
+
+state.activeAverageData =
+    clone(
+        activeAverage
+    );
+
+        
+        /* =================================================
+           STORE UPDATED DATA
+        ================================================= */
+
+        state.activeAverageData =
+            clone(
+                activeAverage
+            );
+
+
+        state.serverStatusResult = {
+
+            success:
+                true,
+
+            season:
+                normalizeSeason(
+                    state.season
+                ),
+
+            updatedPlayers:
+                updatedPlayers,
+
+            lv3Players:
+                lv3Players,
+
+            lv2Players:
+                lv2Players,
+
+            lv1Players:
+                lv1Players,
+
+            lv0Players:
+                lv0Players,
+
+            newPlayers:
+                newPlayers,
+
+            rejoinPlayers:
+                rejoinPlayers,
+
+            movePlayers:
+                movePlayers,
+
+            lv0Warnings:
+                clone(
+                    lv0Warnings
+                )
+
+        };
+
+
+        /* =================================================
+           LOG
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7E — Server Status updated.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} LV3:`,
+            lv3Players
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} LV2:`,
+            lv2Players
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} LV1:`,
+            lv1Players
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} LV0:`,
+            lv0Players
+        );
+
+
+        if (
+            lv0Warnings.length >
+            0
+        ) {
+
+            console.warn(
+                `${LOG_PREFIX} WARNING — LV0 players require in-game removal:`,
+                lv0Warnings
+            );
+
+        }
+
+
+        /* =================================================
+           MARK COMPLETE
+        ================================================= */
+
+        state.step7E =
+            true;
+
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7E COMPLETED
+           NEXT STEP = 7F
+        ------------------------------------------------- */
+
+        await persistSaveSeasonStep(
+            "7E",
+            "completed",
+            {
+                nextStep:
+                    "7F",
+
+                updatedBy:
+                    options.updatedBy
+            }
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7E COMPLETED.`
+        );
+
+
+        /* =================================================
+           RETURN
+        ================================================= */
+
+        return {
+
+            success:
+                true,
+
+            step:
+                "7E",
+
+            summary:
+                clone(
+                    state.serverStatusResult
+                )
+
+        };
+
+    } catch (
+        error
+    ) {
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7E ERROR
+        ------------------------------------------------- */
+
+        try {
+
+            await persistSaveSeasonStep(
+                "7E",
+                "error",
+                {
+                    updatedBy:
+                        options.updatedBy
+                }
+            );
+
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7E error status could not be persisted:`,
+                persistError
+            );
+
+        }
+
+
+        console.error(
+            `${LOG_PREFIX} STEP 7E FAILED:`,
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+/* =====================================================
+   STEP 7F — CREATE NEXT SEASON COLUMNS
+=========================================================
+
+PURPOSE
+-------
+Create the next Season structure for:
+
+    Active & Average
+    Old Players
+
+The completed Season remains untouched.
+
+Example:
+
+    Current Season = 1
+
+STEP 7F creates:
+
+    Season 2
+
+Season 2 starts empty.
+
+No Season 1 data is copied into Season 2.
+
+The existing page structure will then display
+the new Season using the same Season column
+structure as the previous Season.
+
+========================================================= */
+
+
+/* -----------------------------------------------------
+   GET NEXT SEASON NUMBER
+----------------------------------------------------- */
+
+function getNextSeasonNumber() {
+
+    const currentSeason =
+        normalizeSeason(
+            state.season
+        );
+
+
+    return (
+        currentSeason +
+        1
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   CREATE NEXT SEASON ENTRY
+----------------------------------------------------- */
+
+function createNextSeasonEntry(
+    player,
+    nextSeason
+) {
+
+    if (
+        !player ||
+        typeof player !==
+            "object"
+    ) {
+
+        return;
+
+    }
+
+
+    /* -------------------------------------------------
+       ENSURE SEASONS OBJECT
+    ------------------------------------------------- */
+
+    if (
+        !player.seasons ||
+        typeof player.seasons !==
+            "object" ||
+        Array.isArray(
+            player.seasons
+        )
+    ) {
+
+        player.seasons =
+            {};
+
+    }
+
+
+    const seasonKey =
+        String(
+            nextSeason
+        );
+
+
+    /* -------------------------------------------------
+       DO NOT OVERWRITE EXISTING DATA
+    ------------------------------------------------- */
+
+    if (
+        Object.prototype
+            .hasOwnProperty.call(
+                player.seasons,
+                seasonKey
+            )
+    ) {
+
+        return;
+
+    }
+
+
+    /* -------------------------------------------------
+       CREATE EMPTY NEXT SEASON
+    -------------------------------------------------
+
+       null means:
+
+           no data for this Season yet
+
+       It must NOT be interpreted as:
+
+           0
+
+       because 0 is valid Season data.
+
+    ------------------------------------------------- */
+
+    player.seasons[
+        seasonKey
+    ] = null;
+
+}
+
+
+/* -----------------------------------------------------
+   CREATE NEXT SEASON FOR DATASET
+----------------------------------------------------- */
+
+function createNextSeasonForDataset(
+    dataset,
+    nextSeason
+) {
+
+    if (
+        !dataset ||
+        typeof dataset !==
+            "object"
+    ) {
+
+        throw new Error(
+            "STEP 7F failed: Dataset is empty or invalid."
+        );
+
+    }
+
+
+    const players =
+        Array.isArray(
+            dataset.players
+        )
+            ? dataset.players
+            : [];
+
+
+    if (
+        !players.length
+    ) {
+
+        throw new Error(
+            "STEP 7F failed: Dataset contains no players."
+        );
+
+    }
+
+
+    for (
+        const player of
+        players
+    ) {
+
+        createNextSeasonEntry(
+            player,
+            nextSeason
+        );
+
+    }
+
+
+    return dataset;
+
+}
+
+
+/* =====================================================
+   STEP 7F — CREATE NEXT SEASON COLUMNS
+========================================================= */
+
+/* =====================================================
+   STEP 7F — CREATE NEXT SEASON COLUMNS
+========================================================= */
+
+async function step7FSeasonColumns(
+    options = {}
+) {
+
+    /* -------------------------------------------------
+       STEP 7E MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7E
+    ) {
+
+        throw new Error(
+            "STEP 7F cannot start. " +
+            "STEP 7E — Server Status must be completed first."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7F RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7F",
+        "running",
+        {
+            updatedBy:
+                options.updatedBy
+        }
+    );
+
+
+    try {
+
+        /* -------------------------------------------------
+           CURRENT / NEXT SEASON
+        ------------------------------------------------- */
+
+        const currentSeason =
+            normalizeSeason(
+                state.season
+            );
+
+
+        const nextSeason =
+            getNextSeasonNumber();
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7F — Creating Season ${nextSeason} columns...`
+        );
+
+/* =================================================
+   READ CURRENT ACTIVE & AVERAGE
+================================================= */
+
+console.info(
+    `${LOG_PREFIX} STEP 7F — Reading Active & Average...`
+);
+
+const activeAverage =
+    await readJson(
+        PATHS.ACTIVE_AVERAGE
+    );
+
+
+if (
+    !activeAverage ||
+    typeof activeAverage !==
+        "object"
+) {
+
+    throw new Error(
+        "STEP 7F failed: Active & Average is empty or invalid."
+    );
+
+}
+
+        createNextSeasonForDataset(
+            activeAverage,
+            nextSeason
+        );
+
+
+        /* =================================================
+           OLD PLAYERS
+        =================================================
+
+           IMPORTANT:
+           This is the current Old Players DATASET.
+
+           We are NOT using any OLD engine file,
+           OLD2 file, backup file, or previous code version.
+
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7F — Reading current Old Players dataset...`
+        );
+
+
+        const oldPlayers =
+            await readJson(
+                PATHS.OLD_PLAYERS
+            );
+
+
+        if (
+            !oldPlayers ||
+            typeof oldPlayers !==
+                "object"
+        ) {
+
+            throw new Error(
+                "STEP 7F failed: Current Old Players dataset is empty or invalid."
+            );
+
+        }
+
+
+        createNextSeasonForDataset(
+            oldPlayers,
+            nextSeason
+        );
+
+/* =================================================
+   WRITE UPDATED ACTIVE & AVERAGE
+================================================= */
+
+console.info(
+    `${LOG_PREFIX} STEP 7E — Writing updated Active & Average...`
+);
+
+
+await writePublicDataJson(
+
+    PATHS.ACTIVE_AVERAGE,
+
+    activeAverage,
+
+    `K630 Season ${state.season} - STEP 7E Server Status`
+
+);
+
+
+/* -------------------------------------------------
+   REFRESH ACTIVE & AVERAGE PAGE
+------------------------------------------------- */
+
+try {
+
+    document.dispatchEvent(
+        new CustomEvent(
+            "k630:active-average-refresh"
+        )
+    );
+
+} catch (
+    refreshError
+) {
+
+    console.warn(
+        `${LOG_PREFIX} Active & Average refresh event could not be dispatched:`,
+        refreshError
+    );
+
+}
+
+
+/* =================================================
+   STORE UPDATED DATA
+================================================= */
+
+state.activeAverageData =
+    clone(
+        activeAverage
+    );
+
+
+state.serverStatusResult = {
+
+    success:
+        true,
+
+    season:
+        normalizeSeason(
+            state.season
+        ),
+
+    updatedPlayers:
+        updatedPlayers,
+
+    lv3Players:
+        lv3Players,
+
+    lv2Players:
+        lv2Players,
+
+    lv1Players:
+        lv1Players,
+
+    lv0Players:
+        lv0Players,
+
+    newPlayers:
+        newPlayers,
+
+    rejoinPlayers:
+        rejoinPlayers,
+
+    movePlayers:
+        movePlayers,
+
+    lv0Warnings:
+        clone(
+            lv0Warnings
+        )
+
+};
+
+        /* =================================================
+           STORE UPDATED DATA
+        ================================================= */
+
+        state.activeAverageData =
+            clone(
+                activeAverage
+            );
+
+
+        state.oldPlayersData =
+            clone(
+                oldPlayers
+            );
+
+
+        /* =================================================
+           RESULT
+        ================================================= */
+
+        state.seasonColumnsResult = {
+
+            success:
+                true,
+
+            completedSeason:
+                currentSeason,
+
+            nextSeason:
+                nextSeason,
+
+            activeAverage:
+                true,
+
+            oldPlayers:
+                true
+
+        };
+
+
+        /* =================================================
+           MARK COMPLETE
+        ================================================= */
+
+        state.step7F =
+            true;
+
+
+        /* =================================================
+           LOG
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7F — Season ${nextSeason} created for Active & Average.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7F — Season ${nextSeason} created for Old Players.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7F COMPLETED.`
+        );
+
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7F COMPLETED
+           NEXT STEP = 7G
+        ------------------------------------------------- */
+
+        await persistSaveSeasonStep(
+            "7F",
+            "completed",
+            {
+                nextStep:
+                    "7G",
+
+                updatedBy:
+                    options.updatedBy
+            }
+        );
+
+
+        /* =================================================
+           RETURN
+        ================================================= */
+
+        return {
+
+            success:
+                true,
+
+            step:
+                "7F",
+
+            completedSeason:
+                currentSeason,
+
+            nextSeason:
+                nextSeason,
+
+            activeAverage:
+                true,
+
+            oldPlayers:
+                true
+
+        };
+
+    } catch (
+        error
+    ) {
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7F ERROR
+        ------------------------------------------------- */
+
+        try {
+
+            await persistSaveSeasonStep(
+                "7F",
+                "error",
+                {
+                    updatedBy:
+                        options.updatedBy
+                }
+            );
+
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7F error status could not be persisted:`,
+                persistError
+            );
+
+        }
+
+
+        console.error(
+            `${LOG_PREFIX} STEP 7F FAILED:`,
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+/* =====================================================
+   STEP 7G — RESET CURRENT SEASON DATA
+========================================================= */
+
+async function step7GReset(
+    options = {}
+) {
+
+    /* -------------------------------------------------
+       STEP 7F MUST BE COMPLETE
+    ------------------------------------------------- */
+
+    if (
+        !state.step7F
+    ) {
+
+        throw new Error(
+            "STEP 7G cannot start. " +
+            "STEP 7F — Next Season Columns must be completed first."
+        );
+
+    }
+
+
+    /* -------------------------------------------------
+       PERSIST — STEP 7G RUNNING
+    ------------------------------------------------- */
+
+    await persistSaveSeasonStep(
+        "7G",
+        "running",
+        {
+            updatedBy:
+                options.updatedBy
+        }
+    );
+
+
+    try {
+
+        const completedSeason =
+            normalizeSeason(
+                state.season
+            );
+
+
+        const nextSeason =
+            completedSeason +
+            1;
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7G — Resetting current Season data...`
+        );
+
+
+        /* =================================================
+           EMPTY SEASON INFO
+        =================================================
+
+           The file remains present.
+
+           Only the current Season player data is removed.
+
+           0 is NOT used here because 0 is valid gameplay
+           data. An empty players array means there is no
+           current Season data yet.
+
+        ================================================= */
+
+        const emptySeasonInfo = {
+
+            players:
+                []
+
+        };
+
+
+        /* =================================================
+           EMPTY SERVER VS SERVER
+        =================================================
+
+           The file remains present.
+
+           The next Matchmaking / Season engines will
+           populate it again.
+
+        ================================================= */
+
+        const emptyServerVsServer = {};
+
+
+        /* =================================================
+           RESET SEASON INFO CURRENT.JSON
+        ================================================= */
+
+        await writePublicDataJson(
+
+            PATHS.SEASON_INFO,
+
+            emptySeasonInfo,
+
+            (
+                `K630 Season ${completedSeason} - ` +
+                `Reset Current Season Info for Season ${nextSeason}`
+            )
+
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7G — Season Info current.json reset.`
+        );
+
+
+        /* =================================================
+           RESET SERVER VS SERVER CURRENT.JSON
+        ================================================= */
+
+        await writePublicDataJson(
+
+            PATHS.SERVER_VS_SERVER,
+
+            emptyServerVsServer,
+
+            (
+                `K630 Season ${completedSeason} - ` +
+                `Reset Current Server vs Server for Season ${nextSeason}`
+            )
+
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} STEP 7G — Server vs Server current.json reset.`
+        );
+
+
+        /* =================================================
+           STORE RESET RESULT
+        ================================================= */
+
+        state.seasonResetResult = {
+
+            success:
+                true,
+
+            completedSeason:
+                completedSeason,
+
+            nextSeason:
+                nextSeason,
+
+            seasonInfoReset:
+                true,
+
+            serverVsServerReset:
+                true
+
+        };
+
+
+        /* =================================================
+           MARK STEP COMPLETE
+        ================================================= */
+
+        state.step7G =
+            true;
+
+
+        /* =================================================
+           PERSIST — STEP 7G COMPLETED
+        =================================================
+
+           7G is the final Save Season step.
+
+           The overall Save Season workflow becomes
+           completed.
+
+        ================================================= */
+
+        await persistSaveSeasonStep(
+            "7G",
+            "completed",
+            {
+                updatedBy:
+                    options.updatedBy
+            }
+        );
+
+
+        /* =================================================
+           LOG
+        ================================================= */
+
+        console.info(
+            `${LOG_PREFIX} STEP 7G COMPLETED.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Season ${completedSeason} is fully processed.`
+        );
+
+
+        console.info(
+            `${LOG_PREFIX} Season ${nextSeason} current data is ready to be populated.`
+        );
+
+
+        /* =================================================
+           RETURN
+        ================================================= */
+
+        return {
+
+            success:
+                true,
+
+            step:
+                "7G",
+
+            completedSeason:
+                completedSeason,
+
+            nextSeason:
+                nextSeason,
+
+            seasonInfoReset:
+                true,
+
+            serverVsServerReset:
+                true
+
+        };
+
+    } catch (
+        error
+    ) {
+
+        /* -------------------------------------------------
+           PERSIST — STEP 7G ERROR
+        ------------------------------------------------- */
+
+        try {
+
+            await persistSaveSeasonStep(
+                "7G",
+                "error",
+                {
+                    updatedBy:
+                        options.updatedBy
+                }
+            );
+
+        } catch (
+            persistError
+        ) {
+
+            console.error(
+                `${LOG_PREFIX} STEP 7G error status could not be persisted:`,
+                persistError
+            );
+
+        }
+
+
+        console.error(
+            `${LOG_PREFIX} STEP 7G FAILED:`,
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+/* =====================================================
+   RESTORE PERSISTENT STEP STATE
+========================================================= */
+
+/*
+    Rebuild the internal Save Season step flags from the
+    persistent admin-config.json workflow state.
+
+    This is required because setSeason() intentionally
+    resets all step flags when the engine is configured.
+
+    The public admin-config.json remains the source of truth.
+*/
+
+function restoreWorkflowState(
+    saveSeasonState = {}
+) {
+
+    const steps =
+        saveSeasonState?.steps ||
+        {};
+
+
+    /* -------------------------------------------------
+       RESTORE CONFIGURATION
+    ------------------------------------------------- */
+
+    const season =
+        Number(
+            saveSeasonState?.seasonNumber
+        );
+
+    const officialDate =
+        normalizeText(
+            saveSeasonState?.officialDate
+        );
+
+
+    if (
+        Number.isInteger(
+            season
+        ) &&
+        season > 0 &&
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            officialDate
+        )
+    ) {
+
+        state.season =
+            season;
+
+        state.officialDate =
+            officialDate;
+
+        state.configured =
+            true;
+
+    }
+
+
+    /* -------------------------------------------------
+       RESTORE COMPLETED FLAGS
+    ------------------------------------------------- */
+
+    state.step7A =
+        normalizeText(
+            steps?.["7A"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7B =
+        normalizeText(
+            steps?.["7B"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7C =
+        normalizeText(
+            steps?.["7C"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7D =
+        normalizeText(
+            steps?.["7D"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7E =
+        normalizeText(
+            steps?.["7E"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7F =
+        normalizeText(
+            steps?.["7F"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    state.step7G =
+        normalizeText(
+            steps?.["7G"]?.status
+        ).toLowerCase() ===
+        "completed";
+
+
+    console.info(
+        `${LOG_PREFIX} Persistent Save Season state restored.`,
+        {
+            season:
+                state.season,
+
+            officialDate:
+                state.officialDate,
+
+            step7A:
+                state.step7A,
+
+            step7B:
+                state.step7B,
+
+            step7C:
+                state.step7C,
+
+            step7D:
+                state.step7D,
+
+            step7E:
+                state.step7E,
+
+            step7F:
+                state.step7F,
+
+            step7G:
+                state.step7G
+        }
+    );
+
+    return getState();
+
+}
+
+/* =====================================================
+   PUBLIC ENGINE API
+========================================================= */
+
+global.K630SaveSeasonEngine = Object.freeze({
 
     name:
         ENGINE_NAME,
@@ -3292,30 +6541,49 @@ window.K630SaveSeasonEngine = {
     version:
         ENGINE_VERSION,
 
+    paths:
+        PATHS,
 
-    /* ================================================
-       SAVE SEASON
-    ================================================ */
-
-    saveSeason:
-
-
-        saveSeason
-
-};
+    repository:
+        GITHUB_REPOSITORY,
 
 
-/* -----------------------------------------------------
-   ENGINE LOADED
------------------------------------------------------ */
+    /* -------------------------------------------------
+       SEASON CONFIGURATION
+    ------------------------------------------------- */
 
-console.info(
+    setSeason,
 
-    `${LOG_PREFIX} ${ENGINE_NAME} ${ENGINE_VERSION} Public API ready.`
+    restoreWorkflowState,
 
-);
+    getState,
+
+    requireConfigured,
 
 
-/* =====================================================
-   END OF MODULE 14
-===================================================== */
+    /* -------------------------------------------------
+       RESET
+    ------------------------------------------------- */
+
+    reset,
+
+
+    /* -------------------------------------------------
+       SAVE SEASON STEPS
+    ------------------------------------------------- */
+
+    step7AArchive,
+
+    step7BSeasonData,
+
+    step7CAverages,
+
+    step7DUpdateNotes,
+
+    step7EServerStatus,
+
+    step7FSeasonColumns
+
+});
+
+})(window);

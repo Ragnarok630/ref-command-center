@@ -1610,182 +1610,587 @@
 
 
   <!-- =====================================================
-       STEP 7 — SAVE ARCHIVE
+     STEP 7 — SAVE ARCHIVE
+===================================================== -->
+
+<section
+  class="dashboard-panel admin-detail-workspace workflow-theme-archive"
+  id="saveArchivePanel"
+>
+
+  <div class="admin-detail-header">
+
+    <div>
+
+      <span class="section-kicker">
+        Step 7 | Save Archive
+      </span>
+
+      <h3>
+        Save Official Season Archive
+      </h3>
+
+      <p>
+        Validate the completed Season and permanently archive
+        Season Info and Server vs Server data.
+      </p>
+
+    </div>
+
+
+    <span
+      class="management-status-badge"
+      id="saveArchiveStatus"
+      data-status="locked"
+    >
+      Locked
+    </span>
+
+  </div>
+
+
+  <!-- =====================================================
+       SEASON + ARCHIVE DATE
   ====================================================== -->
 
-  <section
-    class="dashboard-panel admin-detail-workspace workflow-theme-archive"
-    id="saveArchivePanel"
-  >
-    <div class="admin-detail-header">
-      <div>
-        <span class="section-kicker">
-          Step 7 | Save Archive
+  <div class="admin-form-grid">
+
+    <div class="admin-field">
+
+      <label for="archiveSeasonNumber">
+        Season Number
+      </label>
+
+      <input
+        id="archiveSeasonNumber"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Current Season"
+      >
+
+    </div>
+
+
+    <div class="admin-field">
+
+      <label for="archiveOfficialDate">
+        Archive Official Date
+      </label>
+
+      <input
+        id="archiveOfficialDate"
+        type="date"
+      >
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       SET SEASON
+  ====================================================== -->
+
+  <div class="admin-action-row">
+
+    <button
+      class="admin-btn confirm"
+      id="setSaveSeasonBtn"
+      type="button"
+      disabled
+    >
+
+      <i class="fa-solid fa-check"></i>
+
+      Set Season
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       SAVE SEASON WORKFLOW
+  ====================================================== -->
+
+  <div class="admin-save-season-workflow">
+
+
+    <!-- =================================================
+         7A
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7A"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7A
         </span>
 
-        <h3>
-          Save Official Season Archive
-        </h3>
+        <div>
 
-        <p>
-          Validate the completed Season and permanently archive Season
-          Info and Server vs Server data.
-        </p>
+          <strong>
+            Archive Season Info &amp; Server vs Server
+          </strong>
+
+          <span>
+            Archive the two current.json files.
+          </span>
+
+        </div>
+
       </div>
 
-      <span
-        class="management-status-badge"
-        id="saveArchiveStatus"
-        data-status="locked"
-      >
-        Locked
-      </span>
-    </div>
 
-    <div class="admin-form-grid">
-      <div class="admin-field">
-        <label for="archiveSeasonNumber">
-          Season Number
-        </label>
+      <div class="admin-save-season-step-status">
 
-        <input
-          id="archiveSeasonNumber"
-          type="number"
-          min="1"
-          step="1"
-          placeholder="Current Season"
+        <span
+          id="saveSeasonStep7AStatus"
+          data-status="waiting"
         >
+          Waiting
+        </span>
+
       </div>
 
-      <div class="admin-field">
-        <label for="archiveOfficialDate">
-          Archive Official Date
-        </label>
 
-        <input
-          id="archiveOfficialDate"
-          type="date"
-        >
-      </div>
-    </div>
-
-    <div class="admin-archive-checklist">
-      <div
-        class="admin-archive-check"
-        id="archiveCheckMatchmaking"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Matchmaking</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW0"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 0</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW1"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 1</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW2"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 2</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW3"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 3</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW4"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 4</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW5"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 5</span>
-        <strong>Waiting</strong>
-      </div>
-
-      <div
-        class="admin-archive-check"
-        id="archiveCheckW6"
-        data-status="waiting"
-      >
-        <i class="fa-solid fa-circle"></i>
-        <span>Week 6</span>
-        <strong>Waiting</strong>
-      </div>
-    </div>
-
-    <div class="admin-action-row">
       <button
         class="admin-btn"
-        id="validateSeasonArchiveBtn"
-        type="button"
-      >
-        <i class="fa-solid fa-list-check"></i>
-        Validate Season
-      </button>
-
-      <button
-        class="admin-btn confirm"
-        id="saveSeasonArchiveBtn"
+        id="step7ABtn"
         type="button"
         disabled
       >
+
         <i class="fa-solid fa-box-archive"></i>
-        Save Season Archive
+
+        7A
+
       </button>
+
     </div>
+
+
+    <!-- =================================================
+         7B
+    ================================================== -->
 
     <div
-      class="admin-validation-box"
-      id="saveArchiveValidationBox"
+      class="admin-save-season-step"
+      id="saveSeasonStep7B"
+      data-status="waiting"
     >
-      <div class="validation-state warning">
-        <i class="fa-solid fa-triangle-exclamation"></i>
 
-        <span>
-          Save Archive requires Matchmaking, complete Week 0 through
-          Week 6 data and a successful public website rebuild.
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7B
         </span>
+
+        <div>
+
+          <strong>
+            Update Season Data
+          </strong>
+
+          <span>
+            Merits, Power and M-P (%) updating.
+          </span>
+
+        </div>
+
       </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7BStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7BBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-database"></i>
+
+        7B
+
+      </button>
+
     </div>
-  </section>
+
+
+    <!-- =================================================
+         7C
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7C"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7C
+        </span>
+
+        <div>
+
+          <strong>
+            Calculate Averages
+          </strong>
+
+          <span>
+            Average Merits and Average Merits (%) calculation.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7CStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7CBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-calculator"></i>
+
+        7C
+
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         7D
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7D"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7D
+        </span>
+
+        <div>
+
+          <strong>
+            Update Notes
+          </strong>
+
+          <span>
+            Note-symbols copy to Active &amp; Average Page.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7DStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7DBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-note-sticky"></i>
+
+        7D
+
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         7E
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7E"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7E
+        </span>
+
+        <div>
+
+          <strong>
+            Update Server Status
+          </strong>
+
+          <span>
+            LV1, LV2, LV3 and LV0 updating by Server-Status rules.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7EStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7EBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-layer-group"></i>
+
+        7E
+
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         7F
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7F"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7F
+        </span>
+
+        <div>
+
+          <strong>
+            Create Next Season Columns
+          </strong>
+
+          <span>
+            Add new Season colomns for the next Season.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7FStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7FBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-table-columns"></i>
+
+        7F
+
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         7G
+    ================================================== -->
+
+    <div
+      class="admin-save-season-step"
+      id="saveSeasonStep7G"
+      data-status="waiting"
+    >
+
+      <div class="admin-save-season-step-info">
+
+        <span class="admin-save-season-step-number">
+          7G
+        </span>
+
+        <div>
+
+          <strong>
+            Reset Current Season Data
+          </strong>
+
+          <span>
+            Season Info and Server vs Server Pages ready for next Season.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-save-season-step-status">
+
+        <span
+          id="saveSeasonStep7GStatus"
+          data-status="waiting"
+        >
+          Waiting
+        </span>
+
+      </div>
+
+
+      <button
+        class="admin-btn"
+        id="step7GBtn"
+        type="button"
+        disabled
+      >
+
+        <i class="fa-solid fa-rotate"></i>
+
+        7G
+
+      </button>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =====================================================
+       FINAL ARCHIVE ACTIONS
+  ====================================================== -->
+
+  <div class="admin-action-row">
+
+    <button
+      class="admin-btn"
+      id="validateSeasonArchiveBtn"
+      type="button"
+    >
+
+      <i class="fa-solid fa-list-check"></i>
+
+      Validate Season
+
+    </button>
+
+
+    <button
+      class="admin-btn confirm"
+      id="saveSeasonArchiveBtn"
+      type="button"
+      disabled
+    >
+
+      <i class="fa-solid fa-box-archive"></i>
+
+      Save Season Archive
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       VALIDATION / STATUS
+  ====================================================== -->
+
+  <div
+    class="admin-validation-box"
+    id="saveArchiveValidationBox"
+  >
+
+    <div class="validation-state warning">
+
+      <i class="fa-solid fa-triangle-exclamation"></i>
+
+      <span>
+        Set the Season Number and Archive Official Date first.
+      </span>
+
+    </div>
+
+  </div>
+
+
+</section>
 
 
   <!-- =====================================================

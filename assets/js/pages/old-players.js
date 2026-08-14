@@ -1552,63 +1552,81 @@
   }
 
   function renderSeasonFilters(
+  elements
+) {
+  const container =
     elements
+      .seasonFilterContainer;
+
+  if (!container) {
+    return;
+  }
+
+  if (
+    state.seasonColumns
+      .length ===
+    0
   ) {
-    const container =
-      elements
-        .seasonFilterContainer;
-
-    if (!container) {
-      return;
-    }
-
-    if (
-      state.seasonColumns
-        .length ===
-      0
-    ) {
-      container.innerHTML =
-        (
-          "Season filters appear after " +
-          "archived Season data is loaded."
-        );
-
-      return;
-    }
-
     container.innerHTML =
-      state.seasonColumns
-        .map(
-          seasonNumber => `
-            <div class="old-players-season-filter">
+      (
+        "Season filters appear after " +
+        "archived Season data is loaded."
+      );
 
-              <strong>
-                Season ${seasonNumber}
-              </strong>
+    return;
+  }
+
+  container.innerHTML =
+    state.seasonColumns
+      .map(
+        seasonNumber => `
+          <div class="op-season-filter-group">
+
+            <div class="op-season-filter-title">
+              Season ${seasonNumber}
+            </div>
+
+            <label>
+              <span>
+                Merits
+              </span>
 
               <select
                 data-old-players-sort="season:${seasonNumber}:merits"
               >
                 ${createSortOptions()}
               </select>
+            </label>
+
+            <label>
+              <span>
+                Power
+              </span>
 
               <select
                 data-old-players-sort="season:${seasonNumber}:power"
               >
                 ${createSortOptions()}
               </select>
+            </label>
+
+            <label>
+              <span>
+                M-P (%)
+              </span>
 
               <select
                 data-old-players-sort="season:${seasonNumber}:percentage"
               >
                 ${createSortOptions()}
               </select>
+            </label>
 
-            </div>
-          `
-        )
-        .join("");
-  }
+          </div>
+        `
+      )
+      .join("");
+}
 
   /* =====================================================
      COUNT AND COMPLETE RENDER

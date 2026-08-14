@@ -350,6 +350,7 @@
             power:
               integerValue(
                 seasonData?.power ??
+                seasonData?.currentPower ??
                 seasonData?.finalPower ??
                 seasonData?.historicalPower
               ),

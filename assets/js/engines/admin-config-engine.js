@@ -493,6 +493,70 @@ function normalizeWeekDates(value) {
         ""
     },
 
+        saveSeason: {
+
+      active:
+        false,
+
+      seasonNumber:
+        0,
+
+      officialDate:
+        "",
+
+      currentStep:
+        null,
+
+      status:
+        "waiting",
+
+      steps: {
+
+        "7A": {
+          status:
+            "waiting"
+        },
+
+        "7B": {
+          status:
+            "waiting"
+        },
+
+        "7C": {
+          status:
+            "waiting"
+        },
+
+        "7D": {
+          status:
+            "waiting"
+        },
+
+        "7E": {
+          status:
+            "waiting"
+        },
+
+        "7F": {
+          status:
+            "waiting"
+        },
+
+        "7G": {
+          status:
+            "waiting"
+        }
+
+      },
+
+      updatedAt:
+        "",
+
+      updatedBy:
+        ""
+
+    },
+
     meritConfiguration:
   normalizeMeritConfiguration({
     version:
@@ -560,6 +624,107 @@ function normalizeWeekDates(value) {
   /* =====================================================
      NORMALIZATION
   ===================================================== */
+
+function normalizeSaveSeasonStep(
+  value
+) {
+
+  const step =
+    normalizeText(
+      value
+    ).toUpperCase();
+
+
+  if (
+    /^7[A-G]$/.test(
+      step
+    )
+  ) {
+
+    return step;
+
+  }
+
+
+  return null;
+
+}
+
+function normalizeSaveSeasonStatus(
+  value
+) {
+
+  const status =
+    normalizeText(
+      value
+    ).toLowerCase();
+
+  if (
+    status ===
+    "running"
+  ) {
+    return "running";
+  }
+
+  if (
+    status ===
+    "completed"
+  ) {
+    return "completed";
+  }
+
+  if (
+    status ===
+    "error"
+  ) {
+    return "error";
+  }
+
+  return "waiting";
+}
+
+
+function normalizeSaveSeasonSteps(
+  value
+) {
+
+  const source =
+    isObject(
+      value
+    )
+      ? value
+      : {};
+
+  const steps = {};
+
+  [
+    "7A",
+    "7B",
+    "7C",
+    "7D",
+    "7E",
+    "7F",
+    "7G"
+
+  ].forEach(
+    step => {
+
+      steps[step] = {
+
+        status:
+          normalizeSaveSeasonStatus(
+            source[step]
+              ?.status
+          )
+
+      };
+
+    }
+  );
+
+  return steps;
+
+}
 
   function normalizeSelectedSeason(value) {
     if (!isObject(value)) {
@@ -777,6 +942,58 @@ function normalizeWeekDates(value) {
           input.season
             ?.updatedAt
         )
+    },
+
+    saveSeason: {
+
+      active:
+        normalizeBoolean(
+          input.saveSeason
+            ?.active
+        ),
+
+      seasonNumber:
+        normalizeInteger(
+          input.saveSeason
+            ?.seasonNumber
+        ),
+
+      officialDate:
+        normalizeOfficialDate(
+          input.saveSeason
+            ?.officialDate
+        ),
+
+      currentStep:
+        normalizeSaveSeasonStep(
+          input.saveSeason
+            ?.currentStep
+        ),
+
+      status:
+        normalizeSaveSeasonStatus(
+          input.saveSeason
+            ?.status
+        ),
+
+      steps:
+        normalizeSaveSeasonSteps(
+          input.saveSeason
+            ?.steps
+        ),
+
+      updatedAt:
+        normalizeIsoDateTime(
+          input.saveSeason
+            ?.updatedAt
+        ),
+
+      updatedBy:
+        normalizeText(
+          input.saveSeason
+            ?.updatedBy
+        )
+
     },
 
     meritConfiguration:
@@ -1457,6 +1674,209 @@ function updateMeritConfiguration(
     );
   }
 
+/* =====================================================
+   UPDATE SAVE SEASON WORKFLOW
+========================================================= */
+
+function updateSaveSeason(
+  currentConfig,
+  saveSeasonUpdate = {},
+  options = {}
+) {
+
+  const config =
+    normalizeConfig(
+      currentConfig
+    );
+
+
+  const current =
+    config.saveSeason;
+
+
+  /* ---------------------------------------------------
+     BASIC VALUES
+  --------------------------------------------------- */
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      saveSeasonUpdate,
+      "active"
+    )
+  ) {
+
+    current.active =
+      normalizeBoolean(
+        saveSeasonUpdate.active
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      saveSeasonUpdate,
+      "seasonNumber"
+    )
+  ) {
+
+    current.seasonNumber =
+      normalizeInteger(
+        saveSeasonUpdate.seasonNumber
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      saveSeasonUpdate,
+      "officialDate"
+    )
+  ) {
+
+    current.officialDate =
+      normalizeOfficialDate(
+        saveSeasonUpdate.officialDate
+      );
+
+  }
+
+
+  /* ---------------------------------------------------
+     CURRENT STEP
+  --------------------------------------------------- */
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      saveSeasonUpdate,
+      "currentStep"
+    )
+  ) {
+
+    current.currentStep =
+      normalizeSaveSeasonStep(
+        saveSeasonUpdate.currentStep
+      );
+
+  }
+
+
+  /* ---------------------------------------------------
+     OVERALL STATUS
+  --------------------------------------------------- */
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      saveSeasonUpdate,
+      "status"
+    )
+  ) {
+
+    current.status =
+      normalizeSaveSeasonStatus(
+        saveSeasonUpdate.status
+      );
+
+  }
+
+
+  /* ---------------------------------------------------
+     INDIVIDUAL STEP
+  ---------------------------------------------------
+
+     Example:
+
+       {
+         step: "7C",
+         stepStatus: "running"
+       }
+
+  --------------------------------------------------- */
+
+  const step =
+    normalizeSaveSeasonStep(
+      saveSeasonUpdate.step
+    );
+
+
+  if (
+    step
+  ) {
+
+    current.steps[step] = {
+
+      status:
+        normalizeSaveSeasonStatus(
+          saveSeasonUpdate.stepStatus
+        )
+
+    };
+
+  }
+
+
+  /* ---------------------------------------------------
+     COMPLETE ALL STEP DATA
+     Optional bulk update
+  --------------------------------------------------- */
+
+  if (
+    isObject(
+      saveSeasonUpdate.steps
+    )
+  ) {
+
+    current.steps =
+      normalizeSaveSeasonSteps(
+        saveSeasonUpdate.steps
+      );
+
+  }
+
+
+  /* ---------------------------------------------------
+     TIMESTAMP
+  --------------------------------------------------- */
+
+  current.updatedAt =
+    normalizeIsoDateTime(
+      saveSeasonUpdate.updatedAt
+    ) ||
+    nowIso();
+
+
+  /* ---------------------------------------------------
+     UPDATED BY
+  --------------------------------------------------- */
+
+  current.updatedBy =
+    normalizeText(
+      saveSeasonUpdate.updatedBy
+    ) ||
+    current.updatedBy ||
+    config.updatedBy;
+
+
+  /* ---------------------------------------------------
+     SAVE BACK INTO CONFIG
+  --------------------------------------------------- */
+
+  config.saveSeason =
+    current;
+
+
+  /* ---------------------------------------------------
+     RETURN COMPLETE NORMALIZED CONFIG
+  --------------------------------------------------- */
+
+  return finalizeConfig(
+    config,
+    options
+  );
+
+}
+
   /* =====================================================
      SEASON ARCHIVE RESET
 
@@ -1716,6 +2136,8 @@ function loadOrCreateConfig(existingConfig = null) {
       updateWebsiteBuild,
 
       updateArchive,
+
+      updateSaveSeason,
 
       resetAfterSeasonArchive,
 

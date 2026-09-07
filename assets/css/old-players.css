@@ -1240,9 +1240,7 @@
   width: max-content;
 
   min-width:
-    calc(
-      var(--op-season-group-width) * 2
-    );
+    var(--op-season-group-width);
 }
 
 /* =========================================================
@@ -1773,9 +1771,9 @@
 
 .op-season-column,
 .op-right-table tbody td {
-  width: var(--op-season-column-width);
-  min-width: var(--op-season-column-width);
-  max-width: var(--op-season-column-width);
+    width: var(--op-season-column-width);
+    min-width: var(--op-season-column-width);
+    max-width: var(--op-season-column-width);
 }
 
 .op-season-column {

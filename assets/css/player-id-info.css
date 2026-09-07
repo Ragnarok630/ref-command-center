@@ -1506,7 +1506,7 @@
 .player-id-timeline::before {
   position: absolute;
 
-  top: 22px;
+  top: 0px;
   left: 17px;
   right: 17px;
 
@@ -1532,7 +1532,7 @@
 
   min-width: 205px;
 
-  padding-top: 25px;
+  padding-top: 30px;
 }
 
 .player-id-timeline-event::before {
@@ -1586,12 +1586,15 @@
 }
 
 .player-id-timeline-card {
-  height: 100%;
-  min-height: 86px;
 
-  overflow: hidden;
+  height: 100%;
+
+  min-height: 100px;
+
+  overflow: visible;
 
   border: 1px solid rgba(157, 78, 221, 0.2);
+
   border-radius: 9px;
 
   background:
@@ -1600,6 +1603,7 @@
       rgba(25, 22, 33, 0.98),
       rgba(11, 10, 16, 0.98)
     );
+
 }
 
 .player-id-timeline-card__header {

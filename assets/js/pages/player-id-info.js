@@ -1141,117 +1141,146 @@
   }
 
   function buildPlayerIndex() {
-    const map =
-      new Map();
+  const map = new Map();
 
-    const activePlayers =
-      extractRecords(
-        activeAverageData,
-        [
-          "players",
-          "activePlayers",
-          "rows"
-        ]
-      );
-
-    const seasonPlayers =
-      extractRecords(
-        seasonInfoData,
-        [
-          "players",
-          "participants",
-          "rows"
-        ]
-      );
-
-    const oldPlayers =
-      extractRecords(
-        oldPlayersData,
-        [
-          "players",
-          "oldPlayers",
-          "rows"
-        ]
-      );
-
-    activePlayers
-      .map(record =>
-        normalizePlayer(
-          record,
-          "active"
-        )
-      )
-      .filter(Boolean)
-      .forEach(player => {
-        map.set(
-          player.id,
-          player
-        );
-      });
-
-    seasonPlayers
-      .map(record =>
-        normalizePlayer(
-          record,
-          "season"
-        )
-      )
-      .filter(Boolean)
-      .forEach(player => {
-        map.set(
-          player.id,
-          mergePlayer(
-            map.get(player.id),
-            player
-          )
-        );
-      });
-
-    oldPlayers
-      .map(record =>
-        normalizePlayer(
-          record,
-          "old-player"
-        )
-      )
-      .filter(Boolean)
-      .forEach(player => {
-        map.set(
-          player.id,
-          mergePlayer(
-            map.get(player.id),
-            player
-          )
-        );
-      });
-
-    playerIndex =
+  const activePlayers =
+    extractRecords(
+      activeAverageData,
       [
-        ...map.values()
-      ].sort(
-        (
-          first,
-          second
-        ) => {
-          return (
-            normalizeSearch(
-              first.name
-            ).localeCompare(
-              normalizeSearch(
-                second.name
-              )
-            )
-          );
-        }
-      );
-
-    console.info(
-      (
-        `[${MODULE_NAME}] ` +
-        `${playerIndex.length} players indexed.`
-      )
+        "players",
+        "activePlayers",
+        "rows"
+      ]
     );
-  }
+
+  const seasonPlayers =
+    extractRecords(
+      seasonInfoData,
+      [
+        "players",
+        "participants",
+        "rows"
+      ]
+    );
+
+  const oldPlayers =
+    extractRecords(
+      oldPlayersData,
+      [
+        "players",
+        "oldPlayers",
+        "rows"
+      ]
+    );
+
+  const historyPlayers =
+    extractRecords(
+      playerHistoryData,
+      [
+        "players",
+        "playerHistory",
+        "history",
+        "records",
+        "rows"
+      ]
+    );
+
+  activePlayers
+    .map(record =>
+      normalizePlayer(
+        record,
+        "active"
+      )
+    )
+    .filter(Boolean)
+    .forEach(player => {
+      map.set(
+        player.id,
+        player
+      );
+    });
+
+  seasonPlayers
+    .map(record =>
+      normalizePlayer(
+        record,
+        "season"
+      )
+    )
+    .filter(Boolean)
+    .forEach(player => {
+      map.set(
+        player.id,
+        mergePlayer(
+          map.get(player.id),
+          player
+        )
+      );
+    });
+
+  oldPlayers
+    .map(record =>
+      normalizePlayer(
+        record,
+        "old-player"
+      )
+    )
+    .filter(Boolean)
+    .forEach(player => {
+      map.set(
+        player.id,
+        mergePlayer(
+          map.get(player.id),
+          player
+        )
+      );
+    });
+
+  historyPlayers
+    .map(record =>
+      normalizePlayer(
+        record,
+        "history"
+      )
+    )
+    .filter(Boolean)
+    .forEach(player => {
+      map.set(
+        player.id,
+        mergePlayer(
+          map.get(player.id),
+          player
+        )
+      );
+    });
+
+  playerIndex =
+    [
+      ...map.values()
+    ].sort(
+      (
+        first,
+        second
+      ) => {
+        return (
+          normalizeSearch(
+            first.name
+          ).localeCompare(
+            normalizeSearch(
+              second.name
+            )
+          )
+        );
+      }
+    );
+
+  console.info(
+    (
+      `[${MODULE_NAME}] ` +
+      `${playerIndex.length} players indexed.`
+    )
+  );
+}
 
   /* =====================================================
      SEARCH
@@ -1656,25 +1685,31 @@
   ===================================================== */
 
   function setEngineStatus(
-    status,
-    text
-  ) {
-    const container =
-      getElement(
-        "playerIdEngineStatus"
-      );
-
-    if (container) {
-      container.dataset.status =
-        status;
-    }
-
-    setText(
-      "playerIdEngineStatusText",
-      text,
-      "Ready"
+  status,
+  text
+) {
+  const container =
+    getElement(
+      "playerIdEngineStatus"
     );
+
+  if (!container) {
+    return;
   }
+
+  container.dataset.status =
+    status;
+
+  const statusText =
+    getElement(
+      "playerIdEngineStatusText"
+    );
+
+  if (statusText) {
+    statusText.textContent =
+      text;
+  }
+}
 
   function showSearchMessage(
     message,
@@ -1848,39 +1883,65 @@
     );
   }
 
-  function buildNote(player) {
-    const notes =
-      [];
+  function buildNote(
+  player,
+  departureInfo = null
+) {
+  const notes =
+    [];
 
-    if (player.note) {
-      notes.push(
+  if (
+    normalizeText(
+      player?.note
+    )
+  ) {
+    notes.push(
+      normalizeText(
         player.note
-      );
-    }
-
-    if (player.isNew) {
-      notes.push(
-        "New player"
-      );
-    }
-
-    if (player.isLeft) {
-      notes.push(
-        "Left Kingdom 630"
-      );
-    }
-
-    if (player.afkApproved) {
-      notes.push(
-        "AFK approved"
-      );
-    }
-
-    return notes.join(
-      " · "
-    ) ||
-    "-";
+      )
+    );
   }
+
+  if (
+    departureInfo?.date
+  ) {
+    notes.push(
+      (
+        `Player disappeared from Kingdom 630 ` +
+        `weekly data during ` +
+        `${departureInfo.seasonNumber
+          ? `Season ${departureInfo.seasonNumber}`
+          : "a completed season"}`
+      )
+    );
+  }
+
+  if (
+    player?.isNew
+  ) {
+    notes.push(
+      "New player"
+    );
+  }
+
+  if (
+    player?.isLeft
+  ) {
+    notes.push(
+      "Left Kingdom 630"
+    );
+  }
+
+  if (
+    player?.afkApproved
+  ) {
+    notes.push(
+      "AFK approved"
+    );
+  }
+
+  return notes;
+}
 
   function renderBadge(
     id,
@@ -2021,109 +2082,879 @@
     return [];
   }
 
-  async function loadPlayerArchives(
-    playerId
+async function loadPlayerArchives(
+  playerId
+) {
+
+  const entries =
+    extractArchiveEntries();
+
+
+  const results =
+    [];
+
+
+  function collectJsonPaths(
+    source,
+    output = []
   ) {
-    const entries =
-      extractArchiveEntries();
 
-    const results =
-      [];
-
-    for (
-      const entry of
-      entries
+    if (
+      source === null ||
+      source === undefined
     ) {
-      const seasonNumber =
-        integerValue(
-          entry?.seasonNumber ??
-          entry?.season ??
-          entry?.number
-        );
 
-      if (seasonNumber <= 0) {
-        continue;
-      }
+      return output;
 
-      const candidatePaths =
-        [
-          normalizeText(
-            entry?.seasonInfoPath
-          ),
-
-          normalizeText(
-            entry?.playerHistoryPath
-          ),
-
-          (
-            `archives/season-${seasonNumber}/` +
-            `season-info.json`
-          ),
-
-          (
-            `archives/season-${seasonNumber}/` +
-            `generated/season-info/current.json`
-          )
-        ].filter(Boolean);
-
-      let archiveData =
-        null;
-
-      for (
-        const path of
-        candidatePaths
-      ) {
-        archiveData =
-          await fetchOptionalJson(
-            path,
-            null
-          );
-
-        if (archiveData) {
-          break;
-        }
-      }
-
-      if (!archiveData) {
-        continue;
-      }
-
-      const playerRecord =
-        extractRecords(
-          archiveData,
-          [
-            "players",
-            "participants",
-            "rows"
-          ]
-        ).find(record => {
-          return (
-            normalizeText(
-              getRecordValue(
-                record,
-                FIELDS.id
-              )
-            ) ===
-            normalizeText(
-              playerId
-            )
-          );
-        });
-
-      if (!playerRecord) {
-        continue;
-      }
-
-      results.push(
-        normalizeArchiveSeason(
-          seasonNumber,
-          entry,
-          playerRecord
-        )
-      );
     }
 
-    return results.sort(
+
+    if (
+      typeof source ===
+        "string"
+    ) {
+
+      const value =
+        normalizeText(
+          source
+        );
+
+
+      if (
+        /\.json(?:\?|$)/i.test(
+          value
+        )
+      ) {
+
+        let path =
+          value
+            .replace(
+              /^https?:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+\//i,
+              ""
+            )
+            .replace(
+              /^\/+/,
+              ""
+            )
+            .replace(
+              /^assets\/data\//i,
+              ""
+            );
+
+
+        if (
+          path &&
+          !output.includes(
+            path
+          )
+        ) {
+
+          output.push(
+            path
+          );
+
+        }
+
+      }
+
+
+      return output;
+
+    }
+
+
+    if (
+      Array.isArray(
+        source
+      )
+    ) {
+
+      source.forEach(
+        item =>
+          collectJsonPaths(
+            item,
+            output
+          )
+      );
+
+
+      return output;
+
+    }
+
+
+    if (
+      typeof source ===
+        "object"
+    ) {
+
+      Object.values(
+        source
+      ).forEach(
+        value =>
+          collectJsonPaths(
+            value,
+            output
+          )
+      );
+
+    }
+
+
+    return output;
+
+  }
+
+
+  function findPlayerRecordDeep(
+    source
+  ) {
+
+    const visited =
+      new Set();
+
+
+    function walk(
+      node
+    ) {
+
+      if (
+        node === null ||
+        node === undefined ||
+        typeof node !==
+          "object"
+      ) {
+
+        return null;
+
+      }
+
+
+      if (
+        visited.has(
+          node
+        )
+      ) {
+
+        return null;
+
+      }
+
+
+      visited.add(
+        node
+      );
+
+
+      if (
+        Array.isArray(
+          node
+        )
+      ) {
+
+        for (
+          const item of
+          node
+        ) {
+
+          const result =
+            walk(
+              item
+            );
+
+
+          if (
+            result
+          ) {
+
+            return result;
+
+          }
+
+        }
+
+
+        return null;
+
+      }
+
+
+      const id =
+        normalizeText(
+          getRecordValue(
+            node,
+            FIELDS.id
+          )
+        );
+
+
+      if (
+        id &&
+        id ===
+          normalizeText(
+            playerId
+          )
+      ) {
+
+        return node;
+
+      }
+
+
+      for (
+        const value of
+        Object.values(
+          node
+        )
+      ) {
+
+        const result =
+          walk(
+            value
+          );
+
+
+        if (
+          result
+        ) {
+
+          return result;
+
+        }
+
+      }
+
+
+      return null;
+
+    }
+
+
+    return walk(
+      source
+    );
+
+  }
+
+
+  for (
+    const entry of
+    entries
+  ) {
+
+    const seasonNumber =
+      integerValue(
+        entry?.seasonNumber ??
+        entry?.season ??
+        entry?.number
+      );
+
+
+    if (
+      seasonNumber <=
+      0
+    ) {
+
+      continue;
+
+    }
+
+
+    /*
+      Every JSON path stored in the archive entry.
+    */
+
+    const candidatePaths =
+      collectJsonPaths(
+        entry,
+        []
+      );
+
+
+    /*
+      Known fallback locations.
+      These do NOT replace the paths above.
+    */
+
+    [
+      `archives/season-${seasonNumber}.json`,
+
+      `archives/season-${seasonNumber}/current.json`,
+
+      `archives/season-${seasonNumber}/season-info.json`,
+
+      `archives/season-${seasonNumber}/generated/season-info/current.json`,
+
+      `archive/season-${seasonNumber}.json`,
+
+      `archive/season-${seasonNumber}/current.json`,
+
+      `archive/season-${seasonNumber}/season-info.json`,
+
+      `archive/season-${seasonNumber}/generated/season-info/current.json`
+
+    ].forEach(
+      path => {
+
+        if (
+          !candidatePaths.includes(
+            path
+          )
+        ) {
+
+          candidatePaths.push(
+            path
+          );
+
+        }
+
+      }
+    );
+
+
+    let archiveData =
+      null;
+
+
+    let archivePath =
+      null;
+
+
+    for (
+      const path of
+      candidatePaths
+    ) {
+
+      const data =
+        await fetchOptionalJson(
+          path,
+          null
+        );
+
+
+      if (
+        data
+      ) {
+
+        const playerRecord =
+          findPlayerRecordDeep(
+            data
+          );
+
+
+        if (
+          playerRecord
+        ) {
+
+          archiveData =
+            data;
+
+          archivePath =
+            path;
+
+          break;
+
+        }
+
+      }
+
+    }
+
+
+    if (
+      !archiveData
+    ) {
+
+      console.warn(
+        `[${MODULE_NAME}] No archive player record found for Season ${seasonNumber}.`,
+        candidatePaths
+      );
+
+
+      continue;
+
+    }
+
+
+    results.push(
+      normalizeArchiveSeason(
+        seasonNumber,
+        entry,
+        archiveData,
+        playerId
+      )
+    );
+
+  }
+
+
+  return results.sort(
+    (
+      first,
+      second
+    ) =>
+      first.seasonNumber -
+      second.seasonNumber
+  );
+
+}
+
+function normalizeArchiveSeason(
+  seasonNumber,
+  archiveEntry,
+  archiveData,
+  playerId
+) {
+
+  function findPlayerRecordDeep(
+    source
+  ) {
+
+    const visited =
+      new Set();
+
+
+    function walk(
+      node
+    ) {
+
+      if (
+        node === null ||
+        node === undefined ||
+        typeof node !==
+          "object"
+      ) {
+
+        return null;
+
+      }
+
+
+      if (
+        visited.has(
+          node
+        )
+      ) {
+
+        return null;
+
+      }
+
+
+      visited.add(
+        node
+      );
+
+
+      if (
+        Array.isArray(
+          node
+        )
+      ) {
+
+        for (
+          const item of
+          node
+        ) {
+
+          const result =
+            walk(
+              item
+            );
+
+
+          if (
+            result
+          ) {
+
+            return result;
+
+          }
+
+        }
+
+
+        return null;
+
+      }
+
+
+      const id =
+        normalizeText(
+          getRecordValue(
+            node,
+            FIELDS.id
+          )
+        );
+
+
+      if (
+        id &&
+        id ===
+          normalizeText(
+            playerId
+          )
+      ) {
+
+        return node;
+
+      }
+
+
+      for (
+        const value of
+        Object.values(
+          node
+        )
+      ) {
+
+        const result =
+          walk(
+            value
+          );
+
+
+        if (
+          result
+        ) {
+
+          return result;
+
+        }
+
+      }
+
+
+      return null;
+
+    }
+
+
+    return walk(
+      source
+    );
+
+  }
+
+
+  function findWeeksDeep(
+    source
+  ) {
+
+    const result =
+      {};
+
+
+    const visited =
+      new Set();
+
+
+    function walk(
+      node
+    ) {
+
+      if (
+        node === null ||
+        node === undefined ||
+        typeof node !==
+          "object"
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        visited.has(
+          node
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      visited.add(
+        node
+      );
+
+
+      if (
+        Array.isArray(
+          node
+        )
+      ) {
+
+        node.forEach(
+          walk
+        );
+
+        return;
+
+      }
+
+
+      for (
+        const [
+          key,
+          value
+        ] of
+        Object.entries(
+          node
+        )
+      ) {
+
+        const normalizedKey =
+          normalizeKey(
+            key
+          );
+
+
+        if (
+          /^w[0-6]$/.test(
+            normalizedKey
+          ) &&
+          isPlainObject(
+            value
+          )
+        ) {
+
+          result[
+            normalizedKey
+              .toUpperCase()
+          ] =
+            value;
+
+        }
+
+
+        walk(
+          value
+        );
+
+      }
+
+    }
+
+
+    walk(
+      source
+    );
+
+
+    return result;
+
+  }
+
+
+  const playerRecord =
+    findPlayerRecordDeep(
+      archiveData
+    ) ||
+    {};
+
+
+  const weeks =
+    findWeeksDeep(
+      playerRecord
+    );
+
+
+  /*
+    Last available week:
+    W6 -> W5 -> W4 -> W3 -> W2 -> W1 -> W0
+  */
+
+  let finalWeek =
+    null;
+
+
+  for (
+    let weekNumber = 6;
+    weekNumber >= 0;
+    weekNumber -= 1
+  ) {
+
+    const week =
+      weeks[
+        `W${weekNumber}`
+      ];
+
+
+    if (
+      !isPlainObject(
+        week
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    if (
+      week.available ===
+        false
+    ) {
+
+      continue;
+
+    }
+
+
+    /*
+      A week without "available" is still valid
+      when it actually contains player data.
+    */
+
+    const hasUsefulData =
+      week.currentPower !==
+        undefined ||
+      week.power !==
+        undefined ||
+      week.merits !==
+        undefined ||
+      week.meritPercent !==
+        undefined ||
+      week.meritsPercent !==
+        undefined;
+
+
+    if (
+      week.available ===
+        true ||
+      hasUsefulData
+    ) {
+
+      finalWeek = {
+
+        week:
+          `W${weekNumber}`,
+
+        data:
+          week
+
+      };
+
+      break;
+
+    }
+
+  }
+
+
+  const finalData =
+    finalWeek?.data ||
+    {};
+
+
+  const power =
+    integerValue(
+      finalData.currentPower ??
+      finalData.power ??
+      getRecordValue(
+        playerRecord,
+        FIELDS.currentPower
+      )
+    );
+
+
+  const merits =
+    integerValue(
+      finalData.merits ??
+      finalData.meritValue ??
+      getRecordValue(
+        playerRecord,
+        [
+          "seasonMerits",
+          "merits",
+          "Merits"
+        ]
+      )
+    );
+
+
+  const meritPercent =
+    numberValue(
+      finalData.meritPercent ??
+      finalData.meritsPercent ??
+      finalData.meritPowerPercentage ??
+      finalData.mp ??
+      getRecordValue(
+        playerRecord,
+        [
+          "meritPercent",
+          "meritsPercent",
+          "M-P",
+          "Merits %"
+        ]
+      )
+    );
+
+
+  const rank =
+    integerValue(
+      finalData.rank ??
+      getRecordValue(
+        playerRecord,
+        [
+          "rank",
+          "Rank",
+          "seasonRank"
+        ]
+      )
+    );
+
+
+  return {
+
+    seasonNumber,
+
+    seasonName:
+      normalizeText(
+        archiveEntry?.seasonName ??
+        archiveEntry?.name ??
+        archiveEntry?.title
+      ) ||
+      `Season ${seasonNumber}`,
+
+    power,
+
+    merits,
+
+    meritPercent,
+
+    rank,
+
+    weeks,
+
+    lastAvailableWeek:
+      finalWeek?.week ||
+      null,
+
+    lastAvailableData:
+      finalData
+
+  };
+
+}
+
+function getArchiveDepartureInfo(
+  archives,
+  player
+) {
+  if (
+    !Array.isArray(archives)
+  ) {
+    return null;
+  }
+
+  const sortedArchives =
+    [
+      ...archives
+    ].sort(
       (
         first,
         second
@@ -2131,164 +2962,809 @@
         first.seasonNumber -
         second.seasonNumber
     );
-  }
 
-  function normalizeArchiveSeason(
-    seasonNumber,
-    archiveEntry,
-    playerRecord
+  for (
+    const season of
+    sortedArchives
   ) {
-    const currentPower =
-      integerValue(
-        getRecordValue(
-          playerRecord,
-          [
-            "seasonPower",
-            "currentPower",
-            "Current Power",
-            "power",
-            "Power"
-          ]
-        )
+
+    if (
+      !season.firstMissingWeek
+    ) {
+      continue;
+    }
+
+    const previousWeekNumber =
+      Number(
+        season.firstMissingWeek
+          .replace(
+            "W",
+            ""
+          )
+      ) - 1;
+
+    let departureDate =
+      normalizeText(
+        season
+          .firstMissingData
+          ?.officialDate
       );
 
-    const merits =
-      integerValue(
-        getRecordValue(
-          playerRecord,
-          [
-            "seasonMerits",
-            "merits",
-            "Merits"
-          ]
-        )
-      );
+    /*
+      If the missing week itself has no
+      date, try to find its official date
+      from another participant in Season Info.
+    */
 
-    const meritPercent =
-      numberValue(
-        getRecordValue(
-          playerRecord,
-          [
-            "meritPercent",
-            "meritsPercent",
-            "M-P",
-            "Merits %"
-          ]
-        )
-      );
+    if (
+      !departureDate &&
+      isPlainObject(
+        seasonInfoData
+      )
+    ) {
 
-    const rank =
-      integerValue(
-        getRecordValue(
-          playerRecord,
+      const weekKey =
+        season.firstMissingWeek;
+
+      const allPlayers =
+        extractRecords(
+          seasonInfoData,
           [
-            "rank",
-            "Rank",
-            "seasonRank"
+            "players",
+            "participants",
+            "rows"
           ]
-        )
-      );
+        );
+
+      for (
+        const record of
+        allPlayers
+      ) {
+
+        const weekData =
+          record?.weeks?.[weekKey];
+
+        if (
+          isPlainObject(
+            weekData
+          ) &&
+          normalizeText(
+            weekData.officialDate
+          )
+        ) {
+          departureDate =
+            normalizeText(
+              weekData.officialDate
+            );
+
+          break;
+        }
+      }
+    }
+
+    /*
+      Final fallback:
+      use the last known week date.
+    */
+
+    if (
+      !departureDate &&
+      season.lastAvailableData
+    ) {
+      departureDate =
+        normalizeText(
+          season.lastAvailableData
+            .officialDate
+        );
+    }
 
     return {
-      seasonNumber,
+      seasonNumber:
+        season.seasonNumber,
 
-      seasonName:
-        normalizeText(
-          archiveEntry?.seasonName ??
-          archiveEntry?.name
-        ) ||
-        `Season ${seasonNumber}`,
+      week:
+        season.firstMissingWeek,
 
-      power:
-        currentPower,
+      previousWeek:
+        previousWeekNumber >= 0
+          ? `W${previousWeekNumber}`
+          : null,
 
-      merits,
-
-      meritPercent,
-
-      rank
+      date:
+        departureDate ||
+        null
     };
   }
+
+  /*
+    Also use an explicitly stored leave date
+    when available.
+  */
+
+  if (
+    normalizeText(
+      player?.leaveDate
+    )
+  ) {
+    return {
+      seasonNumber:
+        null,
+
+      week:
+        null,
+
+      previousWeek:
+        null,
+
+      date:
+        normalizeText(
+          player.leaveDate
+        )
+    };
+  }
+
+  return null;
+}
 
   /* =====================================================
      TIMELINE
   ===================================================== */
 
-  function getPlayerTimeline(
-  player
+function getPlayerTimeline(
+  player,
+  archiveSeasons = []
 ) {
-  const events =
-    [];
 
-  const playerId =
-    normalizeText(
-      player?.id
-    );
+  const events = [];
 
-  const historyRecords =
-    extractRecords(
-      playerHistoryData,
-      [
-        "events",
-        "timeline",
-        "players",
-        "rows"
-      ]
-    );
+  /*
+    =========================================================
+    LOCAL HELPERS
+    =========================================================
+  */
 
-  historyRecords
-    .filter(record => {
-      return (
-        normalizeText(
-          getRecordValue(
-            record,
-            FIELDS.id
-          )
-        ) ===
-        playerId
+  function findDeepValue(
+    source,
+    fieldNames
+  ) {
+
+    const wanted =
+      new Set(
+        [
+          ...fieldNames,
+          "leaveDate",
+          "Leave 630",
+          "Date Leave Kingdom",
+          "dateLeaveKingdom",
+          "leftDate",
+          "dateLeft",
+          "leave",
+          "left",
+          "leftKingdom",
+          "leftKingdomDate",
+          "leaveKingdomDate",
+          "leave630",
+          "left630"
+        ].map(
+          field =>
+            normalizeKey(
+              field
+            )
+        )
       );
-    })
-    .forEach(record => {
-      events.push({
-        date:
-          normalizeText(
-            record.date ??
-            record.eventDate ??
-            record.createdAt
-          ),
 
-        type:
-          normalizeText(
-            record.type ??
-            record.eventType
-          ) ||
-          "history",
+    const visited =
+      new Set();
 
-        title:
-          normalizeText(
-            record.title ??
-            record.label ??
-            record.event
-          ) ||
-          "Player history",
+    function walk(
+      node
+    ) {
 
-        description:
-          normalizeText(
-            record.description ??
-            record.note ??
-            record.details
+      if (
+        node === null ||
+        node === undefined ||
+        typeof node !==
+          "object"
+      ) {
+        return undefined;
+      }
+
+      if (
+        visited.has(
+          node
+        )
+      ) {
+        return undefined;
+      }
+
+      visited.add(
+        node
+      );
+
+      if (
+        Array.isArray(
+          node
+        )
+      ) {
+
+        for (
+          const item of
+            node
+        ) {
+
+          const result =
+            walk(
+              item
+            );
+
+          if (
+            result !==
+              undefined &&
+            result !== ""
+          ) {
+            return result;
+          }
+
+        }
+
+        return undefined;
+      }
+
+      for (
+        const [
+          key,
+          value
+        ] of
+          Object.entries(
+            node
           )
-      });
-    });
+      ) {
+
+        if (
+          wanted.has(
+            normalizeKey(
+              key
+            )
+          ) &&
+          value !==
+            null &&
+          value !==
+            undefined &&
+          value !== ""
+        ) {
+          return value;
+        }
+
+      }
+
+      for (
+        const value of
+          Object.values(
+            node
+          )
+      ) {
+
+        const result =
+          walk(
+            value
+          );
+
+        if (
+          result !==
+            undefined &&
+          result !== ""
+        ) {
+          return result;
+        }
+
+      }
+
+      return undefined;
+    }
+
+    return walk(
+      source
+    );
+  }
+
+  function getWeekPower(
+    week
+  ) {
+
+    if (
+      !isPlainObject(
+        week
+      )
+    ) {
+      return 0;
+    }
+
+    return integerValue(
+      week.currentPower ??
+      week.power ??
+      week.historicalPower
+    );
+  }
+
+  function getWeekMerits(
+    week
+  ) {
+
+    if (
+      !isPlainObject(
+        week
+      )
+    ) {
+      return 0;
+    }
+
+    return integerValue(
+      week.merits ??
+      week.meritValue
+    );
+  }
+
+  function hasWeekData(
+    week
+  ) {
+
+    if (
+      !isPlainObject(
+        week
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      week.available ===
+        false
+    ) {
+      return false;
+    }
+
+    return (
+      week.available ===
+        true ||
+      week.currentPower !==
+        undefined ||
+      week.power !==
+        undefined ||
+      week.historicalPower !==
+        undefined ||
+      week.merits !==
+        undefined ||
+      week.meritValue !==
+        undefined ||
+      week.meritPercent !==
+        undefined ||
+      week.meritsPercent !==
+        undefined
+    );
+  }
+
+  function findLastAvailableWeek(
+    season
+  ) {
+
+    const weeks =
+      isPlainObject(
+        season?.weeks
+      )
+        ? season.weeks
+        : {};
+
+    for (
+      let weekNumber = 6;
+      weekNumber >= 0;
+      weekNumber -= 1
+    ) {
+
+      const week =
+        weeks[
+          `W${weekNumber}`
+        ];
+
+      if (
+        hasWeekData(
+          week
+        )
+      ) {
+
+        return {
+          week:
+            `W${weekNumber}`,
+
+          data:
+            week
+        };
+
+      }
+
+    }
+
+    return null;
+  }
+
+  function findFirstAvailableWeek(
+    season
+  ) {
+
+    const weeks =
+      isPlainObject(
+        season?.weeks
+      )
+        ? season.weeks
+        : {};
+
+    for (
+      let weekNumber = 0;
+      weekNumber <= 6;
+      weekNumber += 1
+    ) {
+
+      const week =
+        weeks[
+          `W${weekNumber}`
+        ];
+
+      if (
+        hasWeekData(
+          week
+        )
+      ) {
+
+        return {
+          week:
+            `W${weekNumber}`,
+
+          data:
+            week
+        };
+
+      }
+
+    }
+
+    return null;
+  }
+
+  /*
+    =========================================================
+    RESOLVE LEAVE DATE
+    =========================================================
+  */
+
+  let leaveDate =
+    normalizeText(
+      player?.leaveDate
+    );
+
+  /*
+    1. merged raw sources
+  */
 
   if (
-    normalizeText(
-      player?.joinDate
+    !leaveDate &&
+    Array.isArray(
+      player?.rawSources
     )
   ) {
+
+    for (
+      const source of
+        player.rawSources
+    ) {
+
+      const candidate =
+        findDeepValue(
+          source,
+          FIELDS.leaveDate
+        );
+
+      if (
+        normalizeText(
+          candidate
+        )
+      ) {
+
+        leaveDate =
+          normalizeText(
+            candidate
+          );
+
+        break;
+      }
+
+    }
+
+  }
+
+  /*
+    2. Old Players current dataset
+  */
+
+  if (
+    !leaveDate
+  ) {
+
+    const records =
+      extractRecords(
+        oldPlayersData,
+        [
+          "players",
+          "oldPlayers",
+          "rows"
+        ]
+      );
+
+    const oldRecord =
+      records.find(
+        record =>
+          normalizeText(
+            getRecordValue(
+              record,
+              FIELDS.id
+            )
+          ) ===
+          normalizeText(
+            player?.id
+          )
+      );
+
+    if (
+      oldRecord
+    ) {
+
+      leaveDate =
+        normalizeText(
+          findDeepValue(
+            oldRecord,
+            FIELDS.leaveDate
+          )
+        );
+
+    }
+
+  }
+
+  /*
+    3. Archive departure information.
+
+    When a player has W5 but no W6, the first missing week is
+    W6. The actual departure date is the official date of W6.
+    Therefore the departure date is resolved from the missing
+    week first, then from the last known week only as fallback.
+  */
+
+  if (
+    !leaveDate &&
+    Array.isArray(
+      archiveSeasons
+    )
+  ) {
+
+    for (
+      const season of
+        archiveSeasons
+    ) {
+
+      const weeks =
+        isPlainObject(
+          season?.weeks
+        )
+          ? season.weeks
+          : {};
+
+      let lastKnown =
+        null;
+
+      let firstMissing =
+        null;
+
+      for (
+        let weekNumber = 0;
+        weekNumber <= 6;
+        weekNumber += 1
+      ) {
+
+        const week =
+          weeks[
+            `W${weekNumber}`
+          ];
+
+        if (
+          hasWeekData(
+            week
+          )
+        ) {
+
+          lastKnown = {
+            week:
+              weekNumber,
+
+            data:
+              week
+          };
+
+        } else if (
+          lastKnown
+        ) {
+
+          firstMissing = {
+            week:
+              weekNumber
+          };
+
+          break;
+        }
+
+      }
+
+      if (
+        firstMissing
+      ) {
+
+        /*
+          Prefer an official date stored directly on the
+          missing week, when available.
+        */
+
+        const missingWeek =
+          weeks[
+            `W${firstMissing.week}`
+          ];
+
+        leaveDate =
+          normalizeText(
+            missingWeek?.officialDate
+          );
+
+        /*
+          Otherwise use the official date of that week's
+          data from Season Info.
+        */
+
+        if (
+          !leaveDate &&
+          isPlainObject(
+            seasonInfoData
+          )
+        ) {
+
+          const records =
+            extractRecords(
+              seasonInfoData,
+              [
+                "players",
+                "participants",
+                "rows"
+              ]
+            );
+
+          for (
+            const record of
+              records
+          ) {
+
+            const candidateWeek =
+              record?.weeks?.[
+                `W${firstMissing.week}`
+              ];
+
+            const candidateDate =
+              normalizeText(
+                candidateWeek?.officialDate
+              );
+
+            if (
+              candidateDate
+            ) {
+
+              leaveDate =
+                candidateDate;
+
+              break;
+            }
+
+          }
+
+        }
+
+        /*
+          Last fallback: last known week date.
+        */
+
+        if (
+          !leaveDate &&
+          lastKnown
+        ) {
+
+          leaveDate =
+            normalizeText(
+              lastKnown.data?.officialDate
+            );
+
+        }
+
+      }
+
+      if (
+        leaveDate
+      ) {
+        break;
+      }
+
+    }
+
+  }
+
+  /*
+    =========================================================
+    JOINED KINGDOM 630
+    =========================================================
+  */
+
+  const joinDate =
+    normalizeText(
+      player?.joinDate
+    );
+
+  if (
+    joinDate
+  ) {
+
+    /*
+      Historical Power here is the Historical Power that
+      existed when the player joined, not the current value.
+    */
+
+    let joinHistoricalPower =
+      integerValue(
+        player?.historicalPower
+      );
+
+    if (
+      Array.isArray(
+        player?.rawSources
+      )
+    ) {
+
+      for (
+        const source of
+          player.rawSources
+      ) {
+
+        const sourceHistorical =
+          integerValue(
+            findDeepValue(
+              source,
+              [
+                "historicalPower",
+                "Historical Power",
+                "topPower",
+                "Top Power"
+              ]
+            )
+          );
+
+        if (
+          sourceHistorical > 0
+        ) {
+
+          joinHistoricalPower =
+            sourceHistorical;
+
+          break;
+        }
+
+      }
+
+    }
+
     events.push({
       date:
-        player.joinDate,
+        joinDate,
 
       type:
         "join",
@@ -2296,185 +3772,230 @@
       title:
         "Joined Kingdom 630",
 
-      description:
-        "Player became part of Kingdom 630."
+      lines:
+        [
+          (
+            `Historical Power: ` +
+            `${formatNumber(
+              joinHistoricalPower
+            )}`
+          )
+        ]
     });
+
   }
 
-  const seasonPlayers =
-    extractRecords(
-      seasonInfoData,
-      [
-        "players",
-        "participants",
-        "rows"
-      ]
-    );
+  /*
+    =========================================================
+    ARCHIVED SEASONS
+    =========================================================
+  */
 
-  const currentSeasonPlayer =
-    seasonPlayers.find(record => {
-      return (
-        normalizeText(
-          getRecordValue(
-            record,
-            FIELDS.id
-          )
-        ) ===
-        playerId
-      );
-    }) ||
-    null;
-
-  const seasonNumber =
-    integerValue(
-      seasonInfoData
-        ?.season
-        ?.number ??
-      seasonInfoData
-        ?.seasonNumber ??
-      1
-    );
-
-  const seasonName =
-    normalizeText(
-      seasonInfoData
-        ?.season
-        ?.name ??
-      seasonInfoData
-        ?.seasonName
-    ) ||
-    `Season ${seasonNumber}`;
-
-  const weeks =
-    isPlainObject(
-      currentSeasonPlayer?.weeks
-    )
-      ? currentSeasonPlayer.weeks
-      : {};
-
-  const weekZero =
-    weeks.W0;
-
-  if (
-    isPlainObject(
-      weekZero
-    ) &&
-    weekZero.available ===
-      true
+  for (
+    const season of
+      archiveSeasons
   ) {
-    const startDate =
-      normalizeText(
-        weekZero.officialDate
-      ) ||
-      normalizeText(
-        seasonInfoData
-          ?.season
-          ?.latestWeekDate
+
+    const seasonNumber =
+      integerValue(
+        season?.seasonNumber
       );
 
-    if (startDate) {
+    if (
+      seasonNumber <= 0
+    ) {
+      continue;
+    }
+
+    const seasonName =
+      normalizeText(
+        season?.seasonName
+      ) ||
+      `Season ${seasonNumber}`;
+
+    const firstWeek =
+      findFirstAvailableWeek(
+        season
+      );
+
+    const lastWeek =
+      findLastAvailableWeek(
+        season
+      );
+
+    /*
+      Season start
+    */
+
+    if (
+      firstWeek &&
+      normalizeText(
+        firstWeek.data?.officialDate
+      )
+    ) {
+
       events.push({
         date:
-          startDate,
+          firstWeek.data.officialDate,
 
         type:
           "season-start",
 
         title:
-          `${seasonName} Started (W0)`,
+          `${seasonName} Start`,
 
-        description:
-          (
-            `Historical Power: ` +
-            `${formatNumber(
-              weekZero.historicalPower ??
-              currentSeasonPlayer
-                ?.historicalPower
-            )} · ` +
-            `Current Power: ` +
-            `${formatNumber(
-              weekZero.currentPower
-            )} · ` +
-            `Merits: ` +
-            `${formatNumber(
-              weekZero.merits
-            )}`
-          )
+        lines:
+          [
+            (
+              `Current Power: ` +
+              `${formatNumber(
+                getWeekPower(
+                  firstWeek.data
+                )
+              )}`
+            ),
+
+            (
+              `Merits Value: ` +
+              `${formatNumber(
+                getWeekMerits(
+                  firstWeek.data
+                )
+              )}`
+            )
+          ]
+
       });
+
     }
+
+    /*
+      Season end
+    */
+
+    if (
+      lastWeek &&
+      normalizeText(
+        lastWeek.data?.officialDate
+      )
+    ) {
+
+      events.push({
+        date:
+          lastWeek.data.officialDate,
+
+        type:
+          "season-finish",
+
+        title:
+          `${seasonName} End`,
+
+        lines:
+          [
+            (
+              `Current Power: ` +
+              `${formatNumber(
+                getWeekPower(
+                  lastWeek.data
+                )
+              )}`
+            ),
+
+            (
+              `Merits Value: ` +
+              `${formatNumber(
+                getWeekMerits(
+                  lastWeek.data
+                )
+              )}`
+            )
+          ]
+
+      });
+
+    }
+
   }
 
-  const weekSix =
-    weeks.W6;
+  /*
+    =========================================================
+    LEAVE KINGDOM 630
+    =========================================================
+  */
 
   if (
-    isPlainObject(
-      weekSix
-    ) &&
-    weekSix.available ===
-      true &&
-    normalizeText(
-      weekSix.officialDate
-    )
+    leaveDate
   ) {
+
+    /*
+      Last known Historical Power before departure.
+    */
+
+    let historicalPower =
+      0;
+
+    let lastKnownWeek =
+      null;
+
+    for (
+      let seasonIndex =
+        archiveSeasons.length - 1;
+      seasonIndex >= 0;
+      seasonIndex -= 1
+    ) {
+
+      const season =
+        archiveSeasons[
+          seasonIndex
+        ];
+
+      const candidate =
+        findLastAvailableWeek(
+          season
+        );
+
+      if (
+        candidate
+      ) {
+
+        lastKnownWeek =
+          candidate;
+
+        const candidatePower =
+          integerValue(
+            candidate.data?.historicalPower ??
+            candidate.data?.currentPower ??
+            candidate.data?.power
+          );
+
+        if (
+          candidatePower > 0
+        ) {
+
+          historicalPower =
+            candidatePower;
+
+          break;
+        }
+
+      }
+
+    }
+
+    if (
+      historicalPower <= 0
+    ) {
+
+      historicalPower =
+        integerValue(
+          player?.historicalPower
+        );
+
+    }
+
     events.push({
       date:
-        weekSix.officialDate,
-
-      type:
-        "season-finish",
-
-      title:
-        `${seasonName} Finished (W6)`,
-
-      description:
-        (
-          `Historical Power: ` +
-          `${formatNumber(
-            weekSix.historicalPower ??
-            currentSeasonPlayer
-              ?.historicalPower
-          )} · ` +
-          `Final Power: ` +
-          `${formatNumber(
-            weekSix.currentPower
-          )} · ` +
-          `Final Merits: ` +
-          `${formatNumber(
-            weekSix.merits
-          )}`
-        )
-    });
-  }
-
-  if (
-    normalizeText(
-      player?.rejoinDate
-    )
-  ) {
-    events.push({
-      date:
-        player.rejoinDate,
-
-      type:
-        "rejoin",
-
-      title:
-        "Rejoined Kingdom 630",
-
-      description:
-        "Player returned to Kingdom 630."
-    });
-  }
-
-  if (
-    normalizeText(
-      player?.leaveDate
-    )
-  ) {
-    events.push({
-      date:
-        player.leaveDate,
+        leaveDate,
 
       type:
         "leave",
@@ -2482,41 +4003,94 @@
       title:
         "Left Kingdom 630",
 
-      description:
-        "Player left Kingdom 630."
+      lines:
+        [
+          (
+            `Historical Power: ` +
+            `${formatNumber(
+              historicalPower
+            )}`
+          )
+        ]
+
     });
+
   }
+
+  /*
+    =========================================================
+    REJOIN
+    =========================================================
+  */
+
+  const rejoinDate =
+    normalizeText(
+      player?.rejoinDate
+    );
+
+  if (
+    rejoinDate
+  ) {
+
+    events.push({
+      date:
+        rejoinDate,
+
+      type:
+        "rejoin",
+
+      title:
+        "Rejoined Kingdom 630",
+
+      lines:
+        []
+    });
+
+  }
+
+  /*
+    =========================================================
+    REMOVE EXACT DUPLICATES
+    =========================================================
+  */
 
   const uniqueEvents =
     new Map();
 
-  events.forEach(event => {
-    if (
-      !normalizeText(
-        event.date
-      )
-    ) {
-      return;
+  events.forEach(
+    event => {
+
+      const date =
+        normalizeText(
+          event?.date
+        );
+
+      if (
+        !date
+      ) {
+        return;
+      }
+
+      const key =
+        [
+          date,
+
+          normalizeText(
+            event?.type
+          ),
+
+          normalizeText(
+            event?.title
+          )
+        ].join("|");
+
+      uniqueEvents.set(
+        key,
+        event
+      );
+
     }
-
-    const key =
-      [
-        normalizeText(
-          event.date
-        ),
-        normalizeText(
-          event.type
-        ),
-        normalizeText(
-          event.title
-        )
-      ].join("|");
-
-    uniqueEvents.set(
-      key,
-      event
-    );
-  });
+  );
 
   return [
     ...uniqueEvents.values()
@@ -2525,173 +4099,280 @@
       first,
       second
     ) => {
-      const firstDate =
-        Date.parse(
-          first.date
-        ) ||
-        0;
-
-      const secondDate =
-        Date.parse(
-          second.date
-        ) ||
-        0;
 
       return (
-        firstDate -
-        secondDate
+        (
+          Date.parse(
+            first.date
+          ) || 0
+        ) -
+        (
+          Date.parse(
+            second.date
+          ) || 0
+        )
       );
+
     }
   );
+
 }
 
   /* =====================================================
      RENDER PLAYER
   ===================================================== */
 
-  async function renderPlayer(player) {
-    showLoadingState();
+async function renderPlayer(
+  player
+) {
 
-    const requestId =
-      ++activeRequestId;
+  showLoadingState();
 
-    const seasonRecord =
-      findCurrentSeasonPlayer(
-        player.id
-      );
+  const requestId =
+    ++activeRequestId;
 
-    const archiveSeasons =
-      await loadPlayerArchives(
-        player.id
-      );
-
-    if (
-      requestId !==
-        activeRequestId ||
-      !isPagePresent()
-    ) {
-      return;
-    }
-
-    const merged =
-      seasonRecord
-        ? mergePlayer(
-            player,
-            normalizePlayer(
-              seasonRecord,
-              "season"
-            )
-          )
-        : player;
-
-    renderPlayerSummary(
-      merged
-    );
-
-    renderPerformance(
-      merged
-    );
-
-    renderResources(
-      merged
-    );
-
-    renderPowerInfo(
-      merged
-    );
-
-    renderMembership(
-      merged
-    );
-
-    renderSeasonArchives(
-      archiveSeasons,
-      seasonRecord
-    );
-
-    renderTimeline(
-      getPlayerTimeline(
-        merged
-      )
-    );
-
-    showResultState();
-
-    document.dispatchEvent(
-      new CustomEvent(
-        "k630:player-id-rendered",
-        {
-          detail: {
-            playerId:
-              merged.id,
-
-            name:
-              merged.name,
-
-            archiveSeasons:
-              archiveSeasons.length
-          }
-        }
-      )
-    );
-  }
-
-  function renderPlayerSummary(
-    player
-  ) {
-    setText(
-      "playerIdSummaryId",
+  const seasonRecord =
+    findCurrentSeasonPlayer(
       player.id
     );
 
-    setText(
-      "playerIdResultName",
-      player.name
+  const archiveSeasons =
+    await loadPlayerArchives(
+      player.id
     );
 
-    setText(
-      "playerIdSummaryAlliance",
-      player.alliance
-    );
+  if (
+    requestId !==
+      activeRequestId ||
+    !isPagePresent()
+  ) {
 
-    const membership =
-      player.isFormer
-        ? "Former Player"
-        : "Active Player";
+    return;
 
-    const membershipBadge =
-      getElement(
-        "playerIdMembershipStatus"
-      );
-
-    if (membershipBadge) {
-      membershipBadge.textContent =
-        membership;
-
-      membershipBadge.dataset.membership =
-        player.isFormer
-          ? "former"
-          : "active";
-    }
-
-    renderBadge(
-      "playerIdSummaryServerStatus",
-      player.serverStatus,
-      player.serverStatus
-    );
-
-    renderBadge(
-      "playerIdSummaryTroopTier",
-      player.troopTier,
-      player.troopTier
-    );
-
-    renderBadge(
-      "playerIdSummaryPlayerType",
-      player.playerType,
-      player.playerType
-    );
   }
+
+  /*
+    ---------------------------------------------------------
+    MERGE CURRENT PLAYER DATA
+    ---------------------------------------------------------
+  */
+
+  const merged =
+    seasonRecord
+      ? mergePlayer(
+          player,
+          normalizePlayer(
+            seasonRecord,
+            "season"
+          )
+        )
+      : {
+          ...player
+        };
+
+  /*
+    ---------------------------------------------------------
+    BUILD TIMELINE FIRST
+    ---------------------------------------------------------
+
+    The timeline is now the single source of truth for
+    Leave 630. This prevents Membership and Timeline from
+    disagreeing about the departure date.
+  */
+
+  const timelineEvents =
+    getPlayerTimeline(
+      merged,
+      archiveSeasons
+    );
+
+  const leaveEvent =
+    timelineEvents.find(
+      event =>
+        event?.type ===
+        "leave"
+    );
+
+  /*
+    ---------------------------------------------------------
+    CREATE DISPLAY PLAYER
+    ---------------------------------------------------------
+
+    Do not mutate the original player object.
+
+    When a Leave 630 event exists, make the display copy
+    explicitly inactive and give it the exact same leave date
+    used by the Timeline.
+  */
+
+  const displayPlayer =
+    leaveEvent?.date
+      ? {
+          ...merged,
+
+          leaveDate:
+            leaveEvent.date,
+
+          isLeft:
+            true,
+
+          isFormer:
+            true
+        }
+      : merged;
+
+  /*
+    ---------------------------------------------------------
+    EXISTING PAGE RENDERING
+    ---------------------------------------------------------
+  */
+
+  renderPlayerSummary(
+    displayPlayer
+  );
+
+  renderPerformance(
+    displayPlayer
+  );
+
+  renderResources(
+    displayPlayer
+  );
+
+  renderPowerInfo(
+    displayPlayer
+  );
+
+  renderMembership(
+    displayPlayer
+  );
+
+  renderSeasonArchives(
+    archiveSeasons,
+    seasonRecord
+  );
+
+  renderTimeline(
+    timelineEvents
+  );
+
+  showResultState();
+
+  document.dispatchEvent(
+    new CustomEvent(
+      "k630:player-id-rendered",
+      {
+        detail: {
+
+          playerId:
+            displayPlayer.id,
+
+          name:
+            displayPlayer.name,
+
+          archiveSeasons:
+            archiveSeasons.length
+
+        }
+      }
+    )
+  );
+
+}
+
+function renderPlayerSummary(
+  player
+) {
+
+  setText(
+    "playerIdSummaryId",
+    player.id
+  );
+
+
+  setText(
+    "playerIdResultName",
+    player.name
+  );
+
+
+  setText(
+    "playerIdSummaryAlliance",
+    player.alliance
+  );
+
+
+  const inactive =
+    Boolean(
+      player.leaveDate
+    ) ||
+    Boolean(
+      player.isLeft
+    ) ||
+    Boolean(
+      player.isFormer
+    );
+
+
+  const membership =
+    inactive
+      ? "Inactive Player"
+      : "Active Player";
+
+
+  const membershipBadge =
+    getElement(
+      "playerIdMembershipStatus"
+    );
+
+
+  if (
+    membershipBadge
+  ) {
+
+    membershipBadge.textContent =
+      membership;
+
+
+    membershipBadge.dataset.membership =
+      inactive
+        ? "inactive"
+        : "active";
+
+
+    membershipBadge.style.color =
+      inactive
+        ? "#ff3147"
+        : "#67e84d";
+
+
+    membershipBadge.style.fontWeight =
+      "800";
+
+  }
+
+
+  renderBadge(
+    "playerIdSummaryServerStatus",
+    player.serverStatus,
+    player.serverStatus
+  );
+
+
+  renderBadge(
+    "playerIdSummaryTroopTier",
+    player.troopTier,
+    player.troopTier
+  );
+
+
+  renderBadge(
+    "playerIdSummaryPlayerType",
+    player.playerType,
+    player.playerType
+  );
+
+}
 
   function renderPerformance(
     player
@@ -2827,44 +4508,291 @@
     );
   }
 
-  function renderMembership(
-    player
+function renderMembership(
+  player
+) {
+
+  /*
+    =========================================================
+    MEMBERSHIP STATUS
+    =========================================================
+  */
+
+  const inactive =
+    Boolean(
+      player?.leaveDate
+    ) ||
+    Boolean(
+      player?.isLeft
+    ) ||
+    Boolean(
+      player?.isFormer
+    );
+
+  const statusElement =
+    getElement(
+      "playerIdMembershipPanelStatus"
+    );
+
+  if (
+    statusElement
   ) {
-    setText(
-      "playerIdMembershipPanelStatus",
-      player.isFormer
-        ? "Former Player"
-        : "Active Player"
+
+    statusElement.textContent =
+      inactive
+        ? "Inactive Player"
+        : "Active Player";
+
+    statusElement.dataset.membership =
+      inactive
+        ? "inactive"
+        : "active";
+
+    statusElement.style.setProperty(
+      "color",
+      inactive
+        ? "#ff3147"
+        : "#45ff78",
+      "important"
     );
 
-    setText(
-      "playerIdServerJoin",
-      formatDate(
-        player.joinDate
-      )
+    statusElement.style.setProperty(
+      "font-weight",
+      "800",
+      "important"
     );
 
-    setText(
-      "playerIdServerLeave",
-      formatDate(
-        player.leaveDate
-      )
-    );
-
-    setText(
-      "playerIdServerRejoin",
-      formatDate(
-        player.rejoinDate
-      )
-    );
-
-    setText(
-      "playerIdStatusNote",
-      buildNote(player)
-    );
   }
 
-  function renderSeasonArchives(
+  /*
+    =========================================================
+    JOIN 630
+    =========================================================
+  */
+
+  setText(
+    "playerIdServerJoin",
+    formatDate(
+      player?.joinDate
+    )
+  );
+
+  /*
+    =========================================================
+    LEAVE 630
+    =========================================================
+  */
+
+  const leaveElement =
+    getElement(
+      "playerIdServerLeave"
+    );
+
+  if (
+    leaveElement
+  ) {
+
+    const leaveDate =
+      normalizeText(
+        player?.leaveDate
+      );
+
+    leaveElement.textContent =
+      leaveDate
+        ? formatDate(
+            leaveDate
+          )
+        : "-";
+
+    if (
+      leaveDate
+    ) {
+
+      leaveElement.classList.add(
+        "player-id-leave-date"
+      );
+
+      leaveElement.style.setProperty(
+        "display",
+        "inline-block",
+        "important"
+      );
+
+      leaveElement.style.setProperty(
+        "color",
+        "#ff3147",
+        "important"
+      );
+
+      leaveElement.style.setProperty(
+        "font-weight",
+        "800",
+        "important"
+      );
+
+      leaveElement.title =
+        "Date the player left Kingdom 630.";
+
+    } else {
+
+      leaveElement.classList.remove(
+        "player-id-leave-date"
+      );
+
+      leaveElement.style.removeProperty(
+        "display"
+      );
+
+      leaveElement.style.removeProperty(
+        "color"
+      );
+
+      leaveElement.style.removeProperty(
+        "font-weight"
+      );
+
+      leaveElement.removeAttribute(
+        "title"
+      );
+
+    }
+
+  }
+
+  /*
+    =========================================================
+    REJOIN
+    =========================================================
+  */
+
+  setText(
+    "playerIdServerRejoin",
+    formatDate(
+      player?.rejoinDate
+    )
+  );
+
+  /*
+    =========================================================
+    NOTE
+
+    Never show the note text itself.
+    Always show the warning symbol with the note as tooltip.
+    =========================================================
+  */
+
+  const noteElement =
+    getElement(
+      "playerIdStatusNote"
+    );
+
+  if (
+    !noteElement
+  ) {
+
+    return;
+
+  }
+
+  noteElement.innerHTML =
+    "";
+
+  const noteText =
+    normalizeText(
+      player?.note
+    );
+
+  if (
+    noteText ||
+    inactive
+  ) {
+
+    const warning =
+      document.createElement(
+        "span"
+      );
+
+    warning.className =
+      "player-id-note-warning";
+
+    warning.setAttribute(
+      "aria-label",
+      "Player status note"
+    );
+
+    warning.innerHTML =
+      `
+        <i
+          class="fa-solid fa-triangle-exclamation"
+          aria-hidden="true"
+        ></i>
+      `;
+
+    warning.style.setProperty(
+      "display",
+      "inline-flex",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "align-items",
+      "center",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "justify-content",
+      "center",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "width",
+      "18px",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "height",
+      "18px",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "color",
+      "#ff3147",
+      "important"
+    );
+
+    warning.style.setProperty(
+      "cursor",
+      "help",
+      "important"
+    );
+
+    warning.title =
+      noteText ||
+      (
+        inactive
+          ? "Player has left Kingdom 630."
+          : "Player note."
+      );
+
+    noteElement.appendChild(
+      warning
+    );
+
+  } else {
+
+    noteElement.textContent =
+      "-";
+
+  }
+
+}
+
+
+function renderSeasonArchives(
     archives,
     currentSeasonRecord
   ) {
@@ -3123,128 +5051,646 @@
     };
   }
 
-  function renderTimeline(events) {
+function renderTimeline(
+  events
+) {
+
   const timeline =
     getElement(
       "playerIdTimeline"
     );
+
 
   const empty =
     getElement(
       "playerIdTimelineEmpty"
     );
 
-  if (!timeline) {
-    return;
-  }
 
   if (
-    !Array.isArray(events) ||
+    !timeline
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    -----------------------------------------------------
+    TIMELINE ONLY
+    -----------------------------------------------------
+  */
+
+  const panel =
+    timeline.closest(
+      ".player-id-timeline-panel"
+    );
+
+
+  const scroll =
+    timeline.closest(
+      ".player-id-timeline-scroll"
+    );
+
+
+  /*
+    Small, compact layout.
+    Enough room for 3 lines of information,
+    without the huge empty area from before.
+  */
+
+  if (
+    panel
+  ) {
+
+    panel.style.setProperty(
+      "height",
+      "158px",
+      "important"
+    );
+
+
+    panel.style.setProperty(
+      "min-height",
+      "158px",
+      "important"
+    );
+
+
+    panel.style.setProperty(
+      "max-height",
+      "158px",
+      "important"
+    );
+
+
+    panel.style.setProperty(
+      "overflow",
+      "visible",
+      "important"
+    );
+
+  }
+
+
+  if (
+    scroll
+  ) {
+
+    scroll.style.setProperty(
+      "height",
+      "130px",
+      "important"
+    );
+
+
+    scroll.style.setProperty(
+      "max-height",
+      "130px",
+      "important"
+    );
+
+
+    scroll.style.setProperty(
+      "overflow-x",
+      "auto",
+      "important"
+    );
+
+
+    scroll.style.setProperty(
+      "overflow-y",
+      "hidden",
+      "important"
+    );
+
+  }
+
+
+  timeline.style.setProperty(
+    "height",
+    "120px",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "min-height",
+    "120px",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "width",
+    "max-content",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "min-width",
+    "100%",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "display",
+    "flex",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "align-items",
+    "flex-start",
+    "important"
+  );
+
+
+  timeline.style.setProperty(
+    "gap",
+    "6px",
+    "important"
+  );
+
+
+  if (
+    !Array.isArray(
+      events
+    ) ||
     events.length ===
       0
   ) {
+
     timeline.innerHTML =
       "";
 
-    if (empty) {
+
+    if (
+      empty
+    ) {
+
       empty.hidden =
         false;
+
     }
 
+
     return;
+
   }
 
-  if (empty) {
+
+  if (
+    empty
+  ) {
+
     empty.hidden =
       true;
+
   }
 
+
   timeline.innerHTML =
-    events.map(event => {
-      let icon =
-        "fa-clock-rotate-left";
+    events.map(
+      event => {
 
-      if (
-        event.type ===
-        "leave"
-      ) {
-        icon =
-          "fa-right-from-bracket";
-      } else if (
-        event.type ===
-          "join" ||
-        event.type ===
+        let icon =
+          "fa-clock-rotate-left";
+
+
+        if (
+          event.type ===
+          "join"
+        ) {
+
+          icon =
+            "fa-right-to-bracket";
+
+        } else if (
+          event.type ===
+          "leave"
+        ) {
+
+          icon =
+            "fa-right-from-bracket";
+
+        } else if (
+          event.type ===
           "rejoin"
-      ) {
-        icon =
-          "fa-right-to-bracket";
-      } else if (
-        event.type ===
-        "season-start"
-      ) {
-        icon =
-          "fa-flag";
-      } else if (
-        event.type ===
-        "season-finish"
-      ) {
-        icon =
-          "fa-trophy";
-      }
+        ) {
 
-      return `
-        <article
-          class="player-id-timeline-item"
-          role="listitem"
-          data-event-type="${escapeHtml(
-            event.type
-          )}"
-        >
-          <span
-            class="player-id-timeline-item__icon"
-          >
-            <i
-              class="fa-solid ${icon}"
-              aria-hidden="true"
-            ></i>
-          </span>
+          icon =
+            "fa-right-to-bracket";
 
-          <div
-            class="player-id-timeline-item__content"
-          >
-            <time>
-              ${escapeHtml(
-                formatDate(
-                  event.date
-                )
-              )}
-            </time>
+        } else if (
+          event.type ===
+          "season-start"
+        ) {
 
-            <strong>
-              ${escapeHtml(
-                event.title
-              )}
-            </strong>
+          icon =
+            "fa-flag";
 
-            ${
-              event.description
-                ? `
-                  <p
-                    title="${escapeHtml(
-                      event.description
-                    )}"
+        } else if (
+          event.type ===
+          "season-finish"
+        ) {
+
+          icon =
+            "fa-trophy";
+
+        }
+
+
+        const lines =
+          Array.isArray(
+            event.lines
+          )
+            ? event.lines
+            : [];
+
+
+        const details =
+          lines
+            .map(
+              line =>
+                `
+                  <span
+                    class="player-id-timeline-item__line"
                   >
                     ${escapeHtml(
-                      event.description
+                      line
                     )}
-                  </p>
+                  </span>
                 `
-                : ""
+            )
+            .join("");
+
+
+        const article =
+          `
+            <article
+              class="player-id-timeline-item"
+              role="listitem"
+              data-event-type="${escapeHtml(
+                event.type
+              )}"
+            >
+
+              <span
+                class="player-id-timeline-item__icon"
+              >
+                <i
+                  class="fa-solid ${icon}"
+                  aria-hidden="true"
+                ></i>
+              </span>
+
+
+              <div
+                class="player-id-timeline-item__content"
+              >
+
+                <time>
+                  ${escapeHtml(
+                    formatDate(
+                      event.date
+                    )
+                  )}
+                </time>
+
+
+                <strong>
+                  ${escapeHtml(
+                    event.title
+                  )}
+                </strong>
+
+
+                ${
+                  details
+                    ? `
+                      <div
+                        class="player-id-timeline-item__details"
+                      >
+                        ${details}
+                      </div>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </article>
+          `;
+
+
+        return article;
+
+      }
+    ).join("");
+
+
+  /*
+    Apply compact dimensions after rendering.
+    This is intentionally limited to Timeline cards.
+  */
+
+  timeline
+    .querySelectorAll(
+      ".player-id-timeline-item"
+    )
+    .forEach(
+      item => {
+
+        item.style.setProperty(
+          "flex",
+          "0 0 175px",
+          "important"
+        );
+
+
+        item.style.setProperty(
+          "width",
+          "175px",
+          "important"
+        );
+
+
+        item.style.setProperty(
+          "min-width",
+          "175px",
+          "important"
+        );
+
+
+       item.style.setProperty(
+          "height",
+          "116px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "min-height",
+          "116px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "max-height",
+          "116px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "padding",
+          "6px 8px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "margin-top",
+          "6px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "margin-bottom",
+          "6px",
+          "important"
+        );
+
+        item.style.setProperty(
+          "box-sizing",
+          "border-box",
+          "important"
+        );
+
+       item.style.setProperty(
+          "overflow",
+          "visible",
+          "important"
+        );
+
+
+        const date =
+          item.querySelector(
+            "time"
+          );
+
+
+        if (
+          date
+        ) {
+
+          date.style.setProperty(
+            "font-size",
+            "8px",
+            "important"
+          );
+
+
+          date.style.setProperty(
+            "line-height",
+            "1.1",
+            "important"
+          );
+
+
+          if (
+            item.dataset.eventType ===
+            "leave"
+          ) {
+
+            date.style.setProperty(
+              "color",
+              "#ff3147",
+              "important"
+            );
+
+
+            date.style.setProperty(
+              "font-weight",
+              "800",
+              "important"
+            );
+
+          }
+
+        }
+
+
+        const title =
+          item.querySelector(
+            "strong"
+          );
+
+
+        if (
+          title
+        ) {
+
+          title.style.setProperty(
+            "font-size",
+            "9px",
+            "important"
+          );
+
+
+          title.style.setProperty(
+            "line-height",
+            "1.1",
+            "important"
+          );
+
+        }
+
+        const content =
+          item.querySelector(
+            ".player-id-timeline-item__content"
+          );
+
+        if (
+          content
+        ) {
+          content.style.setProperty(
+            "display",
+            "grid",
+            "important"
+          );
+
+          content.style.setProperty(
+            "grid-template-rows",
+            "12px 14px 36px",
+            "important"
+          );
+
+          content.style.setProperty(
+            "height",
+            "62px",
+            "important"
+          );
+
+          content.style.setProperty(
+            "overflow",
+            "visible",
+            "important"
+          );
+
+          content.style.setProperty(
+            "align-content",
+            "start",
+            "important"
+          );
+
+          content.style.setProperty(
+            "gap",
+            "2px",
+            "important"
+          );
+
+          content.style.setProperty(
+            "min-width",
+            "0",
+            "important"
+          );
+        }
+
+        item
+  .querySelectorAll(
+    ".player-id-timeline-item__details"
+  )
+  .forEach(
+    details => {
+      details.style.setProperty(
+        "display",
+        "grid",
+        "important"
+      );
+
+      details.style.setProperty(
+        "gap",
+        "2px",
+        "important"
+      );
+
+      details.style.setProperty(
+        "overflow",
+        "visible",
+        "important"
+      );
+
+      details
+        .querySelectorAll(
+          ".player-id-timeline-item__line"
+        )
+        .forEach(
+          line => {
+            line.style.setProperty(
+              "display",
+              "block",
+              "important"
+            );
+
+            line.style.setProperty(
+              "height",
+              "10px",
+              "important"
+            );
+
+            line.style.setProperty(
+              "line-height",
+              "10px",
+              "important"
+            );
+
+            line.style.setProperty(
+              "white-space",
+              "nowrap",
+              "important"
+            );
+          }
+        );
+    }
+  );
+
+
+        item
+          .querySelectorAll(
+            ".player-id-timeline-item__line"
+          )
+          .forEach(
+            line => {
+
+              line.style.setProperty(
+                "font-size",
+                "8px",
+                "important"
+              );
+
+
+              line.style.setProperty(
+                "line-height",
+                "1.1",
+                "important"
+              );
+
+
+              line.style.setProperty(
+                "white-space",
+                "nowrap",
+                "important"
+              );
+
             }
-          </div>
-        </article>
-      `;
-    }).join("");
+          );
+
+      }
+    );
+
 }
 
   /* =====================================================
@@ -3293,88 +5739,157 @@
   ===================================================== */
 
   function bindEvents() {
-    const form =
-      getElement(
-        "playerIdSearchForm"
-      );
+  const form =
+    getElement(
+      "playerIdSearchForm"
+    );
 
-    const input =
-      getElement(
-        "playerIdSearchInput"
-      );
+  const input =
+    getElement(
+      "playerIdSearchInput"
+    );
 
-    const clearButton =
-      getElement(
-        "playerIdSearchClearButton"
-      );
+  const searchButton =
+    getElement(
+      "playerIdSearchButton"
+    );
 
-    if (form) {
-      form.onsubmit =
-        event => {
+  const clearButton =
+    getElement(
+      "playerIdSearchClearButton"
+    );
+
+  /*
+    SEARCH FORM
+  */
+  if (form) {
+    form.onsubmit =
+      event => {
+        event.preventDefault();
+
+        submitSearch();
+      };
+  }
+
+  /*
+    SEARCH BUTTON
+    Expliciet koppelen zodat zoeken niet afhankelijk is
+    van alleen de submit-functionaliteit van het formulier.
+  */
+  if (searchButton) {
+    searchButton.onclick =
+      event => {
+        event.preventDefault();
+
+        submitSearch();
+      };
+  }
+
+  /*
+    SEARCH INPUT
+  */
+  if (input) {
+    input.oninput =
+      () => {
+        updateClearButton();
+        clearSearchMessage();
+
+        global.clearTimeout(
+          searchTimer
+        );
+
+        const query =
+          input.value;
+
+        searchTimer =
+          global.setTimeout(
+            () => {
+              renderSuggestions(
+                query
+              );
+            },
+            80
+          );
+      };
+
+    input.onkeydown =
+      event => {
+        /*
+          ENTER = SEARCH
+        */
+        if (
+          event.key ===
+          "Enter"
+        ) {
           event.preventDefault();
 
+          closeSuggestions();
+
           submitSearch();
-        };
-    }
 
-    if (input) {
-      input.oninput =
-        () => {
-          updateClearButton();
-          clearSearchMessage();
+          return;
+        }
 
-          global.clearTimeout(
-            searchTimer
-          );
+        /*
+          ESCAPE = CLOSE SUGGESTIONS
+        */
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          event.preventDefault();
 
-          const query =
-            input.value;
+          closeSuggestions();
 
-          searchTimer =
-            global.setTimeout(
-              () => {
-                renderSuggestions(
-                  query
-                );
-              },
-              80
+          return;
+        }
+
+        /*
+          ARROWDOWN = FIRST SUGGESTION
+        */
+        if (
+          event.key ===
+          "ArrowDown"
+        ) {
+          const first =
+            getElement(
+              "playerIdSearchSuggestions"
+            )?.querySelector(
+              "[data-player-id]"
             );
-        };
 
-      input.onkeydown =
-        event => {
-          if (
-            event.key ===
-            "Escape"
-          ) {
-            closeSuggestions();
+          if (first) {
+            event.preventDefault();
 
-            return;
+            first.focus();
           }
+        }
+      };
+  }
 
-          if (
-            event.key ===
-            "ArrowDown"
-          ) {
-            const first =
-              getElement(
-                "playerIdSearchSuggestions"
-              )?.querySelector(
-                "[data-player-id]"
-              );
+  /*
+    CLEAR BUTTON
+  */
+  if (clearButton) {
+    clearButton.onclick =
+      event => {
+        event.preventDefault();
 
-            if (first) {
-              event.preventDefault();
-              first.focus();
-            }
-          }
-        };
-    }
+        clearSearch();
+      };
+  }
 
-    if (clearButton) {
-      clearButton.onclick =
-        clearSearch;
-    }
+  /*
+    CLOSE SUGGESTIONS WHEN CLICKING OUTSIDE
+  */
+  if (
+    document.body &&
+    !document.body.dataset
+      .k630PlayerIdOutsideClickBound
+  ) {
+    document.body.dataset
+      .k630PlayerIdOutsideClickBound =
+      "true";
 
     document.addEventListener(
       "click",
@@ -3390,6 +5905,7 @@
       }
     );
   }
+}
 
   /* =====================================================
      STYLES
@@ -3873,17 +6389,19 @@ function injectPlayerIdLayoutFixes() {
 
     #playerIdInfoPage .player-id-timeline-panel {
       flex: 1 1 auto;
-      min-height: 108px;
+      min-height: 18px;
       max-height: 132px;
       margin: 0;
       padding: 5px 8px;
       overflow: hidden;
     }
 
-    #playerIdInfoPage .player-id-timeline-panel__header {
-      min-height: 25px;
-      margin-bottom: 2px;
-    }
+    #playerIdInfoPage .player-id-timeline-panel .player-id-wide-panel-header {
+  position: relative !important;
+  min-height: 10px !important;
+  margin-bottom: 4px !important;
+  border-bottom: 0 !important;
+}
 
     #playerIdInfoPage .player-id-timeline-scroll {
       width: 100%;
@@ -3923,18 +6441,17 @@ function injectPlayerIdLayoutFixes() {
     }
 
     #playerIdInfoPage .player-id-timeline-item {
-      flex: 0 0 205px;
-      width: 205px;
-      min-width: 205px;
-      min-height: 60px;
-      max-height: 60px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-      padding: 6px 8px;
-      overflow: hidden;
-    }
+  flex: 0 0 205px !important;
+  width: 205px !important;
+  min-width: 205px !important;
+  height: 100px !important;
+  min-height: 100px !important;
+  max-height: 100px !important;
+  padding: 5px 7px !important;
+  border: 1px solid rgba(181, 92, 255, 0.35) !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+}
 
     #playerIdInfoPage .player-id-timeline-item__icon {
       flex: 0 0 27px;
@@ -4008,21 +6525,23 @@ function injectPlayerIdLayoutFixes() {
       }
 
       #playerIdInfoPage .player-id-timeline-panel {
-        min-height: 96px;
-        max-height: 110px;
+        min-height: 120px;
+        max-height: 120px;
       }
 
       #playerIdInfoPage .player-id-timeline-scroll {
-        height: 70px;
+        height: 96px;
+        max-height: 96px;
       }
 
       #playerIdInfoPage .player-id-timeline {
-        height: 61px;
+        height: 82px;
+        min-height: 82px;
       }
 
       #playerIdInfoPage .player-id-timeline-item {
-        min-height: 52px;
-        max-height: 52px;
+        min-height: 84px;
+        max-height: 84px;
       }
     }
 
@@ -4049,22 +6568,29 @@ function injectPlayerIdLayoutFixes() {
   ===================================================== */
 
 function injectPlayerIdFinalFixes() {
+
   const existingStyle =
     getElement(
       "k630PlayerIdFinalFixes"
     );
 
-  if (existingStyle) {
+
+  if (
+    existingStyle
+  ) {
     existingStyle.remove();
   }
+
 
   const style =
     document.createElement(
       "style"
     );
 
+
   style.id =
     "k630PlayerIdFinalFixes";
+
 
   style.textContent = `
     /* ===================================================
@@ -4091,6 +6617,7 @@ function injectPlayerIdFinalFixes() {
       overflow: visible !important;
     }
 
+
     #playerIdInfoBannerImage {
       display: block !important;
 
@@ -4108,18 +6635,12 @@ function injectPlayerIdFinalFixes() {
       object-position: center !important;
 
       border-radius: 16px;
+
       box-shadow:
         0 0 18px
         rgba(170, 70, 255, 0.45);
     }
 
-    /* Oude bannercontainers uitschakelen */
-
-    #playerIdInfoPage .player-id-hero,
-    #playerIdInfoPage .player-id-banner,
-    #playerIdInfoPage .player-id-hero-banner {
-      display: none !important;
-    }
 
     /* ===================================================
        SEARCH
@@ -4143,11 +6664,13 @@ function injectPlayerIdFinalFixes() {
       overflow: visible !important;
     }
 
+
     #playerIdInfoPage .player-id-search-form {
       height: auto !important;
       min-height: 34px !important;
       max-height: none !important;
     }
+
 
     #playerIdInfoPage .player-id-search-field {
       position: relative !important;
@@ -4158,12 +6681,14 @@ function injectPlayerIdFinalFixes() {
       overflow: visible !important;
     }
 
+
     #playerIdInfoPage #playerIdSearchInput,
     #playerIdInfoPage #playerIdSearchButton,
     #playerIdInfoPage .player-id-search-button {
       height: 30px !important;
       min-height: 30px !important;
     }
+
 
     #playerIdInfoPage .player-id-search-suggestions {
       z-index: 500 !important;
@@ -4173,6 +6698,7 @@ function injectPlayerIdFinalFixes() {
       overflow-x: hidden !important;
       overflow-y: auto !important;
     }
+
 
     /* ===================================================
        PLAYER IDENTITY / STATUS
@@ -4192,16 +6718,19 @@ function injectPlayerIdFinalFixes() {
       overflow: visible !important;
     }
 
+
     #playerIdInfoPage .player-id-summary__identity,
     #playerIdInfoPage .player-id-summary__statuses {
       min-height: 34px !important;
     }
+
 
     #playerIdInfoPage .player-id-summary__status,
     #playerIdInfoPage .player-id-summary-card {
       min-height: 34px !important;
       padding: 5px 9px !important;
     }
+
 
     /* ===================================================
        PLAYER INFORMATION PANELS
@@ -4212,10 +6741,12 @@ function injectPlayerIdFinalFixes() {
       padding: 5px 8px !important;
     }
 
+
     #playerIdInfoPage .player-id-data-row {
       min-height: 20px !important;
       padding: 2px 0 !important;
     }
+
 
     /* ===================================================
        SEASON INFO
@@ -4235,10 +6766,12 @@ function injectPlayerIdFinalFixes() {
       overflow: hidden !important;
     }
 
+
     #playerIdInfoPage .player-id-season-panel__header {
       min-height: 26px !important;
       margin-bottom: 3px !important;
     }
+
 
     #playerIdInfoPage .player-id-season-scroll {
       width: 100% !important;
@@ -4252,6 +6785,7 @@ function injectPlayerIdFinalFixes() {
       overflow-y: hidden !important;
     }
 
+
     #playerIdInfoPage .player-id-season-table th,
     #playerIdInfoPage .player-id-season-table td {
       height: 20px !important;
@@ -4260,16 +6794,17 @@ function injectPlayerIdFinalFixes() {
       padding-bottom: 2px !important;
     }
 
+
     /* ===================================================
        TIMELINE
     =================================================== */
-
+  
     #playerIdInfoPage .player-id-timeline-panel {
       flex: 1 1 auto !important;
 
-      height: auto !important;
-      min-height: 104px !important;
-      max-height: 118px !important;
+     height: 166px !important;
+      min-height: 166px !important;
+      max-height: 166px !important;
 
       margin: 0 !important;
       padding: 5px 8px !important;
@@ -4277,62 +6812,212 @@ function injectPlayerIdFinalFixes() {
       overflow: hidden !important;
     }
 
-    #playerIdInfoPage .player-id-timeline-panel__header {
-      min-height: 25px !important;
-      margin-bottom: 2px !important;
-    }
 
-    #playerIdInfoPage .player-id-timeline-scroll {
-      width: 100% !important;
-      height: 72px !important;
+#playerIdInfoPage .player-id-timeline-panel__header {
+  min-height: 25px !important;
+  margin-bottom: 2px !important;
+}
 
-      padding: 2px 0 4px !important;
 
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-    }
+#playerIdInfoPage .player-id-timeline-scroll {
+  width: 100% !important;
+  height: 122px !important;
+  max-height: 122px !important;
 
-    #playerIdInfoPage .player-id-timeline {
-      width: max-content !important;
-      min-width: 100% !important;
-      height: 64px !important;
+  padding: 3px 0 5px !important;
 
-      display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+
+#playerIdInfoPage .player-id-timeline {
+  width: max-content !important;
+  min-width: 100% !important;
+
+  height: 128px !important;
+  min-height: 128px !important;
+
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+
+  margin: 0 !important;
+  padding: 3px !important;
+
+  border: 0 !important;
+  background: transparent !important;
+}
+
+
+#playerIdInfoPage .player-id-timeline-item {
+  flex: 0 0 205px !important;
+
+  width: 205px !important;
+  min-width: 205px !important;
+
+  height: 116px !important;
+  min-height: 116px !important;
+  max-height: 116px !important;
+
+  padding: 5px 7px !important;
+  border: 1px solid rgba(181, 92, 255, 0.35) !important;
+  border-radius: 8px !important;
+}
+
+#playerIdInfoPage .player-id-timeline {
+  position: relative !important;
+}
+
+#playerIdInfoPage .player-id-timeline::before {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: static !important;
+}
+
+#playerIdInfoPage .player-id-timeline::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+    /* ===================================================
+       NOTE WARNING SYMBOL
+       
+       Red triangle.
+       Browser tooltip appears on mouse hover because
+       the element receives the explanatory title.
+    =================================================== */
+
+    #playerIdInfoPage
+    .player-id-note-warning {
+      display: inline-flex !important;
+
       align-items: center !important;
-      gap: 8px !important;
+      justify-content: center !important;
 
-      margin: 0 !important;
-      padding: 2px !important;
+      width: 18px !important;
+      height: 18px !important;
 
-      border: 0 !important;
-      background: transparent !important;
+      color: #ff3147 !important;
+
+      cursor: help !important;
+
+      font-size: 14px !important;
+
+      vertical-align: middle !important;
     }
 
-    #playerIdInfoPage .player-id-timeline-item {
-      flex: 0 0 205px !important;
 
-      width: 205px !important;
-      min-width: 205px !important;
+    /* ===================================================
+       LEAVE DATE
+       
+       Departure date is red and receives a tooltip
+       explaining why this date was determined.
+    =================================================== */
 
-      height: 56px !important;
-      min-height: 56px !important;
-      max-height: 56px !important;
+    #playerIdInfoPage
+    .player-id-leave-date {
+      color: #ff3147 !important;
 
-      padding: 5px 7px !important;
+      font-weight: 700 !important;
+
+      cursor: help !important;
     }
 
-    #playerIdInfoPage .player-id-timeline::before,
-    #playerIdInfoPage .player-id-timeline::after,
-    #playerIdInfoPage .player-id-timeline-item::before,
-    #playerIdInfoPage .player-id-timeline-item::after {
-      display: none !important;
-      content: none !important;
+
+    /* ===================================================
+       RED TIMELINE DEPARTURE DATE
+    =================================================== */
+
+    #playerIdInfoPage
+    .player-id-timeline-item__date--danger {
+      color: #ff3147 !important;
     }
   `;
+
 
   document.head.appendChild(
     style
   );
+
+}
+
+function injectPlayerIdStatusFixes() {
+
+  if (
+    document.getElementById(
+      "playerIdStatusFixes"
+    )
+  ) {
+    return;
+  }
+
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    "playerIdStatusFixes";
+
+
+  style.textContent = `
+    #playerIdInfoPage
+    .player-id-note-warning {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      color: #ff3147;
+      cursor: help;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    #playerIdInfoPage
+    .player-id-note-warning:hover {
+      color: #ff5b6d;
+    }
+
+    #playerIdInfoPage
+    .player-id-leave-date {
+      color: #ff3147;
+      font-weight: 700;
+      cursor: help;
+    }
+
+    #playerIdInfoPage
+    .player-id-leave-date:hover {
+      color: #ff5b6d;
+    }
+
+    #playerIdInfoPage
+    .player-id-timeline-item
+    [data-event-type="leave"]
+    time {
+      color: #ff3147;
+    }
+
+    #playerIdInfoPage
+    .player-id-timeline-item
+    [data-event-type="season-leave"]
+    time {
+      color: #ff3147;
+    }
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
 }
 
 function initializePlayerIdBanner() {
@@ -4345,122 +7030,313 @@ function initializePlayerIdBanner() {
     return;
   }
 
-  const oldShell =
-    getElement(
-      "playerIdInfoBannerShell"
+  /*
+    Zoek ALLE mogelijke banner-elementen.
+
+    Er mag uiteindelijk maar één banner
+    op de Player ID Info pagina staan.
+  */
+  const bannerCandidates =
+    Array.from(
+      page.querySelectorAll(
+        [
+          ".player-id-banner",
+          ".player-id-hero",
+          ".player-id-hero-banner",
+          "#playerIdInfoBannerShell"
+        ].join(",")
+      )
     );
 
-  if (oldShell) {
-    oldShell.remove();
+  let banner =
+    bannerCandidates[0] ||
+    null;
+
+  /*
+    Wanneer er meerdere banners aanwezig zijn,
+    verwijderen we alle duplicaten.
+  */
+  if (
+    bannerCandidates.length >
+    1
+  ) {
+    bannerCandidates
+      .slice(1)
+      .forEach(
+        duplicate => {
+          duplicate.remove();
+        }
+      );
   }
 
-  const bannerShell =
-    document.createElement(
-      "div"
+  /*
+    Als er helemaal geen banner bestaat,
+    maken we er één aan.
+  */
+  if (!banner) {
+    const searchPanel =
+      page.querySelector(
+        ".player-id-search-panel"
+      );
+
+    if (!searchPanel) {
+      return;
+    }
+
+    banner =
+      document.createElement(
+        "section"
+      );
+
+    banner.className =
+      "player-id-hero";
+
+    banner.setAttribute(
+      "aria-label",
+      "Rebels of Fury Kingdom 630 banner"
     );
 
-  bannerShell.id =
-    "playerIdInfoBannerShell";
+    searchPanel.before(
+      banner
+    );
+  }
 
-  bannerShell.className =
-    "player-id-info-banner-shell";
+  /*
+    Zorg dat de banner de juiste class heeft.
+  */
+  banner.classList.add(
+    "player-id-hero"
+  );
 
-  const bannerImage =
-    document.createElement(
+  /*
+    Zoek bestaande image.
+  */
+  let image =
+    banner.querySelector(
       "img"
     );
 
-  bannerImage.id =
-    "playerIdInfoBannerImage";
+  /*
+    Als er nog geen image bestaat,
+    maken we deze aan.
+  */
+  if (!image) {
+    const imageWrap =
+      document.createElement(
+        "div"
+      );
 
-  bannerImage.className =
-    "player-id-info-banner-image";
+    imageWrap.className =
+      "player-id-hero__image-wrap";
 
-  bannerImage.src =
+    image =
+      document.createElement(
+        "img"
+      );
+
+    image.className =
+      "player-id-hero__image";
+
+    imageWrap.appendChild(
+      image
+    );
+
+    banner.appendChild(
+      imageWrap
+    );
+  }
+
+  /*
+    Juiste banner-afbeelding.
+  */
+  image.src =
     "assets/images/player-id-banner.png";
 
-  bannerImage.alt =
+  image.alt =
     "Rebels of Fury - Kingdom 630";
 
-  bannerImage.draggable =
+  image.draggable =
     false;
 
-  bannerShell.appendChild(
-    bannerImage
-  );
-
-  const searchPanel =
-    page.querySelector(
-      ".player-id-search-panel, .player-id-search"
+  /*
+    Zorg dat de image-wrap bestaat.
+  */
+  let imageWrap =
+    banner.querySelector(
+      ".player-id-hero__image-wrap"
     );
 
-  if (searchPanel) {
-    searchPanel.before(
-      bannerShell
+  if (!imageWrap) {
+    imageWrap =
+      document.createElement(
+        "div"
+      );
+
+    imageWrap.className =
+      "player-id-hero__image-wrap";
+
+    image.before(
+      imageWrap
     );
-  } else {
-    page.prepend(
-      bannerShell
+
+    imageWrap.appendChild(
+      image
     );
   }
+
+  /*
+    Zorg dat de glow bestaat.
+  */
+  let glow =
+    banner.querySelector(
+      ".player-id-hero__glow"
+    );
+
+  if (!glow) {
+    glow =
+      document.createElement(
+        "span"
+      );
+
+    glow.className =
+      "player-id-hero__glow";
+
+    glow.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    imageWrap.appendChild(
+      glow
+    );
+  }
+
+  /*
+    Forceer zichtbaarheid.
+  */
+  banner.style.display =
+    "flex";
+
+  banner.style.visibility =
+    "visible";
+
+  banner.style.opacity =
+    "1";
+
+  image.style.display =
+    "block";
+
+  image.style.visibility =
+    "visible";
+
+  image.style.opacity =
+    "1";
 }
 
-  async function init() {
-  if (!isPagePresent()) {
+
+
+async function init() {
+
+  if (
+    !isPagePresent()
+  ) {
+
     return;
+
   }
 
+
+  /* =====================================================
+     INITIAL UI
+  ===================================================== */
+
   injectStyles();
+
   injectPlayerIdLayoutFixes();
+
   injectPlayerIdFinalFixes();
+
   initializePlayerIdBanner();
 
+
   bindEvents();
+
   showInitialState();
+
   updateClearButton();
+
 
   initialized =
     true;
 
+
+  /* =====================================================
+     LOAD DATA
+  ===================================================== */
+
   try {
+
     await loadBaseData();
 
+
     initializePlayerIdBanner();
+
 
     const urlSearch =
       getUrlPlayerSearch();
 
-    if (urlSearch) {
+
+    if (
+      urlSearch
+    ) {
+
       const input =
         getElement(
           "playerIdSearchInput"
         );
 
-      if (input) {
+
+      if (
+        input
+      ) {
+
         input.value =
           urlSearch;
+
       }
 
+
       updateClearButton();
+
       submitSearch();
+
     }
-  } catch (error) {
+
+
+  } catch (
+    error
+  ) {
+
     console.error(
       `[${MODULE_NAME}]`,
       error
     );
+
 
     setEngineStatus(
       "error",
       "Data unavailable"
     );
 
+
     showSearchMessage(
       error?.message ||
       "Player data could not be loaded.",
       "error"
     );
+
   }
+
 }
 
   function destroy() {
@@ -4511,9 +7387,9 @@ function initializePlayerIdBanner() {
     publicApi;
 
   global.initializeK630PlayerIdInfoPage =
-    init;
+  init;
 
-  console.info(
-    `[${MODULE_NAME}] Version ${MODULE_VERSION} ready.`
-  );
+console.info(
+  `[${MODULE_NAME}] Version ${MODULE_VERSION} ready.`
+);
 })(window);

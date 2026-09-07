@@ -286,8 +286,8 @@ function validateEmail(
     );
 
   const valid =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      .test(email);
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    .test(email);
 
   if (!valid) {
     throw createHttpError(

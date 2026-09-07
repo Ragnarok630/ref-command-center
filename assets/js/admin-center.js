@@ -518,29 +518,51 @@ function createDefaultAdminConfig() {
   });
 }
 
+/* =====================================================
+   LOAD ADMIN CONFIGURATION
+========================================================= */
+
 async function loadAdminConfig() {
+
   const engine =
     getAdminConfigEngine();
 
+
   const writer =
     getWriter();
+
 
   if (
     !engine ||
     typeof engine.normalize !==
       "function"
   ) {
+
     throw new Error(
       "K630AdminConfigEngine is not loaded."
     );
+
   }
 
-  try {
-    if (
-      writer &&
-      typeof writer.readJson ===
-        "function"
-    ) {
+
+  /* =================================================
+     FIRST ATTEMPT
+     
+     Try the secure writer read first.
+     
+     IMPORTANT:
+     If that read fails, do NOT abort.
+     Fall back to the public GitHub file.
+  ================================================= */
+
+  if (
+    writer &&
+    typeof writer.readJson ===
+      "function"
+  ) {
+
+    try {
+
       const result =
         await writer.readJson(
           ADMIN_CONFIG_WRITE_PATH,
@@ -550,76 +572,134 @@ async function loadAdminConfig() {
           }
         );
 
+
       if (
         result?.data &&
         typeof result.data ===
           "object"
       ) {
+
         adminConfig =
           engine.normalize(
             result.data
           );
 
+
+        console.info(
+          `[${MODULE_NAME}] admin-config.json loaded through GitHub writer.`
+        );
+
+
         return true;
+
       }
-    }
 
-    const response =
-      await fetch(
-        (
-          `${DATA_ROOT}/${ADMIN_CONFIG_RELATIVE_PATH}` +
-          `?cacheBust=${Date.now()}`
-        ),
-        {
-          method:
-            "GET",
+    } catch (
+      writerReadError
+    ) {
 
-          cache:
-            "no-store",
-
-          headers: {
-            Accept:
-              "application/json",
-
-            "Cache-Control":
-              "no-cache"
-          }
-        }
+      console.warn(
+        `[${MODULE_NAME}] Writer read of admin-config.json failed. ` +
+        `Falling back to public GitHub read.`,
+        writerReadError
       );
 
-    if (response.status === 404) {
+    }
+
+  }
+
+
+  /* =================================================
+     SECOND ATTEMPT
+     
+     Public GitHub / raw.githubusercontent.com
+  ================================================= */
+
+  try {
+
+    const response =
+  await fetch(
+    (
+      `${DATA_ROOT}/${ADMIN_CONFIG_RELATIVE_PATH}` +
+      `?cacheBust=${Date.now()}`
+    ),
+    {
+      method:
+        "GET",
+
+      cache:
+        "no-store"
+    }
+  );
+
+
+    if (
+      response.status ===
+      404
+    ) {
+
+      console.warn(
+        `[${MODULE_NAME}] admin-config.json does not exist yet. ` +
+        `Creating default configuration.`
+      );
+
+
       adminConfig =
         createDefaultAdminConfig();
 
+
       return false;
+
     }
 
-    if (!response.ok) {
+
+    if (
+      !response.ok
+    ) {
+
       throw new Error(
         `admin-config.json returned HTTP ${response.status}.`
       );
+
     }
+
 
     const data =
       await response.json();
+
 
     adminConfig =
       engine.normalize(
         data
       );
 
+
+    console.info(
+      `[${MODULE_NAME}] admin-config.json loaded from public GitHub.`
+    );
+
+
     return true;
-  } catch (error) {
+
+
+  } catch (
+    error
+  ) {
+
     console.error(
-      `[${MODULE_NAME}] Failed to load admin-config.json.`,
+      `[${MODULE_NAME}] Failed to load admin-config.json from public GitHub.`,
       error
     );
+
 
     adminConfig =
       createDefaultAdminConfig();
 
+
     return false;
+
   }
+
 }
 
 /* =====================================================
@@ -4694,6 +4774,28 @@ async function runSaveSeasonStep7E() {
   }
 
 
+  /* =================================================
+     ASK USER WHETHER SERVER STATUS SHOULD BE UPDATED
+     
+     YES  = calculate and update Server Status
+     NO   = keep all existing Server Status levels
+     
+     IMPORTANT:
+     Both choices must complete STEP 7E.
+  ================================================= */
+
+  const updateServerStatus =
+    window.confirm(
+      "Do you want to update the Server Status levels for this season based on the achieved merits?\n\n" +
+      "OK = YES, update Server Status\n" +
+      "Cancel = NO, keep the existing Server Status levels"
+    );
+
+
+  /* =================================================
+     START STEP 7E
+  ================================================= */
+
   setButtonEnabled(
     "step7EBtn",
     false
@@ -4703,7 +4805,9 @@ async function runSaveSeasonStep7E() {
   setValidation(
     "saveArchiveValidationBox",
     "warning",
-    "STEP 7E is updating Server Status levels...",
+    updateServerStatus
+      ? "STEP 7E is updating Server Status levels..."
+      : "STEP 7E is keeping the existing Server Status levels...",
     "fa-spinner"
   );
 
@@ -4745,12 +4849,19 @@ async function runSaveSeasonStep7E() {
 
   try {
 
+    /* =================================================
+       RUN STEP 7E
+    ================================================= */
+
     const result =
       await engine.step7EServerStatus({
 
         updatedBy:
           getSession()?.email ||
-          getRole()
+          getRole(),
+
+        updateServerStatus:
+          updateServerStatus
 
       });
 
@@ -4779,46 +4890,112 @@ async function runSaveSeasonStep7E() {
     updateWorkflow();
 
 
+    /* =================================================
+       RESULT SUMMARY
+    ================================================= */
+
     const lv0Count =
       result.summary
         ?.lv0Players ||
       0;
 
 
-    setValidation(
-      "saveArchiveValidationBox",
-      lv0Count > 0
-        ? "warning"
-        : "success",
-      lv0Count > 0
-        ? (
-            `STEP 7E completed. ` +
-            `${lv0Count} player(s) reached LV0 and must be removed in-game.`
-          )
-        : (
-            "STEP 7E completed. Server Status levels were updated successfully."
-          ),
-      lv0Count > 0
-        ? "fa-triangle-exclamation"
-        : "fa-circle-check"
-    );
+    /* =================================================
+       MARK UI AS COMPLETED
+       
+       IMPORTANT:
+       Both YES and NO are successful STEP 7E runs.
+    ================================================= */
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "completed";
+
+    }
 
 
-    appendLog(
-      "Save Season STEP 7E",
-      lv0Count > 0
-        ? "warning"
-        : "success",
-      lv0Count > 0
-        ? (
-            `Server Status updated. ` +
-            `${lv0Count} LV0 player(s) require in-game removal. ` +
-            "STEP 7F is now ready."
-          )
-        : (
-            "Server Status updated successfully. STEP 7F is now ready."
-          )
-    );
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Completed";
+
+      stepStatus.dataset.status =
+        "completed";
+
+    }
+
+
+    /* =================================================
+       SUCCESS MESSAGE
+    ================================================= */
+
+    if (
+      result.skipped ===
+      true
+    ) {
+
+      setValidation(
+        "saveArchiveValidationBox",
+        "success",
+        "STEP 7E completed. Server Status levels were not changed. Existing levels were kept.",
+        "fa-circle-check"
+      );
+
+
+      appendLog(
+        "Save Season STEP 7E",
+        "success",
+        "STEP 7E completed. Server Status update was skipped by user. Existing levels were preserved. STEP 7F is now ready."
+      );
+
+    } else if (
+      lv0Count >
+      0
+    ) {
+
+      setValidation(
+        "saveArchiveValidationBox",
+        "warning",
+        (
+          `STEP 7E completed. ` +
+          `${lv0Count} player(s) reached LV0 and must be removed in-game.`
+        ),
+        "fa-triangle-exclamation"
+      );
+
+
+      appendLog(
+        "Save Season STEP 7E",
+        "warning",
+        (
+          `Server Status updated. ` +
+          `${lv0Count} LV0 player(s) require in-game removal. ` +
+          "STEP 7F is now ready."
+        )
+      );
+
+    } else {
+
+      setValidation(
+        "saveArchiveValidationBox",
+        "success",
+        "STEP 7E completed. Server Status levels were updated successfully.",
+        "fa-circle-check"
+      );
+
+
+      appendLog(
+        "Save Season STEP 7E",
+        "success",
+        "Server Status updated successfully. STEP 7F is now ready."
+      );
+
+    }
 
 
   } catch (
@@ -4883,6 +5060,10 @@ async function runSaveSeasonStep7F() {
     global.K630SaveSeasonEngine;
 
 
+  /* =====================================================
+     PERMISSION CHECK
+  ===================================================== */
+
   if (
     !canWrite()
   ) {
@@ -4898,6 +5079,10 @@ async function runSaveSeasonStep7F() {
 
   }
 
+
+  /* =====================================================
+     ENGINE CHECK
+  ===================================================== */
 
   if (
     !engine ||
@@ -4917,11 +5102,19 @@ async function runSaveSeasonStep7F() {
   }
 
 
+  /* =====================================================
+     DISABLE BUTTON
+  ===================================================== */
+
   setButtonEnabled(
     "step7FBtn",
     false
   );
 
+
+  /* =====================================================
+     SHOW RUNNING
+  ===================================================== */
 
   setValidation(
     "saveArchiveValidationBox",
@@ -4966,6 +5159,10 @@ async function runSaveSeasonStep7F() {
   }
 
 
+  /* =====================================================
+     EXECUTE STEP 7F
+  ===================================================== */
+
   try {
 
     const result =
@@ -4978,8 +5175,14 @@ async function runSaveSeasonStep7F() {
       });
 
 
+    /* ===================================================
+       RESULT VALIDATION
+    =================================================== */
+
     if (
-      !result?.success
+      !result ||
+      result.success !==
+        true
     ) {
 
       throw new Error(
@@ -4989,9 +5192,38 @@ async function runSaveSeasonStep7F() {
     }
 
 
-    /* -------------------------------------------------
+    /* ===================================================
+       IMPORTANT:
+       STEP 7F MUST BE COMPLETED
+       REGARDLESS OF THE UI REFRESH
+    =================================================== */
+
+    if (
+      stepElement
+    ) {
+
+      stepElement.dataset.status =
+        "completed";
+
+    }
+
+
+    if (
+      stepStatus
+    ) {
+
+      stepStatus.textContent =
+        "Completed";
+
+      stepStatus.dataset.status =
+        "completed";
+
+    }
+
+
+    /* ===================================================
        RELOAD SHARED ADMIN CONFIG
-    ------------------------------------------------- */
+    =================================================== */
 
     await loadAdminConfig();
 
@@ -4999,33 +5231,111 @@ async function runSaveSeasonStep7F() {
     applyAdminConfigToState();
 
 
+    /* ===================================================
+       UPDATE WORKFLOW
+    =================================================== */
+
     updateWorkflow();
 
+
+    /* ===================================================
+       DETERMINE NEXT SEASON
+    =================================================== */
+
+    const nextSeason =
+      Number(
+        result.nextSeason
+      );
+
+
+    if (
+      !Number.isFinite(
+        nextSeason
+      ) ||
+      nextSeason <=
+        0
+    ) {
+
+      throw new Error(
+        "STEP 7F completed but returned an invalid next Season number."
+      );
+
+    }
+
+
+    /* ===================================================
+       VERIFY BOTH DATASETS
+    =================================================== */
+
+    if (
+      result.activeAverage !==
+        true
+    ) {
+
+      throw new Error(
+        "STEP 7F completed without confirming the Active & Average Season columns."
+      );
+
+    }
+
+
+    if (
+      result.oldPlayers !==
+        true
+    ) {
+
+      throw new Error(
+        "STEP 7F completed without confirming the Old Players Season columns."
+      );
+
+    }
+
+
+    /* ===================================================
+       SUCCESS MESSAGE
+    =================================================== */
 
     setValidation(
       "saveArchiveValidationBox",
       "success",
       (
-        `STEP 7F completed. Season ` +
-        `${result.nextSeason} columns are ready.`
+        `STEP 7F completed. ` +
+        `Season ${nextSeason} columns were created for ` +
+        "Active & Average and Old Players."
       ),
       "fa-circle-check"
     );
 
 
+    /* ===================================================
+       LOG
+    =================================================== */
+
     appendLog(
       "Save Season STEP 7F",
       "success",
       (
-        `Season ${result.nextSeason} columns were created. ` +
+        `Season ${nextSeason} columns were created for ` +
+        "Active & Average and Old Players. " +
         "STEP 7G is now ready."
       )
     );
 
 
+    /* ===================================================
+       FINAL WORKFLOW REFRESH
+    =================================================== */
+
+    updateWorkflow();
+
+
   } catch (
     error
   ) {
+
+    /* ===================================================
+       STEP 7F ERROR
+    =================================================== */
 
     if (
       stepElement
@@ -5068,6 +5378,12 @@ async function runSaveSeasonStep7F() {
 
 
   } finally {
+
+    setButtonEnabled(
+      "step7FBtn",
+      true
+    );
+
 
     updateWorkflow();
 
@@ -8325,11 +8641,211 @@ async function rebuildSeasonInfo() {
 }
 
   function validateArchive() {
-    unavailableEngine(
+  unavailableEngine(
+    "saveArchiveValidationBox",
+    "Season Archive"
+  );
+}
+
+
+/* =====================================================
+   SAVE SEASON ARCHIVE
+===================================================== */
+
+async function saveSeasonArchive() {
+  try {
+    if (!canWrite()) {
+      throw new Error(
+        "You do not have permission to save the Season Archive."
+      );
+    }
+
+    if (
+      !adminConfig ||
+      typeof adminConfig !== "object"
+    ) {
+      throw new Error(
+        "Admin configuration is not loaded."
+      );
+    }
+
+    const season =
+      numberValue(
+        getElement(
+          "archiveSeasonNumber"
+        )?.value
+      );
+
+    if (season <= 0) {
+      throw new Error(
+        "Set the Season Number before saving the Season Archive."
+      );
+    }
+
+    const archiveOfficialDate =
+      normalizeText(
+        getElement(
+          "archiveOfficialDate"
+        )?.value
+      );
+
+    if (!archiveOfficialDate) {
+      throw new Error(
+        "Set the Archive Official Date before saving the Season Archive."
+      );
+    }
+
+    const engine =
+      getAdminConfigEngine();
+
+    if (
+      typeof engine.resetAfterSeasonArchive !==
+      "function"
+    ) {
+      throw new Error(
+        "K630AdminConfigEngine.resetAfterSeasonArchive() is not available."
+      );
+    }
+
+    /* -------------------------------------------------
+       RESET ADMIN CENTER WORKFLOW
+
+       KEEP:
+         Step 1 — GitHub
+         Step 2 — Foundation
+
+       RESET:
+         Step 3 — Matchmaking
+         Step 4+
+         Archive workflow
+    ------------------------------------------------- */
+
+    const nextConfig =
+  engine.resetAfterSeasonArchive(
+    adminConfig,
+    {
+      seasonNumber:
+        season,
+
+      archivedAt:
+        nowIso(),
+
+      websiteStatus:
+        adminConfig.season
+          ?.websiteStatus
+    },
+    {
+      updatedBy:
+        getUpdatedBy()
+    }
+  );
+
+
+/* =====================================================
+   PRESERVE FOUNDATION STATUS
+
+   Foundation is permanent data.
+
+   Save Season Archive must NEVER reset
+   Step 2 — Foundation.
+
+   If the current Foundation is valid,
+   keep it completed in admin-config.json.
+===================================================== */
+
+if (workflowState.foundation) {
+  nextConfig.foundation = {
+    ...nextConfig.foundation,
+
+    ready:
+      true
+  };
+}
+
+
+await writeAdminConfig(
+  nextConfig,
+  `Save Season ${season} Archive`
+);
+
+    /* -------------------------------------------------
+       RESET LOCAL UI STATE
+
+       The next workflow starts from Matchmaking.
+       The Admin chooses the next Season manually.
+    ------------------------------------------------- */
+
+    selectedSeason =
+      null;
+
+    participatingServers =
+      [];
+
+    selectedMatchmakingFile =
+      null;
+
+    validatedMatchmakingData =
+      null;
+
+    selectedSeasonFiles =
+      [];
+
+    validatedSeasonFiles =
+      [];
+
+    applyAdminConfigToState();
+
+    renderSeasonLibrary();
+
+    renderParticipatingServers();
+
+    updateMatchmakingDestination();
+
+    updateUploadDestination();
+
+    updateWorkflow();
+
+    setValidation(
       "saveArchiveValidationBox",
-      "Season Archive"
+      "success",
+      `Season ${season} archive saved. GitHub and Foundation remain completed. Admin Center is reset to Step 3 — Matchmaking.`,
+      "fa-circle-check"
+    );
+
+    appendLog(
+      "Season Archive",
+      "success",
+      `Season ${season} was archived. GitHub and Foundation were preserved. The workflow now starts at Step 3 — Matchmaking.`
+    );
+
+    dispatchEvent(
+      "k630:season-archive-saved",
+      {
+        season,
+        nextStep:
+          "matchmaking"
+      }
+    );
+
+  } catch (error) {
+    setValidation(
+      "saveArchiveValidationBox",
+      "error",
+      error?.message ||
+        "Season Archive could not be saved.",
+      "fa-circle-xmark"
+    );
+
+    appendLog(
+      "Season Archive",
+      "error",
+      error?.message ||
+        "Season Archive could not be saved."
     );
   }
+
+  updateWorkflow();
+}
 
   /* =====================================================
    SAVE SEASON ARCHIVE — FINALIZE SEASON
@@ -9390,7 +9906,654 @@ setButtonEnabled(
       );
   }
 
-  function bindEvents() {
+    /* =====================================================
+     ADMIN USERS
+     Restore Admin / Officer / Owner user list
+  ===================================================== */
+
+  const K630_ADMIN_USERS_FUNCTION =
+    "admin-users";
+
+  async function invokeAdminUsersFunction(
+    payload
+  ) {
+    const auth =
+      global.K630Auth;
+
+    if (
+      !auth ||
+      typeof auth.getClient !==
+        "function"
+    ) {
+      throw new Error(
+        "Supabase user management is not available."
+      );
+    }
+
+    const client =
+      auth.getClient();
+
+    if (
+      !client ||
+      !client.functions ||
+      typeof client.functions.invoke !==
+        "function"
+    ) {
+      throw new Error(
+        "Supabase user management is not available."
+      );
+    }
+
+    const {
+      data,
+      error
+    } =
+      await client.functions.invoke(
+        K630_ADMIN_USERS_FUNCTION,
+        {
+          body:
+            payload
+        }
+      );
+
+    if (error) {
+      let message =
+        error.message ||
+        "The user management request failed.";
+
+      try {
+        const context =
+          error.context;
+
+        if (
+          context &&
+          typeof context.json ===
+            "function"
+        ) {
+          const errorPayload =
+            await context.json();
+
+          message =
+            errorPayload?.error ||
+            errorPayload?.message ||
+            message;
+        }
+      } catch (
+        _error
+      ) {
+        // Keep original message.
+      }
+
+      throw new Error(
+        message
+      );
+    }
+
+    if (
+      !data ||
+      data.success !==
+        true
+    ) {
+      throw new Error(
+        data?.error ||
+        data?.message ||
+        "The user management request failed."
+      );
+    }
+
+    return data;
+  }
+
+
+  function formatAdminUserDate(
+    value
+  ) {
+    if (!value) {
+      return "-";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return "-";
+    }
+
+    return new Intl.DateTimeFormat(
+      "nl-NL",
+      {
+        dateStyle:
+          "short",
+        timeStyle:
+          "short"
+      }
+    ).format(date);
+  }
+
+
+  async function renderAdminUsersTable() {
+    const table =
+      getElement(
+        "adminUsersTable"
+      );
+
+    if (!table) {
+      return;
+    }
+
+    table.innerHTML = `
+      <tr>
+        <td
+          colspan="5"
+          class="admin-users-loading"
+        >
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          Loading users...
+        </td>
+      </tr>
+    `;
+
+    try {
+      const result =
+        await invokeAdminUsersFunction({
+          action:
+            "list"
+        });
+
+      const users =
+        Array.isArray(
+          result?.users
+        )
+          ? result.users
+          : [];
+
+      const session =
+        getSession();
+
+      if (
+        !users.length
+      ) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="5">
+              No users loaded.
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+      table.innerHTML =
+        users
+          .map(
+            user => {
+              const id =
+                String(
+                  user?.id ||
+                  ""
+                );
+
+              const email =
+                String(
+                  user?.email ||
+                  "-"
+                );
+
+              const role =
+                String(
+                  user?.role ||
+                  "admin"
+                )
+                  .toLowerCase();
+
+              const active =
+                user?.active !==
+                  false;
+
+              const isOwner =
+                user?.isOwner ===
+                  true ||
+                role ===
+                  "owner";
+
+              const isCurrent =
+                Boolean(
+                  session?.email &&
+                  email &&
+                  String(
+                    session.email
+                  )
+                    .toLowerCase() ===
+                    email.toLowerCase()
+                );
+
+              const roleLabel =
+                role ===
+                  "owner"
+                  ? "Owner"
+                  : role ===
+                    "officer"
+                    ? "Officer"
+                    : "Admin";
+
+              return `
+                <tr>
+                  <td>
+                    ${escapeHtml(
+                      email
+                    )}
+
+                    ${
+                      isCurrent
+                        ? `
+                          <span class="admin-user-current">
+                            (You)
+                          </span>
+                        `
+                        : ""
+                    }
+                  </td>
+
+                  <td>
+                    <span
+                      class="admin-user-role admin-user-role-${escapeHtml(
+                        role
+                      )}"
+                    >
+                      ${escapeHtml(
+                        roleLabel
+                      )}
+                    </span>
+                  </td>
+
+                  <td>
+                    ${
+                      isOwner
+                        ? `
+                          <span class="status-empty">
+                            Protected
+                          </span>
+                        `
+                        : active
+                          ? `
+                            <span class="status-valid">
+                              Active
+                            </span>
+                          `
+                          : `
+                            <span class="status-failed">
+                              Inactive
+                            </span>
+                          `
+                    }
+                  </td>
+
+                  <td>
+                    ${escapeHtml(
+                      formatAdminUserDate(
+                        user?.createdAt
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${
+                      isOwner
+                        ? `
+                          <span class="admin-owner-lock">
+                            <i class="fa-solid fa-lock"></i>
+                            Owner Locked
+                          </span>
+                        `
+                        : `
+                          <button
+                            type="button"
+                            class="admin-user-delete-button"
+                            data-delete-admin-user="${escapeHtml(id)}"
+                            data-delete-admin-email="${escapeHtml(email)}"
+                          >
+                            <i class="fa-solid fa-trash"></i>
+                            Delete
+                          </button>
+                        `
+                    }
+                  </td>
+                </tr>
+              `;
+            }
+          )
+          .join("");
+
+    } catch (
+      error
+    ) {
+      console.error(
+        "[K630 Admin Users] User list failed.",
+        error
+      );
+
+      table.innerHTML = `
+        <tr>
+          <td colspan="5">
+            ${escapeHtml(
+              error?.message ||
+              "The admin user list could not be loaded."
+            )}
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  async function addAdminUser() {
+    if (!isOwner()) {
+      setValidation(
+        "adminUsersValidationBox",
+        "error",
+        "Only the Owner can create Admin or Officer accounts.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
+    const emailInput =
+      getElement(
+        "newAdminEmail"
+      );
+
+    const passwordInput =
+      getElement(
+        "newAdminPassword"
+      );
+
+    const roleInput =
+      getElement(
+        "newAdminRole"
+      );
+
+    const email =
+      normalizeText(
+        emailInput?.value
+      );
+
+    const password =
+      String(
+        passwordInput?.value ||
+        ""
+      );
+
+    const role =
+      normalizeLower(
+        roleInput?.value ||
+        "admin"
+      );
+
+    if (!email) {
+      setValidation(
+        "adminUsersValidationBox",
+        "warning",
+        "Enter the email address for the new user.",
+        "fa-triangle-exclamation"
+      );
+
+      emailInput?.focus();
+
+      return;
+    }
+
+    if (!password) {
+      setValidation(
+        "adminUsersValidationBox",
+        "warning",
+        "Enter a temporary password for the new user.",
+        "fa-triangle-exclamation"
+      );
+
+      passwordInput?.focus();
+
+      return;
+    }
+
+    if (
+      ![
+        "admin",
+        "officer"
+      ].includes(role)
+    ) {
+      setValidation(
+        "adminUsersValidationBox",
+        "error",
+        "Only Admin or Officer accounts can be created.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
+    const roleLabel =
+      role === "officer"
+        ? "Officer"
+        : "Admin";
+
+    const button =
+      getElement(
+        "addAdminUserBtn"
+      );
+
+    if (button) {
+      button.disabled =
+        true;
+    }
+
+    setValidation(
+      "adminUsersValidationBox",
+      "warning",
+      `Creating ${roleLabel} account for ${email}...`,
+      "fa-spinner fa-spin"
+    );
+
+    try {
+      const result =
+        await invokeAdminUsersFunction({
+          action:
+            "create",
+
+          email:
+            email,
+
+          password:
+            password,
+
+          role:
+            role
+        });
+
+      appendLog(
+        "Create admin user",
+        "success",
+        result?.message ||
+          `${roleLabel} account ${email} was created successfully.`
+      );
+
+      setValidation(
+        "adminUsersValidationBox",
+        "success",
+        result?.message ||
+          `${roleLabel} account ${email} was created successfully.`,
+        "fa-circle-check"
+      );
+
+      if (emailInput) {
+        emailInput.value =
+          "";
+      }
+
+      if (passwordInput) {
+        passwordInput.value =
+          "";
+      }
+
+      if (roleInput) {
+        roleInput.value =
+          "admin";
+      }
+
+      await renderAdminUsersTable();
+
+    } catch (error) {
+      console.error(
+        "[K630 Admin Users] Create failed.",
+        error
+      );
+
+      appendLog(
+        "Create admin user",
+        "error",
+        error?.message ||
+          `The ${roleLabel} account ${email} could not be created.`
+      );
+
+      setValidation(
+        "adminUsersValidationBox",
+        "error",
+        error?.message ||
+          `The ${roleLabel} account ${email} could not be created.`,
+        "fa-circle-xmark"
+      );
+
+    } finally {
+      if (button) {
+        button.disabled =
+          !isOwner();
+      }
+    }
+  }
+
+    async function deleteAdminUser(
+    userId,
+    email
+  ) {
+    if (!isOwner()) {
+      setValidation(
+        "adminUsersValidationBox",
+        "error",
+        "Only the Owner can delete Admin or Officer accounts.",
+        "fa-circle-xmark"
+      );
+
+      return;
+    }
+
+    if (!userId) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Delete the user "${email}"? This action cannot be undone.`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const result =
+        await invokeAdminUsersFunction({
+          action:
+            "delete",
+
+          userId:
+            userId
+        });
+
+      appendLog(
+        "Delete admin user",
+        "success",
+        result?.message ||
+          `User ${email} was deleted.`
+      );
+
+      await renderAdminUsersTable();
+
+    } catch (error) {
+      console.error(
+        "[K630 Admin Users] Delete failed.",
+        error
+      );
+
+      appendLog(
+        "Delete admin user",
+        "error",
+        error?.message ||
+          `User ${email} could not be deleted.`
+      );
+
+      setValidation(
+        "adminUsersValidationBox",
+        "error",
+        error?.message ||
+          `User ${email} could not be deleted.`,
+        "fa-circle-xmark"
+      );
+    }
+  }
+
+
+  function bindAdminUsersEvents() {
+    const table =
+      getElement(
+        "adminUsersTable"
+      );
+
+    if (!table) {
+      return;
+    }
+
+    table.addEventListener(
+      "click",
+      event => {
+        const button =
+          event.target.closest(
+            "[data-delete-admin-user]"
+          );
+
+        if (!button) {
+          return;
+        }
+
+        const userId =
+          button.dataset
+            .deleteAdminUser ||
+          "";
+
+        const email =
+          button.dataset
+            .deleteAdminEmail ||
+          "";
+
+        deleteAdminUser(
+          userId,
+          email
+        );
+      }
+    );
+  }
+
+      function bindEvents() {
+    bindAdminUsersEvents();
+
+    bindClick(
+      "addAdminUserBtn",
+      addAdminUser
+    );
+
     bindClick(
       "checkGithubConnectionBtn",
       checkGitHubConnection
@@ -9644,6 +10807,16 @@ bindClick(
     );
 
     bindClick(
+  "validateSeasonArchiveBtn",
+  validateArchive
+);
+
+bindClick(
+  "saveSeasonArchiveBtn",
+  saveSeasonArchive
+);
+
+    bindClick(
      "saveSeasonArchiveBtn",
      saveSeasonArchive
     );
@@ -9715,6 +10888,7 @@ bindClick(
   updateUploadDestination();
   renderSeasonLibrary();
   renderParticipatingServers();
+  renderAdminUsersTable();
   updateWorkflow();
 
   await Promise.allSettled([
@@ -9722,21 +10896,9 @@ bindClick(
     recheckFoundation()
   ]);
 
-  if (
-    !configLoaded ||
-    !workflowState.matchmaking
+    if (
+    workflowState.matchmaking
   ) {
-    const season =
-      numberValue(
-        getElement(
-          "matchmakingSeasonNumber"
-        )?.value
-      );
-
-    if (season > 0) {
-      await recheckMatchmaking();
-    }
-  } else {
     setBadge(
       "matchmakingStatusBadge",
       "ready",

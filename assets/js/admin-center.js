@@ -4784,12 +4784,230 @@ async function runSaveSeasonStep7E() {
      Both choices must complete STEP 7E.
   ================================================= */
 
-  const updateServerStatus =
-    window.confirm(
-      "Do you want to update the Server Status levels for this season based on the achieved merits?\n\n" +
-      "OK = YES, update Server Status\n" +
-      "Cancel = NO, keep the existing Server Status levels"
+  function askStep7EServerStatusDecision() {
+  return new Promise(resolve => {
+
+    const existing =
+      document.getElementById(
+        "k630Step7EServerStatusOverlay"
+      );
+
+    if (existing) {
+      existing.remove();
+    }
+
+    const overlay =
+      document.createElement(
+        "div"
+      );
+
+    overlay.id =
+      "k630Step7EServerStatusOverlay";
+
+    overlay.className =
+      "k630-login-overlay";
+
+    overlay.innerHTML = `
+      <div
+        class="k630-login-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="k630Step7ETitle"
+      >
+
+        <div class="k630-login-icon">
+          <i class="fa-solid fa-server"></i>
+        </div>
+
+        <h2 id="k630Step7ETitle">
+          Update Server Status
+        </h2>
+
+        <p>
+          Do you want to update the Server Status levels
+          for this season based on the achieved merits?
+        </p>
+
+        <button
+          type="button"
+          class="k630-login-btn"
+          id="k630Step7EUpdateBtn"
+        >
+          <i class="fa-solid fa-arrows-rotate"></i>
+          Update
+        </button>
+
+        <button
+          type="button"
+          class="k630-login-cancel"
+          id="k630Step7ENotUpdateBtn"
+        >
+          <i class="fa-solid fa-shield-halved"></i>
+          Not Update
+        </button>
+
+        <button
+          type="button"
+          class="k630-login-cancel"
+          id="k630Step7ECancelBtn"
+        >
+          <i class="fa-solid fa-xmark"></i>
+          Cancel
+        </button>
+
+      </div>
+    `;
+
+    document.body.appendChild(
+      overlay
     );
+
+        let keyHandler =
+      null;
+
+
+    const close =
+      decision => {
+
+        if (
+          keyHandler
+        ) {
+
+          document.removeEventListener(
+            "keydown",
+            keyHandler
+          );
+
+        }
+
+        overlay.remove();
+
+        resolve(
+          decision
+        );
+
+      };
+
+
+    overlay
+      .querySelector(
+        "#k630Step7EUpdateBtn"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+          close("update");
+        }
+      );
+
+
+    overlay
+      .querySelector(
+        "#k630Step7ENotUpdateBtn"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+          close("not-update");
+        }
+      );
+
+
+    overlay
+      .querySelector(
+        "#k630Step7ECancelBtn"
+      )
+      ?.addEventListener(
+        "click",
+        () => {
+          close("cancel");
+        }
+      );
+
+
+    overlay.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target ===
+          overlay
+        ) {
+
+          close("cancel");
+
+        }
+
+      }
+    );
+
+
+    keyHandler =
+      event => {
+
+        if (
+          event.key ===
+          "Escape"
+        ) {
+
+          close("cancel");
+
+        }
+
+      };
+
+
+    document.addEventListener(
+      "keydown",
+      keyHandler
+    );
+
+  });
+}
+
+  /* =================================================
+     GET USER DECISION
+  ================================================= */
+
+  const serverStatusDecision =
+    await askStep7EServerStatusDecision();
+
+
+  /* =================================================
+     CANCEL
+     
+     IMPORTANT:
+     Cancel must NOT start STEP 7E.
+     No status is changed.
+     STEP 7E remains unchanged.
+  ================================================= */
+
+  if (
+    serverStatusDecision ===
+    "cancel"
+  ) {
+
+    appendLog(
+      "Save Season STEP 7E",
+      "info",
+      "STEP 7E was cancelled by the user. No Server Status changes were made and STEP 7E remains unchanged."
+    );
+
+    return;
+
+  }
+
+
+  /* =================================================
+     CONVERT DECISION TO ENGINE BOOLEAN
+     
+     Update     = true
+     Not Update = false
+  ================================================= */
+
+  const updateServerStatus =
+    serverStatusDecision ===
+    "update";
 
 
   /* =================================================
@@ -4800,7 +5018,6 @@ async function runSaveSeasonStep7E() {
     "step7EBtn",
     false
   );
-
 
   setValidation(
     "saveArchiveValidationBox",

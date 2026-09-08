@@ -68,7 +68,7 @@ The Admin Center will later call:
     step7AArchive()
     step7BSeasonData()
     step7CAverages()
-    step7DNote()
+    step7DUpdateNotes()
     step7EServerStatus()
     step7FSeasonColumns()
     step7GReset()
@@ -1429,7 +1429,7 @@ try {
 archiveIndex =
     archiveIndex.filter(
         entry =>
-            normalizeSeasonNumber(
+            normalizeSeason(
                 entry?.season
             ) !==
             season
@@ -1468,11 +1468,11 @@ archiveIndex.sort(
         second
     ) =>
 
-        normalizeSeasonNumber(
+        normalizeSeason(
             second?.season
         ) -
 
-        normalizeSeasonNumber(
+        normalizeSeason(
             first?.season
         )
 

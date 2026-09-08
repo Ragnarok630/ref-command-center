@@ -750,7 +750,7 @@
       0.52
     );
 
-  scrollbar-width: thin;
+  scrollbar-width: none;
 
   scrollbar-color:
     rgba(217, 180, 95, 0.72)
@@ -1061,6 +1061,7 @@
 
   overflow-x: hidden;
   overflow-y: auto;
+  padding-bottom: 16px;
 
   overscroll-behavior: contain;
 
@@ -1155,16 +1156,13 @@
 
 .op-right-shell {
   position: relative;
-
   width: 100%;
   min-width: 0;
   max-width: 100%;
-
+  min-height: 0;
   overflow-x: auto;
-  overflow-y: visible;
-
+  overflow-y: hidden;
   z-index: 1;
-
   background:
     rgba(
       12,
@@ -1172,29 +1170,67 @@
       18,
       0.94
     );
+  scrollbar-width: none;
+}
+
+.op-right-shell::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================================
+   FIXED HORIZONTAL SEASON SCROLLBAR
+========================================================= */
+
+.op-horizontal-scroll {
+  position: sticky;
+
+  left:
+    calc(
+      var(--op-left-width) + 7px
+    );
+
+  top: 0;
+
+  bottom: auto;
+
+  width: calc(100% - var(--op-left-width) - 7px);
+min-width: 0;
+max-width: calc(100% - var(--op-left-width) - 7px);
+box-sizing: border-box;
+
+  height: 12px;
+
+  margin-left:
+    calc(
+      var(--op-left-width) + 7px
+    );
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  z-index: 100;
+
+  background:
+    transparent;
 
   scrollbar-width: thin;
 
   scrollbar-color:
-    rgba(217, 180, 95, 0.76)
-    rgba(255, 255, 255, 0.02);
+    rgba(217, 180, 95, 0.9)
+    transparent;
 }
 
-.op-right-shell::-webkit-scrollbar {
+.op-horizontal-scroll::-webkit-scrollbar {
   height: 8px;
 }
 
-.op-right-shell::-webkit-scrollbar-track {
+
+.op-horizontal-scroll::-webkit-scrollbar-track {
   background:
-    rgba(
-      255,
-      255,
-      255,
-      0.02
-    );
+    transparent;
 }
 
-.op-right-shell::-webkit-scrollbar-thumb {
+.op-horizontal-scroll::-webkit-scrollbar-thumb {
   background:
     linear-gradient(
       90deg,
@@ -1207,6 +1243,14 @@
     #090a0e;
 
   border-radius: 999px;
+
+  min-width: 70px;
+}
+
+
+.op-horizontal-scroll-content {
+  width: 3000px;
+  height: 1px;
 }
 
 /* =========================================================

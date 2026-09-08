@@ -487,26 +487,28 @@
         ),
 
       leftScrollContainer:
-        queryFirst(
-          [
-            "#oldPlayersLeftShell",
-            "#oldPlayersFixedTableShell",
-            "[data-old-players-left-scroll]",
-            ".old-players-left-table-shell"
-          ],
-          page
-        ),
+  queryFirst(
+    [
+      "#opLeftShell",
+      "#oldPlayersLeftShell",
+      "#oldPlayersFixedTableShell",
+      "[data-old-players-left-scroll]",
+      ".old-players-left-table-shell"
+    ],
+    page
+  ),
 
       rightScrollContainer:
-        queryFirst(
-          [
-            "#oldPlayersRightShell",
-            "#oldPlayersSeasonTableShell",
-            "[data-old-players-right-scroll]",
-            ".old-players-right-table-shell"
-          ],
-          page
-        )
+  queryFirst(
+    [
+      "#opRightShell",
+      "#oldPlayersRightShell",
+      "#oldPlayersSeasonTableShell",
+      "[data-old-players-right-scroll]",
+      ".old-players-right-table-shell"
+    ],
+    page
+  )
     };
   }
 
@@ -877,15 +879,15 @@
       });
     });
 
-    return [
+        return [
       ...seasons
     ].sort(
       (
         first,
         second
       ) =>
-        first -
-        second
+        second -
+        first
     );
   }
 
@@ -1677,12 +1679,99 @@
       elements
     );
 
+    updateHorizontalSeasonScrollbar();
+
     renderPlayerCount(
       elements
     );
 
     return true;
   }
+
+/* =====================================================
+   UPDATE HORIZONTAL SEASON SCROLLBAR
+===================================================== */
+
+function updateHorizontalSeasonScrollbar() {
+  const elements = getElements();
+
+  if (!elements) {
+    return false;
+  }
+
+  const right =
+    elements.rightScrollContainer;
+
+  const horizontal =
+    document.getElementById(
+      "opHorizontalScroll"
+    );
+
+  const horizontalContent =
+    document.getElementById(
+      "opHorizontalScrollContent"
+    );
+
+  if (
+    !right ||
+    !horizontal ||
+    !horizontalContent
+  ) {
+    return false;
+  }
+
+  const table =
+    right.querySelector(
+      ".op-right-table"
+    );
+
+  if (!table) {
+    return false;
+  }
+
+  /*
+     De bovenste scrollbar krijgt exact
+     dezelfde totale breedte als de Season-tabel.
+  */
+
+  horizontalContent.style.width =
+    `${table.scrollWidth}px`;
+
+  /*
+     Begin op exact dezelfde horizontale positie
+     als de Season-tabel.
+  */
+
+  const horizontalMax =
+  Math.max(
+    0,
+    horizontal.scrollWidth -
+    horizontal.clientWidth
+  );
+
+const rightMax =
+  Math.max(
+    0,
+    right.scrollWidth -
+    right.clientWidth
+  );
+
+if (
+  horizontalMax > 0 &&
+  rightMax > 0
+) {
+  horizontal.scrollLeft =
+    (
+      right.scrollLeft /
+      rightMax
+    ) *
+    horizontalMax;
+} else {
+  horizontal.scrollLeft = 0;
+}
+
+  return true;
+}
 
   /* =====================================================
      FILTER EVENTS
@@ -1874,82 +1963,162 @@
   }
 
   /* =====================================================
-     SCROLL SYNCHRONIZATION
+   SCROLL SYNCHRONIZATION
+===================================================== */
+
+function bindScrollSynchronization() {
+  const elements = getElements();
+
+  if (!elements) {
+    return false;
+  }
+
+  const left =
+    elements.leftScrollContainer;
+
+  const right =
+    elements.rightScrollContainer;
+
+  const horizontal =
+    document.getElementById(
+      "opHorizontalScroll"
+    );
+
+  if (!left || !right || !horizontal) {
+    return false;
+  }
+
+  /* =====================================================
+     VERTICAL: LEFT ↔ RIGHT
   ===================================================== */
 
-  function bindScrollSynchronization() {
-    const elements =
-      getElements();
+  if (
+    left.dataset.oldPlayersVerticalBound !==
+    "true"
+  ) {
+    left.dataset.oldPlayersVerticalBound =
+      "true";
 
-    if (!elements) {
-      return false;
-    }
-
-    const left =
-      elements.leftScrollContainer;
-
-    const right =
-      elements.rightScrollContainer;
-
-    if (
-      !left ||
-      !right ||
-      left.dataset
-        .oldPlayersScrollBound ===
-        "true"
-    ) {
-      return false;
-    }
-
-    left.dataset
-      .oldPlayersScrollBound =
-        "true";
-
-    right.dataset
-      .oldPlayersScrollBound =
-        "true";
-
-    let syncing =
-      false;
+    let syncingVertical = false;
 
     left.addEventListener(
       "scroll",
       () => {
-        if (syncing) {
+        if (syncingVertical) {
           return;
         }
 
-        syncing =
-          true;
+        syncingVertical = true;
 
         right.scrollTop =
           left.scrollTop;
 
-        syncing =
-          false;
+        syncingVertical = false;
       }
     );
 
     right.addEventListener(
       "scroll",
       () => {
-        if (syncing) {
+        if (syncingVertical) {
           return;
         }
 
-        syncing =
-          true;
+        syncingVertical = true;
 
         left.scrollTop =
           right.scrollTop;
 
-        syncing =
-          false;
+        syncingVertical = false;
       }
     );
-
-    return true;
   }
+
+  /* =====================================================
+   HORIZONTAL: TOP ↔ SEASON TABLE
+===================================================== */
+
+  let syncingHorizontal = false;
+
+  horizontal.onscroll = () => {
+    if (syncingHorizontal) {
+      return;
+    }
+
+    const horizontalMax =
+      Math.max(
+        0,
+        horizontal.scrollWidth -
+        horizontal.clientWidth
+      );
+
+    const rightMax =
+      Math.max(
+        0,
+        right.scrollWidth -
+        right.clientWidth
+      );
+
+    if (
+      horizontalMax <= 0 ||
+      rightMax <= 0
+    ) {
+      return;
+    }
+
+    syncingHorizontal = true;
+
+    right.scrollLeft =
+      (
+        horizontal.scrollLeft /
+        horizontalMax
+      ) *
+      rightMax;
+
+    syncingHorizontal = false;
+  };
+
+  right.onscroll = () => {
+    if (syncingHorizontal) {
+      return;
+    }
+
+    const horizontalMax =
+      Math.max(
+        0,
+        horizontal.scrollWidth -
+        horizontal.clientWidth
+      );
+
+    const rightMax =
+      Math.max(
+        0,
+        right.scrollWidth -
+        right.clientWidth
+      );
+
+    if (
+      horizontalMax <= 0 ||
+      rightMax <= 0
+    ) {
+      return;
+    }
+
+    syncingHorizontal = true;
+
+    horizontal.scrollLeft =
+      (
+        right.scrollLeft /
+        rightMax
+      ) *
+      horizontalMax;
+
+    syncingHorizontal = false;
+  };
+  updateHorizontalSeasonScrollbar();
+
+  return true;
+}
 
   /* =====================================================
      ERROR RENDERING

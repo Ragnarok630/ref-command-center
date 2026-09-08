@@ -34,7 +34,7 @@
 
 
     const ARCHIVE_ROOT =
-        "archives";
+        "archive";
 
 
     const ARCHIVE_INDEX =

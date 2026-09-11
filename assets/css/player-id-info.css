@@ -245,8 +245,11 @@
   background: transparent;
 
   box-shadow:
-    0 0 6px rgba(184, 51, 255, 0.82),
-    0 0 18px rgba(157, 78, 221, 0.44);
+  0 0 3px rgba(255, 255, 255, 0.95),
+  0 0 8px rgba(255, 215, 55, 0.95),
+  0 0 16px rgba(184, 51, 255, 0.95),
+  0 0 28px rgba(184, 51, 255, 0.72),
+  0 0 42px rgba(255, 45, 75, 0.45);
 }
 
 .player-id-hero__image-wrap::after {
@@ -261,7 +264,7 @@
   border-radius: inherit;
 
   box-shadow:
-    inset 0 0 0 1px rgba(255, 208, 0, 0.14),
+    inset 0 0 0 1px rgba(22, 21, 17, 0.14),
     inset 0 0 14px rgba(157, 78, 221, 0.12);
 
   pointer-events: none;
@@ -329,6 +332,8 @@
   z-index: 20;
 
   flex: none;
+
+  margin-top: 20px;
 
   overflow: visible;
 }
@@ -1927,9 +1932,9 @@
   }
 
   .player-id-hero__image-wrap {
-    width: min(820px, 68%);
-    height: clamp(78px, 6.8vw, 102px);
-  }
+  width: min(820px, 68%);
+  height: clamp(78px, 6.8vw, 102px);
+}
 
   .player-id-search-form {
     min-height: 37px;

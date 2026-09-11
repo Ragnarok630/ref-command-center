@@ -905,48 +905,91 @@
    No long horizontal lines.
 */
 
+@keyframes afkEnergyFlow {
+  0% {
+    background-position: 120% 50%;
+    opacity: 0.58;
+    transform:
+      translateY(-50%)
+      scaleX(0.92);
+  }
+
+  50% {
+    background-position: 50% 50%;
+    opacity: 1;
+    transform:
+      translateY(-50%)
+      scaleX(1);
+  }
+
+  100% {
+    background-position: -20% 50%;
+    opacity: 0.58;
+    transform:
+      translateY(-50%)
+      scaleX(0.92);
+  }
+}
+
 .afk-service-submit::before,
 .afk-service-submit::after {
   position: absolute;
   z-index: 1;
   top: 50%;
   width: clamp(110px, 14vw, 190px);
-  height: 18px;
+  height: 9px;
   content: "";
   pointer-events: none;
-  transform: translateY(-50%);
-  filter: none;
-  animation: none;
+
+  border-radius: 999px;
+
+  transform:
+    translateY(-50%)
+    scaleX(0.96);
+
+  filter:
+    blur(0.2px)
+    drop-shadow(0 0 5px rgba(185, 68, 255, 0.72))
+    drop-shadow(0 0 14px rgba(137, 38, 214, 0.42));
+
+  background-size: 220% 100%;
+
+  animation:
+    afkEnergyFlow 3.8s ease-in-out infinite;
 }
 
 .afk-service-submit::before {
   left: 14%;
+
   background:
     linear-gradient(
       90deg,
       transparent 0%,
-      rgba(128, 42, 205, 0.25) 20%,
-      rgba(192, 74, 255, 0.85) 62%,
-      rgba(255, 204, 68, 0.9) 100%
+      rgba(128, 42, 205, 0.12) 18%,
+      rgba(192, 74, 255, 0.72) 48%,
+      rgba(255, 204, 68, 0.95) 72%,
+      rgba(192, 74, 255, 0.38) 88%,
+      transparent 100%
     );
-  box-shadow:
-    0 0 5px rgba(185, 68, 255, 0.75),
-    0 0 12px rgba(137, 38, 214, 0.42);
+
+  animation-delay: 0s;
 }
 
 .afk-service-submit::after {
   right: 14%;
+
   background:
     linear-gradient(
       90deg,
-      rgba(255, 204, 68, 0.9) 0%,
-      rgba(192, 74, 255, 0.85) 38%,
-      rgba(128, 42, 205, 0.25) 80%,
+      transparent 0%,
+      rgba(192, 74, 255, 0.38) 12%,
+      rgba(255, 204, 68, 0.95) 28%,
+      rgba(192, 74, 255, 0.72) 52%,
+      rgba(128, 42, 205, 0.12) 82%,
       transparent 100%
     );
-  box-shadow:
-    0 0 5px rgba(185, 68, 255, 0.75),
-    0 0 12px rgba(137, 38, 214, 0.42);
+
+  animation-delay: -1.9s;
 }
 
 

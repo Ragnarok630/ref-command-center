@@ -608,12 +608,12 @@
       symbols.push(
         `
           <span
-            class="si-note-symbol si-note-symbol--afk"
-            title="Approved AFK status"
-            aria-label="Approved AFK status"
-          >
-            <i class="fa-solid fa-bed"></i>
-          </span>
+  class="si-note-symbol si-note-symbol--afk"
+  title="Approved AFK status"
+  aria-label="Approved AFK status"
+>
+  Zzz
+</span>
         `
       );
     }

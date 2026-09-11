@@ -506,10 +506,10 @@
           ?.leftDuringSeason ===
         true,
 
-      afkApproved:
-        player
-          ?.afkApproved ===
-        true,
+     afkApproved:
+  player
+    ?.noteFlags?.afk ===
+  true,
 
       seasons:
         normalizeSeasonResults(
@@ -580,88 +580,113 @@
    PLAYER NOTES AND STATUS TOOLTIP
 ===================================================== */
 
-function renderPlayerNotes(player) {
-  const icons =
-    [];
+function renderPlayerNote(player) {
+  const engine =
+    global.K630PlayerNoteEngine;
+
+  let rendered =
+    "";
 
   if (
-    player.leftDuringSeason
+    engine &&
+    typeof engine.renderIcons ===
+      "function"
   ) {
-    icons.push(`
-      <span
-        class="
-          aa-note-icon
-          aa-note-left
-        "
-        title="Left during Season"
-        aria-label="Left during Season"
-      >
-        <i
-          class="fa-solid fa-triangle-exclamation"
-          aria-hidden="true"
-        ></i>
-      </span>
-    `);
+    rendered =
+      engine.renderIcons(
+        player?.id,
+        {
+          maximumSlots:
+            4,
+
+          reserveSlots:
+            true,
+
+          baseClass:
+            "aa-note-icon",
+
+          wrapperClass:
+            "aa-note-icons",
+
+          emptyClass:
+            "aa-note-empty"
+        }
+      );
+  }
+
+  const afkFromData =
+    player?.raw?.noteFlags?.afk ===
+    true;
+
+  if (
+    afkFromData
+  ) {
+    const afkIcon = `
+  <span
+    class="aa-note-icon aa-note-afk"
+    title="Approved AFK status"
+    aria-label="Approved AFK status"
+    data-k630-note-type="afk"
+  >
+    Zzz
+  </span>
+`;
+
+    if (
+      rendered.includes(
+        "aa-note-icons"
+      )
+    ) {
+      rendered =
+        rendered.replace(
+          "</span>",
+          `${afkIcon}</span>`
+        );
+    } else {
+      rendered = `
+        <span
+          class="aa-note-icons"
+          data-player-id="${escapeHtml(
+            player?.id
+          )}"
+        >
+          ${afkIcon}
+        </span>
+      `;
+    }
   }
 
   if (
-    player.afkApproved
+    rendered
   ) {
-    icons.push(`
-      <span
-        class="
-          aa-note-icon
-          aa-note-afk
-        "
-        title="AFK approved"
-        aria-label="AFK approved"
-      >
-        <i
-          class="fa-solid fa-bed"
-          aria-hidden="true"
-        ></i>
-      </span>
-    `);
+    return rendered;
   }
 
-  if (
-    player.matchmakingNewPlayer
-  ) {
-    icons.push(`
+  return `
+    <span
+      class="aa-note-icons"
+      data-player-id="${escapeHtml(
+        player?.id
+      )}"
+    >
       <span
-        class="
-          aa-note-icon
-          aa-note-new
-        "
-        title="New Matchmaking player"
-        aria-label="New Matchmaking player"
-      >
-        <i
-          class="fa-solid fa-user-plus"
-          aria-hidden="true"
-        ></i>
-      </span>
-    `);
-  }
-
-  while (
-    icons.length <
-    4
-  ) {
-    icons.push(`
-      <span
-        class="aa-note-empty"
+        class="aa-note-icon aa-note-icon-reserved"
         aria-hidden="true"
       ></span>
-    `);
-  }
-
-  return icons
-    .slice(
-      0,
-      4
-    )
-    .join("");
+      <span
+        class="aa-note-icon aa-note-icon-reserved"
+        aria-hidden="true"
+      ></span>
+      <span
+        class="aa-note-icon aa-note-icon-reserved"
+        aria-hidden="true"
+      ></span>
+      <span
+        class="aa-note-icon aa-note-icon-reserved"
+        aria-hidden="true"
+      ></span>
+    </span>
+  `;
 }
 
 function renderStatusBadge(player) {
@@ -1312,7 +1337,7 @@ function bindStatusTooltip() {
 
               <td class="aa-col-note">
                 <span class="aa-note-icons">
-                  ${renderPlayerNotes(
+                  ${renderPlayerNote(
                     player
                   )}
                 </span>

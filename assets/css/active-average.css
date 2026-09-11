@@ -2065,7 +2065,8 @@
 
   border-radius: 4px;
 
-  font-size: 9px;
+  font-size: 11px;
+  font-weight: 900;
   line-height: 1;
 
   cursor: help;
@@ -2104,15 +2105,15 @@
 }
 
 .active-average-page .aa-note-afk {
-  color: #ffd36a;
+  color: #39ff14;
 
   background:
     rgba(
-      217,
-      180,
-      95,
-      0.1
-    );
+  57,
+  255,
+  20,
+  0.1
+);
 
   border:
     1px solid
@@ -2890,4 +2891,22 @@
   .aa-status-tooltip {
     transition: none !important;
   }
+}
+
+.aa-note-icon-afk {
+  width: auto;
+  min-width: 24px;
+  height: 18px;
+
+  color: #39ff14;
+
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+
+  text-shadow:
+    0 0 3px rgba(57, 255, 20, 0.75),
+    0 0 6px rgba(57, 255, 20, 0.45);
+
+  cursor: help;
 }

@@ -4938,3 +4938,472 @@ html body .sidebar-navigation ul::-webkit-scrollbar {
 
     min-height: 16px !important;
 }
+
+/* =========================================================
+   K630 CURRENT SEASON
+   ARCANE ENERGY CORE
+   ========================================================= */
+
+#topbarSeason {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+
+/* =========================================================
+   MAIN WRAPPER
+   ========================================================= */
+
+.k630-season-energy {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   CENTRAL CORE
+   ========================================================= */
+
+.k630-season-core {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  height: calc(100% - 6px);
+
+  width: 100%;
+
+  padding: 2px 28px 3px;
+
+  box-sizing: border-box;
+
+  border-radius: 7px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(31, 7, 55, 0.94),
+      rgba(72, 17, 100, 0.97),
+      rgba(31, 7, 55, 0.94)
+    );
+
+  border: 1px solid rgba(185, 111, 255, 0.9);
+
+  box-shadow:
+    0 0 3px rgba(255, 255, 255, 0.55),
+    0 0 7px rgba(188, 106, 255, 0.95),
+    0 0 14px rgba(145, 62, 225, 0.85),
+    0 0 24px rgba(101, 39, 180, 0.55),
+    inset 0 0 8px rgba(183, 95, 255, 0.25);
+
+  z-index: 5;
+}
+
+
+/* =========================================================
+   TEXT BACKGROUND GLOW
+   Gold + Purple + White + Red
+   ========================================================= */
+
+.k630-season-core::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 82%;
+  height: 78%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.48) 0%,
+      rgba(255, 208, 0, 0.42) 18%,
+      rgba(184, 51, 255, 0.48) 40%,
+      rgba(255, 45, 75, 0.38) 62%,
+      rgba(110, 30, 170, 0.22) 76%,
+      transparent 92%
+    );
+
+  filter: blur(10px);
+
+  opacity: 1;
+
+  pointer-events: none;
+
+  z-index: 2;
+
+  animation:
+    k630SeasonTextGlow
+    3.8s
+    ease-in-out
+    infinite;
+}
+
+/* =========================================================
+   INNER GOLD BORDER
+   ========================================================= */
+
+.k630-season-core-border {
+  position: absolute;
+
+  inset: 2px;
+
+  border-radius: 5px;
+
+  border: 1px solid rgba(255, 207, 55, 0.72);
+
+  box-shadow:
+    0 0 4px rgba(255, 207, 55, 0.65),
+    inset 0 0 4px rgba(255, 207, 55, 0.18);
+
+  pointer-events: none;
+
+  z-index: 3;
+}
+
+
+/* =========================================================
+   CENTRAL PURPLE LIGHT
+   ========================================================= */
+
+.k630-season-core-glow {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 75%;
+  height: 100%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(185, 82, 255, 0.28) 0%,
+      rgba(135, 49, 210, 0.13) 45%,
+      transparent 75%
+    );
+
+  filter: blur(6px);
+
+  animation:
+    k630SeasonGlow 3s ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+.k630-season-label,
+.k630-season-number,
+.k630-season-name {
+  position: relative;
+
+  z-index: 4;
+
+  margin: 0;
+
+  font-size: 10px;
+
+  line-height: 1;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+
+/* CURRENT: */
+
+.k630-season-label {
+  color: #f3eaff;
+
+  letter-spacing: 0.8px;
+
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 6px rgba(184, 51, 255, 0.95),
+    0 0 10px rgba(255, 45, 75, 0.55);
+}
+
+
+/* SEASON 3 */
+
+.k630-season-number {
+  color: #ffd83c;
+
+  letter-spacing: 0.8px;
+
+  text-shadow:
+    0 0 2px #ffffff,
+    0 0 5px rgba(255, 214, 54, 1),
+    0 0 10px rgba(184, 51, 255, 0.95),
+    0 0 16px rgba(255, 45, 70, 0.45);
+}
+
+
+/* (S0-S8) Symphony of the Gods */
+
+.k630-season-name {
+  color: #f1e8ff;
+
+  letter-spacing: 0.35px;
+
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 7px rgba(184, 51, 255, 0.95),
+    0 0 12px rgba(255, 55, 85, 0.55);
+}
+
+
+/* =========================================================
+   LEFT / RIGHT SIDE
+   ========================================================= */
+
+.k630-season-side {
+  display: flex;
+  align-items: center;
+
+  height: 100%;
+
+  z-index: 6;
+}
+
+
+.k630-season-side-left {
+  margin-right: 7px;
+}
+
+
+.k630-season-side-right {
+  margin-left: 7px;
+}
+
+
+/* =========================================================
+   DIAMONDS
+   ========================================================= */
+
+.k630-season-diamond {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: rotate(45deg);
+
+  background:
+    linear-gradient(
+      135deg,
+      #32104f 0%,
+      #7e2fc0 45%,
+      #351052 100%
+    );
+
+  border: 1px solid rgba(255, 211, 60, 0.9);
+
+  box-shadow:
+    0 0 4px rgba(255, 218, 66, 1),
+    0 0 8px rgba(185, 80, 255, 1),
+    0 0 16px rgba(131, 44, 215, 0.85);
+
+  animation:
+    k630DiamondGlow 2.7s ease-in-out infinite;
+}
+
+
+.k630-season-diamond-outer {
+  width: 12px;
+  height: 12px;
+}
+
+
+.k630-season-diamond-inner {
+  width: 15px;
+  height: 15px;
+}
+
+
+/* =========================================================
+   DIAMOND CORE GLOW
+   ========================================================= */
+
+.k630-season-diamond-core {
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 3px #ffffff,
+    0 0 7px #e3b0ff,
+    0 0 12px #a13fff,
+    0 0 18px rgba(146, 54, 230, 0.95);
+
+  transform: rotate(-45deg);
+}
+
+
+/* =========================================================
+   ENERGY LINE
+   ========================================================= */
+
+.k630-season-energy-line {
+  position: relative;
+
+  width: 38px;
+  height: 1px;
+
+  margin: 0 4px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(168, 77, 255, 0.9),
+      rgba(255, 207, 57, 0.9)
+    );
+
+  box-shadow:
+    0 0 4px rgba(171, 83, 255, 0.95),
+    0 0 8px rgba(130, 50, 205, 0.65);
+}
+
+
+/* =========================================================
+   MOVING LIGHT
+   ========================================================= */
+
+.k630-season-energy-pulse {
+  position: absolute;
+
+  top: 50%;
+  left: 0;
+
+  width: 4px;
+  height: 4px;
+
+  transform: translateY(-50%);
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 3px #ffffff,
+    0 0 7px #dca3ff,
+    0 0 12px #9b3cff;
+
+  animation:
+    k630EnergyPulse 2.2s linear infinite;
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes k630SeasonGlow {
+
+  0%,
+  100% {
+    opacity: 0.55;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.06);
+  }
+}
+
+
+@keyframes k630DiamondGlow {
+
+  0%,
+  100% {
+    filter: brightness(0.95);
+  }
+
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+
+@keyframes k630EnergyPulse {
+
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes k630SeasonTextGlow {
+
+  0%,
+  100% {
+    opacity: 0.72;
+
+    transform:
+      translate(-50%, -50%)
+      scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.04);
+  }
+}

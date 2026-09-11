@@ -31,7 +31,7 @@
     "K630 Application Router";
 
   const MODULE_VERSION =
-    "630.2.3";
+    "630.2.4";
 
   const RELEASE_NAME =
     "Gold Master";
@@ -1719,119 +1719,253 @@ default:
   }
 
     /* =====================================================
-     TOPBAR
-  ===================================================== */
+   TOPBAR
+===================================================== */
 
-  function getSeasonConfig() {
-    try {
-      const raw =
-        localStorage.getItem(
-          "k630_current_season_config"
-        );
+const HOME_TOPBAR_DATA_URL =
+  (
+    "https://raw.githubusercontent.com/" +
+    "Ragnarok630/k630-public-data/main/" +
+    "assets/data/generated/home/current.json"
+  );
 
-      if (!raw) {
-        return null;
-      }
+let topbarHomeData = null;
 
-      return JSON.parse(
-        raw
-      );
-    } catch (error) {
-      return null;
-    }
-  }
-
-  function getTopbarStatusValue() {
-    try {
-      const seasonConfig =
-        getSeasonConfig();
-
-      return (
-        normalizeText(
-          seasonConfig
-            ?.topbarStatus ??
-          seasonConfig
-            ?.status
-        ) ||
-        "Home Kingdom - Farming - Open for Migration"
-      );
-    } catch (error) {
-      return (
-        "Home Kingdom - Farming - Open for Migration"
-      );
-    }
-  }
-
-  function updateTopbar() {
-    const onlineBox =
-      document.getElementById(
-        "topbarStatus"
-      );
-
-    const kingdomBox =
-      document.getElementById(
-        "topbarKingdom"
-      );
-
-    const seasonBox =
-      document.getElementById(
-        "topbarSeason"
-      );
-
-    const versionBox =
-      document.getElementById(
-        "topbarVersion"
-      );
-
-    if (onlineBox) {
-      onlineBox.innerHTML = `
-        <span
-          class="online"
-          aria-hidden="true"
-        ></span>
-
-        <span class="topbar-status-text">
-          Online
-        </span>
-      `;
-    }
-
-    if (kingdomBox) {
-      kingdomBox.textContent =
-        "Kingdom 630 - Started on the 27th of March 2026";
-    }
-
-    if (versionBox) {
-      versionBox.textContent =
-        `Version ${MODULE_VERSION} ${RELEASE_NAME}`;
-    }
-
-    if (!seasonBox) {
-      return;
-    }
-
-    const season =
-      getSeasonConfig();
-
-    if (
-  !season ||
-  !season.currentSeasonId
+function createTopbarCacheBustedUrl(
+  url
 ) {
-  seasonBox.textContent =
-    "Current Season: Not Set";
+  const separator =
+    url.includes("?")
+      ? "&"
+      : "?";
 
-  return;
+  return (
+    `${url}${separator}` +
+    `t=${Date.now()}`
+  );
 }
 
-seasonBox.textContent =
-  (
-    `Current Season: ` +
-    (
-      season.currentSeasonLabel ||
-      season.currentSeasonId
-    )
-  );
+async function loadTopbarHomeData() {
+  try {
+    const response =
+      await fetch(
+        createTopbarCacheBustedUrl(
+          HOME_TOPBAR_DATA_URL
+        ),
+        {
+          method:
+            "GET",
+
+          cache:
+            "no-store",
+
+          headers: {
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `Home data could not be loaded. HTTP ${response.status}.`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (
+      !data ||
+      typeof data !==
+        "object"
+    ) {
+      throw new Error(
+        "Home data has an invalid format."
+      );
+    }
+
+    if (
+      data.dataset !==
+      "home"
+    ) {
+      throw new Error(
+        "The loaded JSON is not a Home dataset."
+      );
+    }
+
+    topbarHomeData =
+      data;
+
+    return data;
+
+  } catch (error) {
+
+    console.error(
+      "[K630 App] Top Bar Home data could not be loaded.",
+      error
+    );
+
+    return (
+      topbarHomeData
+    );
   }
+}
+
+async function updateTopbar() {
+
+  const onlineBox =
+    document.getElementById(
+      "topbarStatus"
+    );
+
+  const kingdomBox =
+    document.getElementById(
+      "topbarKingdom"
+    );
+
+  const seasonBox =
+    document.getElementById(
+      "topbarSeason"
+    );
+
+  const versionBox =
+    document.getElementById(
+      "topbarVersion"
+    );
+
+  if (onlineBox) {
+
+    onlineBox.innerHTML = `
+      <span
+        class="online"
+        aria-hidden="true"
+      ></span>
+
+      <span class="topbar-status-text">
+        Online
+      </span>
+    `;
+  }
+
+  if (kingdomBox) {
+
+    kingdomBox.textContent =
+      "Kingdom 630 - Started on the 27th of March 2026";
+  }
+
+  if (versionBox) {
+
+    versionBox.textContent =
+      `Version ${MODULE_VERSION} ${RELEASE_NAME}`;
+  }
+
+  if (!seasonBox) {
+    return;
+  }
+
+  const homeData =
+    await loadTopbarHomeData();
+
+  if (!homeData) {
+
+    seasonBox.textContent =
+      "Current Season: Not Set";
+
+    return;
+  }
+
+  const currentSeason =
+    homeData.currentSeason;
+
+  const seasonName =
+    normalizeText(
+      homeData.seasonName
+    );
+
+    if (
+    currentSeason ===
+      null ||
+    currentSeason ===
+      undefined ||
+    currentSeason ===
+      ""
+  ) {
+
+    seasonBox.textContent =
+      "Current Season: Not Set";
+
+    return;
+  }
+
+
+  seasonBox.innerHTML =
+    `
+      <span class="k630-season-energy">
+
+        <span class="k630-season-side k630-season-side-left">
+
+          <span class="k630-season-diamond k630-season-diamond-outer">
+            <span class="k630-season-diamond-core"></span>
+          </span>
+
+          <span class="k630-season-energy-line">
+            <span class="k630-season-energy-pulse"></span>
+          </span>
+
+          <span class="k630-season-diamond k630-season-diamond-inner">
+            <span class="k630-season-diamond-core"></span>
+          </span>
+
+        </span>
+
+
+        <span class="k630-season-core">
+
+          <span class="k630-season-core-border"></span>
+
+          <span class="k630-season-core-glow"></span>
+
+          <span class="k630-season-label">
+            CURRENT:
+          </span>
+
+          <span class="k630-season-number">
+            SEASON ${escapeHtml(currentSeason)}
+          </span>
+
+          ${
+            seasonName
+              ? `
+                <span class="k630-season-name">
+                  ${escapeHtml(seasonName)}
+                </span>
+              `
+              : ""
+          }
+
+        </span>
+
+
+        <span class="k630-season-side k630-season-side-right">
+
+          <span class="k630-season-diamond k630-season-diamond-inner">
+            <span class="k630-season-diamond-core"></span>
+          </span>
+
+          <span class="k630-season-energy-line">
+            <span class="k630-season-energy-pulse"></span>
+          </span>
+
+          <span class="k630-season-diamond k630-season-diamond-outer">
+            <span class="k630-season-diamond-core"></span>
+          </span>
+
+        </span>
+
+      </span>
+    `;
+        }
 
   /* =====================================================
      AUTHENTICATION EVENTS

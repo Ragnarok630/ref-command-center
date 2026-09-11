@@ -35,7 +35,7 @@
 ========================================================= */
 
 const FUNCTION_VERSION =
-  "630.3.0";
+  "630.3.1";
 
 const DEFAULT_GITHUB_OWNER =
   "Ragnarok630";
@@ -92,7 +92,8 @@ const ALLOWED_STATUSES =
 const ALLOWED_ADMIN_ROLES =
   Object.freeze([
     "owner",
-    "admin"
+    "admin",
+    "officer"
   ]);
 
 const CORS_HEADERS =
@@ -123,6 +124,7 @@ type AfkAction =
   | "public-approved"
   | "list"
   | "update"
+  | "sync-player-afk"
   | "delete";
 
 interface PublicAfkRequestInput {
@@ -146,6 +148,8 @@ interface AdminAfkRequestInput {
   status?: unknown;
   adminNote?: unknown;
   reviewedAt?: unknown;
+  playerId?: unknown;
+  approved?: unknown;
 }
 
 interface NormalizedPublicAfkRequest {
@@ -460,6 +464,646 @@ function createGitHubHeaders(
     "Content-Type":
       "application/json"
   };
+}
+
+function buildGitHubGitEndpoint(
+  configuration: GitHubConfiguration,
+  path: string
+): string {
+  return (
+    "https://api.github.com/repos/" +
+    `${encodeURIComponent(
+      configuration.owner
+    )}/` +
+    `${encodeURIComponent(
+      configuration.repository
+    )}/git/${path}`
+  );
+}
+
+async function readGitHubJsonViaGitDatabase(
+  filePath: string
+): Promise<GitHubFileResult> {
+  const configuration =
+    getGitHubConfiguration();
+
+  const refEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `ref/heads/${encodeURIComponent(
+        configuration.branch
+      )}`
+    );
+
+  const refResponse =
+    await fetch(
+      refEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const refPayload =
+    await readResponsePayload(
+      refResponse
+    );
+
+  if (
+    !refResponse.ok ||
+    !isRecord(refPayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the branch reference: " +
+      getGitHubErrorMessage(
+        refPayload,
+        refResponse.status
+      )
+    );
+  }
+
+  const commitSha =
+    normalizeText(
+      refPayload.object &&
+      isRecord(refPayload.object)
+        ? refPayload.object.sha
+        : ""
+    );
+
+  if (!commitSha) {
+    throw new Error(
+      "GitHub returned no branch commit SHA."
+    );
+  }
+
+  const commitEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `commits/${encodeURIComponent(
+        commitSha
+      )}`
+    );
+
+  const commitResponse =
+    await fetch(
+      commitEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const commitPayload =
+    await readResponsePayload(
+      commitResponse
+    );
+
+  if (
+    !commitResponse.ok ||
+    !isRecord(commitPayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the branch commit: " +
+      getGitHubErrorMessage(
+        commitPayload,
+        commitResponse.status
+      )
+    );
+  }
+
+  const treeSha =
+    normalizeText(
+      isRecord(
+        commitPayload.tree
+      )
+        ? commitPayload.tree.sha
+        : ""
+    );
+
+  if (!treeSha) {
+    throw new Error(
+      "GitHub returned no tree SHA."
+    );
+  }
+
+  const treeEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `trees/${encodeURIComponent(
+        treeSha
+      )}?recursive=1`
+    );
+
+  const treeResponse =
+    await fetch(
+      treeEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const treePayload =
+    await readResponsePayload(
+      treeResponse
+    );
+
+  if (
+    !treeResponse.ok ||
+    !isRecord(treePayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the repository tree: " +
+      getGitHubErrorMessage(
+        treePayload,
+        treeResponse.status
+      )
+    );
+  }
+
+  const treeEntries =
+    Array.isArray(
+      treePayload.tree
+    )
+      ? treePayload.tree
+      : [];
+
+  const normalizedPath =
+    filePath
+      .replace(/^\/+/, "");
+
+  const fileEntry =
+    treeEntries.find(
+      entry =>
+        isRecord(entry) &&
+        normalizeText(
+          entry.path
+        ) === normalizedPath &&
+        normalizeText(
+          entry.type
+        ) === "blob"
+    );
+
+  if (
+    !isRecord(fileEntry)
+  ) {
+    throw new Error(
+      `GitHub could not find ${filePath} in the Git tree.`
+    );
+  }
+
+  const blobSha =
+    normalizeText(
+      fileEntry.sha
+    );
+
+  if (!blobSha) {
+    throw new Error(
+      `GitHub returned no blob SHA for ${filePath}.`
+    );
+  }
+
+  const blobEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `blobs/${encodeURIComponent(
+        blobSha
+      )}`
+    );
+
+  const blobResponse =
+    await fetch(
+      blobEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const blobPayload =
+    await readResponsePayload(
+      blobResponse
+    );
+
+  if (
+    !blobResponse.ok ||
+    !isRecord(blobPayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the large JSON blob: " +
+      getGitHubErrorMessage(
+        blobPayload,
+        blobResponse.status
+      )
+    );
+  }
+
+  const encodedContent =
+    normalizeText(
+      blobPayload.content
+    );
+
+  if (!encodedContent) {
+    throw new Error(
+      `GitHub returned no content for ${filePath}.`
+    );
+  }
+
+  const decoded =
+    decodeBase64ToUtf8(
+      encodedContent
+    );
+
+  let parsed:
+    unknown;
+
+  try {
+    parsed =
+      JSON.parse(
+        decoded
+      );
+  } catch (_error) {
+    throw new Error(
+      `The JSON stored at ${filePath} is invalid.`
+    );
+  }
+
+  if (
+    !isRecord(parsed)
+  ) {
+    throw new Error(
+      `The JSON stored at ${filePath} is not an object.`
+    );
+  }
+
+  return {
+    path:
+      filePath,
+    name:
+      filePath
+        .split("/")
+        .pop() ||
+      filePath,
+    sha:
+      blobSha,
+    data:
+      parsed
+  };
+}
+
+async function updateGitHubJsonViaGitDatabase(
+  filePath: string,
+  data: Record<string, unknown>,
+  commitMessage: string
+): Promise<string> {
+  const configuration =
+    getGitHubConfiguration();
+
+  const refEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `ref/heads/${encodeURIComponent(
+        configuration.branch
+      )}`
+    );
+
+  const refResponse =
+    await fetch(
+      refEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const refPayload =
+    await readResponsePayload(
+      refResponse
+    );
+
+  if (
+    !refResponse.ok ||
+    !isRecord(refPayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the branch reference: " +
+      getGitHubErrorMessage(
+        refPayload,
+        refResponse.status
+      )
+    );
+  }
+
+  const parentCommitSha =
+    normalizeText(
+      isRecord(refPayload.object)
+        ? refPayload.object.sha
+        : ""
+    );
+
+  if (!parentCommitSha) {
+    throw new Error(
+      "GitHub returned no current branch commit SHA."
+    );
+  }
+
+  const commitEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `commits/${encodeURIComponent(
+        parentCommitSha
+      )}`
+    );
+
+  const commitResponse =
+    await fetch(
+      commitEndpoint,
+      {
+        method: "GET",
+        headers:
+          createGitHubHeaders(
+            configuration
+          )
+      }
+    );
+
+  const commitPayload =
+    await readResponsePayload(
+      commitResponse
+    );
+
+  if (
+    !commitResponse.ok ||
+    !isRecord(commitPayload)
+  ) {
+    throw new Error(
+      "GitHub could not read the current commit: " +
+      getGitHubErrorMessage(
+        commitPayload,
+        commitResponse.status
+      )
+    );
+  }
+
+  const baseTreeSha =
+    normalizeText(
+      isRecord(
+        commitPayload.tree
+      )
+        ? commitPayload.tree.sha
+        : ""
+    );
+
+  if (!baseTreeSha) {
+    throw new Error(
+      "GitHub returned no base tree SHA."
+    );
+  }
+
+  const content =
+    JSON.stringify(
+      data,
+      null,
+      2
+    ) +
+    "\n";
+
+  const blobEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      "blobs"
+    );
+
+  const blobResponse =
+    await fetch(
+      blobEndpoint,
+      {
+        method: "POST",
+        headers:
+          createGitHubHeaders(
+            configuration
+          ),
+        body:
+          JSON.stringify({
+            content,
+            encoding:
+              "utf-8"
+          })
+      }
+    );
+
+  const blobPayload =
+    await readResponsePayload(
+      blobResponse
+    );
+
+  if (
+    !blobResponse.ok ||
+    !isRecord(blobPayload)
+  ) {
+    throw new Error(
+      "GitHub could not create the large JSON blob: " +
+      getGitHubErrorMessage(
+        blobPayload,
+        blobResponse.status
+      )
+    );
+  }
+
+  const newBlobSha =
+    normalizeText(
+      blobPayload.sha
+    );
+
+  if (!newBlobSha) {
+    throw new Error(
+      "GitHub returned no SHA for the new JSON blob."
+    );
+  }
+
+  const treeEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      "trees"
+    );
+
+  const treeResponse =
+    await fetch(
+      treeEndpoint,
+      {
+        method: "POST",
+        headers:
+          createGitHubHeaders(
+            configuration
+          ),
+        body:
+          JSON.stringify({
+            base_tree:
+              baseTreeSha,
+            tree: [
+              {
+                path:
+                  filePath,
+                mode:
+                  "100644",
+                type:
+                  "blob",
+                sha:
+                  newBlobSha
+              }
+            ]
+          })
+      }
+    );
+
+  const treePayload =
+    await readResponsePayload(
+      treeResponse
+    );
+
+  if (
+    !treeResponse.ok ||
+    !isRecord(treePayload)
+  ) {
+    throw new Error(
+      "GitHub could not create the updated tree: " +
+      getGitHubErrorMessage(
+        treePayload,
+        treeResponse.status
+      )
+    );
+  }
+
+  const newTreeSha =
+    normalizeText(
+      treePayload.sha
+    );
+
+  if (!newTreeSha) {
+    throw new Error(
+      "GitHub returned no SHA for the updated tree."
+    );
+  }
+
+  const createCommitEndpoint =
+  buildGitHubGitEndpoint(
+    configuration,
+    "commits"
+  );
+
+const newCommitResponse =
+  await fetch(
+    createCommitEndpoint,
+    {
+      method:
+        "POST",
+      headers:
+        createGitHubHeaders(
+          configuration
+        ),
+      body:
+        JSON.stringify({
+          message:
+            commitMessage,
+          tree:
+            newTreeSha,
+          parents: [
+            parentCommitSha
+          ]
+        })
+    }
+  );
+
+  const newCommitPayload =
+    await readResponsePayload(
+      newCommitResponse
+    );
+
+  if (
+    !newCommitResponse.ok ||
+    !isRecord(newCommitPayload)
+  ) {
+    throw new Error(
+      "GitHub could not create the large-file commit: " +
+      getGitHubErrorMessage(
+        newCommitPayload,
+        newCommitResponse.status
+      )
+    );
+  }
+
+  const newCommitSha =
+    normalizeText(
+      newCommitPayload.sha
+    );
+
+  if (!newCommitSha) {
+    throw new Error(
+      "GitHub returned no SHA for the new commit."
+    );
+  }
+
+  const updateRefEndpoint =
+    buildGitHubGitEndpoint(
+      configuration,
+      `refs/heads/${encodeURIComponent(
+        configuration.branch
+      )}`
+    );
+
+  const updateRefResponse =
+    await fetch(
+      updateRefEndpoint,
+      {
+        method: "PATCH",
+        headers:
+          createGitHubHeaders(
+            configuration
+          ),
+        body:
+          JSON.stringify({
+            sha:
+              newCommitSha,
+            force:
+              false
+          })
+      }
+    );
+
+  const updateRefPayload =
+    await readResponsePayload(
+      updateRefResponse
+    );
+
+  if (
+    !updateRefResponse.ok ||
+    !isRecord(updateRefPayload)
+  ) {
+    throw new Error(
+      "GitHub could not update the branch reference: " +
+      getGitHubErrorMessage(
+        updateRefPayload,
+        updateRefResponse.status
+      )
+    );
+  }
+
+  return newBlobSha;
 }
 
 async function readResponsePayload(
@@ -835,12 +1479,13 @@ function normalizeAction(
   }
 
   if (
-    action === "create" ||
-    action === "public-approved" ||
-    action === "list" ||
-    action === "update" ||
-    action === "delete"
-  ) {
+  action === "create" ||
+  action === "public-approved" ||
+  action === "list" ||
+  action === "update" ||
+  action === "sync-player-afk" ||
+  action === "delete"
+) {
     return action;
   }
 
@@ -2179,15 +2824,289 @@ async function handleListAction(
 }
 
 /* =========================================================
+   UPDATE CURRENT PLAYER AFK NOTE
+========================================================= */
+
+const ACTIVE_AVERAGE_PATH =
+  "assets/data/generated/active-average/current.json";
+
+const SEASON_INFO_PATH =
+  "assets/data/generated/season-info/current.json";
+
+async function updatePlayerAfkFlag(
+  playerId: string,
+  isAfk: boolean,
+  reviewedAt: string,
+  reviewedBy: string
+): Promise<void> {
+  const paths = [
+    ACTIVE_AVERAGE_PATH,
+    SEASON_INFO_PATH
+  ];
+
+  for (const filePath of paths) {
+  const existingFile =
+    filePath ===
+    SEASON_INFO_PATH
+      ? await readGitHubJsonViaGitDatabase(
+          filePath
+        )
+      : await readGitHubFile(
+          filePath
+        );
+
+    const data =
+      existingFile.data;
+
+    if (
+      !isRecord(data) ||
+      !Array.isArray(
+        data.players
+      )
+    ) {
+      throw new Error(
+        `The generated player data at ${filePath} contains no players array.`
+      );
+    }
+
+    let playerFound =
+      false;
+
+    const updatedPlayers =
+      data.players.map(
+        player => {
+          if (
+            !isRecord(player)
+          ) {
+            return player;
+          }
+
+          const currentPlayerId =
+            normalizeText(
+              player.id ??
+              player.playerId ??
+              player.player_id
+            );
+
+          if (
+            currentPlayerId !==
+            playerId
+          ) {
+            return player;
+          }
+
+          playerFound =
+            true;
+
+          const noteFlags =
+            isRecord(
+              player.noteFlags
+            )
+              ? {
+                  ...player.noteFlags
+                }
+              : {};
+
+          noteFlags.afk =
+            isAfk;
+
+          return {
+            ...player,
+            noteFlags
+          };
+        }
+      );
+
+    if (
+      !playerFound
+    ) {
+      throw new Error(
+        `Player ID ${playerId} was not found in ${filePath}.`
+      );
+    }
+
+    const updatedData = {
+  ...data,
+  players:
+    updatedPlayers
+};
+
+const commitMessage =
+  isAfk
+    ? `Set AFK status for player ${playerId}`
+    : `Clear AFK status for player ${playerId}`;
+
+if (
+  filePath ===
+  SEASON_INFO_PATH
+) {
+  await updateGitHubJsonViaGitDatabase(
+    filePath,
+    updatedData,
+    commitMessage
+  );
+} else {
+  await updateGitHubFile(
+    filePath,
+    existingFile.sha,
+    updatedData,
+    commitMessage
+  );
+}
+  }
+}
+
+async function updateCurrentPlayerAfkStatus(
+  playerId: string,
+  approved: boolean
+): Promise<void> {
+
+  const playerDataPaths = [
+    "assets/data/generated/active-average/current.json",
+    "assets/data/generated/season-info/current.json"
+  ];
+
+  for (
+    const filePath of playerDataPaths
+  ) {
+
+    const existingFile =
+      await readGitHubFile(
+        filePath
+      );
+
+    const data =
+      existingFile.data;
+
+    if (
+      !isRecord(data) ||
+      !Array.isArray(
+        data.players
+      )
+    ) {
+      throw createRequestError(
+        `Invalid player data in ${filePath}.`
+      );
+    }
+
+    let playerFound =
+      false;
+
+    const players =
+      data.players.map(
+        player => {
+
+          if (
+            !isRecord(player)
+          ) {
+            return player;
+          }
+
+          const currentPlayerId =
+            normalizePlayerId(
+              player.id ??
+              player.playerId ??
+              player.player_id
+            );
+
+          if (
+            currentPlayerId !==
+            playerId
+          ) {
+            return player;
+          }
+
+          playerFound =
+            true;
+
+          const existingNotes =
+            Array.isArray(
+              player.notes
+            )
+              ? player.notes
+                  .map(
+                    note =>
+                      normalizeText(
+                        note
+                      )
+                  )
+                  .filter(Boolean)
+              : [];
+
+          const notes =
+            existingNotes.filter(
+              note =>
+                normalizeLower(
+                  note
+                ) !==
+                "afk"
+            );
+
+          const existingNoteFlags =
+            isRecord(
+              player.noteFlags
+            )
+              ? {
+                  ...player.noteFlags
+                }
+              : {};
+
+          existingNoteFlags.afk =
+            approved;
+
+          if (
+            approved
+          ) {
+            notes.push(
+              "afk"
+            );
+          }
+
+          return {
+            ...player,
+
+            notes,
+
+            noteFlags:
+              existingNoteFlags,
+
+            afkApproved:
+              approved
+          };
+        }
+      );
+
+    if (
+      !playerFound
+    ) {
+      throw createRequestError(
+        `Player ID ${playerId} was not found in ${filePath}.`
+      );
+    }
+
+    await updateGitHubFile(
+      filePath,
+      existingFile.sha,
+      {
+        ...data,
+        players
+      },
+      approved
+        ? `Set AFK status for player ${playerId}`
+        : `Clear AFK status for player ${playerId}`
+    );
+  }
+}
+
+/* =========================================================
    UPDATE
 ========================================================= */
 
 async function handleUpdateAction(
-  request:
-    Request,
-  input:
-    AdminAfkRequestInput
+  request: Request,
+  input: AdminAfkRequestInput
 ): Promise<Response> {
+
   const administrator =
     await authenticateAdministrator(
       request
@@ -2245,54 +3164,71 @@ async function handleUpdateAction(
     );
   }
 
+  const currentTime =
+    new Date()
+      .toISOString();
+
   const updatedRequest:
     Record<string, unknown> = {
-    ...existingFile.data,
+      ...existingFile.data,
 
-    schemaVersion:
-      2,
+      schemaVersion:
+        2,
 
-    requestId,
+      requestId,
 
-    status,
+      status,
 
-    adminNote,
+      adminNote,
 
-    reviewedAt,
+      reviewedAt,
 
-    reviewedBy:
-      administrator.displayName,
+      reviewedBy:
+        administrator.displayName,
 
-    reviewedByRole:
-      administrator.role,
+      reviewedByRole:
+        administrator.role,
 
-    reviewedByUserId:
-      administrator.id,
+      reviewedByUserId:
+        administrator.id,
 
-    updatedAt:
-      new Date()
-        .toISOString(),
+      updatedAt:
+        currentTime,
 
-    functionVersion:
-      FUNCTION_VERSION
+      functionVersion:
+        FUNCTION_VERSION
   };
 
   const commitAction =
-    status === "approved"
+    status ===
+      "approved"
       ? "Approve"
-      : status === "rejected"
+      : status ===
+          "rejected"
         ? "Reject"
         : "Reopen";
 
   const newSha =
-    await updateGitHubFile(
-      filePath,
-      existingFile.sha,
-      updatedRequest,
-      `${commitAction} AFK request ${requestId}`
-    );
+  await updateGitHubFile(
+    filePath,
+    existingFile.sha,
+    updatedRequest,
+    `${commitAction} AFK request ${requestId}`
+  );
 
-  return createJsonResponse(
+/* =====================================================
+   UPDATE PLAYER DATA
+   
+   APPROVED:
+     noteFlags.afk = true
+     notes contains "afk"
+     afkApproved = true
+
+   REJECTED / PENDING:
+     AFK flag is removed
+   ===================================================== */
+
+return createJsonResponse(
     200,
     {
       success:
@@ -2315,15 +3251,69 @@ async function handleUpdateAction(
       repositoryPath:
         filePath,
 
-      filename:
-        `${requestId}.json`,
-
       sha:
         newSha,
 
       message:
         `AFK request updated to ${status}.`,
 
+      version:
+        FUNCTION_VERSION
+    }
+  );
+}
+
+async function handleSyncPlayerAfkAction(
+  request: Request,
+  input: AdminAfkRequestInput
+): Promise<Response> {
+  const administrator =
+    await authenticateAdministrator(
+      request
+    );
+
+  const playerId =
+    normalizeText(
+      input.playerId
+    );
+
+  if (!playerId) {
+    throw createRequestError(
+      "A player ID is required to synchronize AFK status."
+    );
+  }
+
+  const approved =
+    input.approved === true;
+
+  const reviewedAt =
+    normalizeReviewedAt(
+      input.reviewedAt
+    );
+
+  await updatePlayerAfkFlag(
+    playerId,
+    approved,
+    reviewedAt,
+    administrator.displayName
+  );
+
+  return createJsonResponse(
+    200,
+    {
+      success:
+        true,
+      action:
+        "sync-player-afk",
+      playerId,
+      approved,
+      reviewedAt,
+      reviewedBy:
+        administrator.displayName,
+      message:
+        approved
+          ? `AFK status enabled for player ${playerId}.`
+          : `AFK status disabled for player ${playerId}.`,
       version:
         FUNCTION_VERSION
     }
@@ -2381,6 +3371,18 @@ async function handleDeleteAction(
       "The stored AFK request does not match the requested ID."
     );
   }
+
+    await updatePlayerAfkFlag(
+    normalizeText(
+      existingFile.data
+        .playerId ??
+      existingFile.data
+        .player_id
+    ),
+    false,
+    new Date().toISOString(),
+    administrator.displayName
+  );
 
   await deleteGitHubFile(
     filePath,
@@ -2514,13 +3516,20 @@ Deno.serve(
           );
 
         case "update":
-          return await handleUpdateAction(
-            request,
-            parsedInput as
-              AdminAfkRequestInput
-          );
+  return await handleUpdateAction(
+    request,
+    parsedInput as
+      AdminAfkRequestInput
+  );
 
-        case "delete":
+case "sync-player-afk":
+  return await handleSyncPlayerAfkAction(
+    request,
+    parsedInput as
+      AdminAfkRequestInput
+  );
+
+case "delete":
           return await handleDeleteAction(
             request,
             parsedInput as

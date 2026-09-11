@@ -101,6 +101,32 @@
     ).trim();
   }
 
+  function normalizeDateValue(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === false ||
+    value === true
+  ) {
+    return "";
+  }
+
+  const text =
+    String(value).trim();
+
+  if (
+    !text ||
+    text.toLowerCase() === "false" ||
+    text.toLowerCase() === "true" ||
+    text === "-"
+  ) {
+    return "";
+  }
+
+  return text;
+}
+
   function normalizeSearch(value) {
     return normalizeText(value)
       .toLowerCase()
@@ -845,12 +871,12 @@
       );
 
     const leaveDate =
-      normalizeText(
-        getRecordValue(
-          record,
-          FIELDS.leaveDate
-        )
-      );
+  normalizeDateValue(
+    getRecordValue(
+      record,
+      FIELDS.leaveDate
+    )
+  );
 
     const leftDuringSeason =
       booleanValue(
@@ -6123,30 +6149,37 @@ function injectPlayerIdLayoutFixes() {
     }
 
     /* ===================================================
-       HERO / BANNER
-    =================================================== */
+   HERO / BANNER
+   VOLLEDIGE BANNER ZICHTBAAR
+=================================================== */
 
-    #playerIdInfoPage .player-id-hero,
-    #playerIdInfoPage .player-id-banner,
-    #playerIdInfoPage .player-id-hero-banner {
-      flex: 0 0 auto;
-      width: min(820px, 62vw);
-      height: 132px;
-      min-height: 132px;
-      max-height: 132px;
-      margin: 0 auto 2px;
-      overflow: hidden;
-    }
+#playerIdInfoPage .player-id-hero,
+#playerIdInfoPage .player-id-banner,
+#playerIdInfoPage .player-id-hero-banner {
+  flex: 0 0 auto;
 
-    #playerIdInfoPage .player-id-hero img,
-    #playerIdInfoPage .player-id-banner img,
-    #playerIdInfoPage .player-id-hero-banner img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: center;
-    }
+  width: min(820px, 62vw);
+
+  height: auto;
+  min-height: 0;
+  max-height: none;
+
+  margin: 0 auto 2px;
+
+  overflow: visible;
+}
+
+#playerIdInfoPage .player-id-hero img,
+#playerIdInfoPage .player-id-banner img,
+#playerIdInfoPage .player-id-hero-banner img {
+  width: 100%;
+  height: auto;
+
+  display: block;
+
+  object-fit: contain;
+  object-position: center;
+}
 
     /* ===================================================
        SEARCH
@@ -6513,11 +6546,12 @@ function injectPlayerIdLayoutFixes() {
       }
 
       #playerIdInfoPage .player-id-hero,
-      #playerIdInfoPage .player-id-banner,
-      #playerIdInfoPage .player-id-hero-banner {
-        height: 112px;
-        min-height: 112px;
-        max-height: 112px;
+#playerIdInfoPage .player-id-banner,
+#playerIdInfoPage .player-id-hero-banner {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+}
       }
 
       #playerIdInfoPage .player-id-season-panel {
@@ -6611,7 +6645,7 @@ function injectPlayerIdFinalFixes() {
       align-items: center !important;
       justify-content: center !important;
 
-      margin: 2px 0 6px !important;
+      margin: 2px 0 26px !important
       padding: 0 !important;
 
       overflow: visible !important;
@@ -6658,7 +6692,7 @@ function injectPlayerIdFinalFixes() {
       min-height: 46px !important;
       max-height: none !important;
 
-      margin: 0 !important;
+      margin: 35px 0 0 !important;
       padding: 5px 8px !important;
 
       overflow: visible !important;

@@ -2736,15 +2736,3 @@ td {
     letter-spacing: -0.065em !important;
   }
 }
-function formatCompactNumber(value) {
-  const number = integerValue(value);
-
-  return new Intl.NumberFormat(
-    "en-US",
-    {
-      notation: "compact",
-      compactDisplay: "short",
-      maximumFractionDigits: 2
-    }
-  ).format(number);
-}

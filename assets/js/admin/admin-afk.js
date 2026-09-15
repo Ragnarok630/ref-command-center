@@ -601,68 +601,61 @@
   }
 
   function actionButtons(
-    request
-  ) {
-    if (!canManage()) {
-      return "-";
-    }
-
-    if (processing) {
-      return "";
-    }
-
-    return `
-      <div class="afk-admin-actions">
-
-        <button
-  type="button"
-  class="admin-btn"
-  request.status ===
-  "approved"
-    ? "confirm"
-    : ""
-}"
-  data-afk-action="approve"
-  data-afk-request-id="${escapeHtml(
-    request.requestId
-  )}"
->
-  <i class="fa-solid fa-check"></i>
-  Approve
-</button>
-
-<button
-  type="button"
-  class="admin-btn delete"
-  request.status ===
-  "rejected"
-    ? "reject-active"
-    : ""
-}"
-  data-afk-action="reject"
-  data-afk-request-id="${escapeHtml(
-    request.requestId
-  )}"
->
-  <i class="fa-solid fa-xmark"></i>
-  Reject
-</button>
-
-<button
-  type="button"
-  class="admin-btn danger"
-  data-afk-action="delete"
-  data-afk-request-id="${escapeHtml(
-    request.requestId
-  )}"
->
-  <i class="fa-solid fa-trash"></i>
-  Delete
-</button>
-
-      </div>
-    `;
+  request
+) {
+  if (!canManage()) {
+    return "-";
   }
+
+  if (processing) {
+    return "";
+  }
+
+  return `
+    <div class="afk-admin-actions">
+
+      <button
+        type="button"
+        class="admin-btn afk-action-approve"
+        data-afk-action="approve"
+        data-afk-request-id="${escapeHtml(
+          request.requestId
+        )}"
+        title="Approve request"
+      >
+        <i class="fa-solid fa-check"></i>
+        Approve
+      </button>
+
+      <button
+        type="button"
+        class="admin-btn afk-action-reject"
+        data-afk-action="reject"
+        data-afk-request-id="${escapeHtml(
+          request.requestId
+        )}"
+        title="Reject request"
+      >
+        <i class="fa-solid fa-xmark"></i>
+        Reject
+      </button>
+
+      <button
+        type="button"
+        class="admin-btn afk-action-delete"
+        data-afk-action="delete"
+        data-afk-request-id="${escapeHtml(
+          request.requestId
+        )}"
+        title="Delete request"
+      >
+        <i class="fa-solid fa-trash"></i>
+        Delete
+      </button>
+
+    </div>
+  `;
+}
 
   function renderRow(
     request

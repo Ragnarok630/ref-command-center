@@ -1546,6 +1546,23 @@ box-sizing: border-box;
 }
 
 /* =========================================================
+   PLAYER ID / NAME
+========================================================= */
+
+.old-players-player-id {
+    color: #58a8ff;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    text-shadow:
+        0 0 6px rgba(88, 168, 255, 0.18);
+}
+
+.old-players-col-name {
+    color: #eee9ff;
+    font-weight: 700;
+}
+
+/* =========================================================
    TEXT AND NUMBER ALIGNMENT
 ========================================================= */
 

@@ -493,6 +493,7 @@
 #oldSeasonsPage .old-seasons-archive-viewer {
     width: 100%;
     min-width: 0;
+    padding-top: 12px;
 
     display: grid;
     grid-template-rows:
@@ -1089,4 +1090,150 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+/* =========================================================
+   OLD SEASONS — ANIMATED BORDER GLOWS
+========================================================= */
+
+/* ---------------------------------------------------------
+   PURPLE + GOLD — BANNER
+--------------------------------------------------------- */
+
+@keyframes oldSeasonsBannerGlow {
+    0% {
+        border-color: rgba(177, 110, 255, 0.75);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.22),
+            0 0 10px rgba(255, 196, 72, 0.28),
+            0 0 22px rgba(142, 44, 255, 0.42),
+            0 0 38px rgba(142, 44, 255, 0.20);
+    }
+
+    25% {
+        border-color: rgba(255, 196, 72, 0.95);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.38),
+            0 0 16px rgba(255, 196, 72, 0.52),
+            0 0 28px rgba(142, 44, 255, 0.46),
+            0 0 48px rgba(142, 44, 255, 0.24);
+    }
+
+    50% {
+        border-color: rgba(197, 127, 255, 0.95);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.28),
+            0 0 12px rgba(255, 196, 72, 0.36),
+            0 0 34px rgba(142, 44, 255, 0.60),
+            0 0 56px rgba(142, 44, 255, 0.30);
+    }
+
+    75% {
+        border-color: rgba(255, 214, 102, 0.95);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.42),
+            0 0 18px rgba(255, 196, 72, 0.58),
+            0 0 26px rgba(142, 44, 255, 0.48),
+            0 0 44px rgba(142, 44, 255, 0.22);
+    }
+
+    100% {
+        border-color: rgba(177, 110, 255, 0.75);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.22),
+            0 0 10px rgba(255, 196, 72, 0.28),
+            0 0 22px rgba(142, 44, 255, 0.42),
+            0 0 38px rgba(142, 44, 255, 0.20);
+    }
+}
+
+#oldSeasonsPage .old-seasons-hero-image {
+    animation: oldSeasonsBannerGlow 5s ease-in-out infinite;
+}
+
+
+/* ---------------------------------------------------------
+   PURPLE — SEASON INFO
+--------------------------------------------------------- */
+
+@keyframes oldSeasonsPurpleGlow {
+    0% {
+        border-color: rgba(177, 110, 255, 0.65);
+
+        box-shadow:
+            0 0 0 1px rgba(177, 110, 255, 0.18),
+            0 0 10px rgba(142, 44, 255, 0.32),
+            0 0 24px rgba(142, 44, 255, 0.16),
+            0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    50% {
+        border-color: rgba(205, 151, 255, 1);
+
+        box-shadow:
+            0 0 0 1px rgba(177, 110, 255, 0.32),
+            0 0 18px rgba(142, 44, 255, 0.60),
+            0 0 40px rgba(142, 44, 255, 0.32),
+            0 10px 26px rgba(0, 0, 0, 0.22);
+    }
+
+    100% {
+        border-color: rgba(177, 110, 255, 0.65);
+
+        box-shadow:
+            0 0 0 1px rgba(177, 110, 255, 0.18),
+            0 0 10px rgba(142, 44, 255, 0.32),
+            0 0 24px rgba(142, 44, 255, 0.16),
+            0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+}
+
+#oldSeasonsPage .old-seasons-selection-card:nth-child(1) {
+    animation: oldSeasonsPurpleGlow 4s ease-in-out infinite;
+}
+
+
+/* ---------------------------------------------------------
+   GOLD — SERVER VS SERVER
+--------------------------------------------------------- */
+
+@keyframes oldSeasonsGoldGlow {
+    0% {
+        border-color: rgba(255, 196, 72, 0.68);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.18),
+            0 0 10px rgba(255, 196, 72, 0.30),
+            0 0 24px rgba(255, 196, 72, 0.15),
+            0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    50% {
+        border-color: rgba(255, 222, 118, 1);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.36),
+            0 0 18px rgba(255, 196, 72, 0.64),
+            0 0 40px rgba(255, 196, 72, 0.34),
+            0 10px 26px rgba(0, 0, 0, 0.22);
+    }
+
+    100% {
+        border-color: rgba(255, 196, 72, 0.68);
+
+        box-shadow:
+            0 0 0 1px rgba(255, 196, 72, 0.18),
+            0 0 10px rgba(255, 196, 72, 0.30),
+            0 0 24px rgba(255, 196, 72, 0.15),
+            0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+}
+
+#oldSeasonsPage .old-seasons-selection-card:nth-child(2) {
+    animation: oldSeasonsGoldGlow 4.5s ease-in-out infinite;
 }

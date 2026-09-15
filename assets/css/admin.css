@@ -16030,3 +16030,77 @@
     gap: 10px;
     margin-top: 12px;
 }
+
+/* =========================================================
+   AFK MANAGEMENT – DEFINITIVE BUTTON + STATUS COLORS
+========================================================= */
+
+/* Management buttons */
+.admin-afk-page .afk-admin-actions .afk-action-approve {
+  color: #07180c !important;
+  background: #5cff78 !important;
+  border: 1px solid #83ff98 !important;
+  box-shadow: 0 0 10px rgba(92, 255, 120, 0.18) !important;
+}
+
+.admin-afk-page .afk-admin-actions .afk-action-approve:hover {
+  color: #07180c !important;
+  background: #79ff90 !important;
+  border-color: #9fffad !important;
+}
+
+.admin-afk-page .afk-admin-actions .afk-action-reject {
+  color: #ffffff !important;
+  background: #c6283d !important;
+  border: 1px solid #ff5b70 !important;
+  box-shadow: 0 0 10px rgba(198, 40, 61, 0.18) !important;
+}
+
+.admin-afk-page .afk-admin-actions .afk-action-reject:hover {
+  color: #ffffff !important;
+  background: #e0344b !important;
+  border-color: #ff7182 !important;
+}
+
+.admin-afk-page .afk-admin-actions .afk-action-delete {
+  color: #ffffff !important;
+  background: #1769c2 !important;
+  border: 1px solid #58aaff !important;
+  box-shadow: 0 0 10px rgba(23, 105, 194, 0.18) !important;
+}
+
+.admin-afk-page .afk-admin-actions .afk-action-delete:hover {
+  color: #ffffff !important;
+  background: #2583e8 !important;
+  border-color: #78bcff !important;
+}
+
+/* AFK status badges */
+.admin-afk-page .afk-admin-badge {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.admin-afk-page .afk-admin-badge-approved {
+  color: #5cff88 !important;
+  background: #06391c !important;
+  border: 1px solid #36e875 !important;
+}
+
+.admin-afk-page .afk-admin-badge-pending {
+  color: #ffd000 !important;
+  background: #5f4805 !important;
+  border: 1px solid #ffd83d !important;
+}
+
+.admin-afk-page .afk-admin-badge-rejected {
+  color: #ff6482 !important;
+  background: #4a0814 !important;
+  border: 1px solid #ff4f70 !important;
+}

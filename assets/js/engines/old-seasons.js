@@ -908,13 +908,6 @@ if (
 
             </button>
 
-            <div
-                class="old-seasons-archive-title"
-            >
-                Season ${seasonEntry.season}
-                · Season Info
-            </div>
-
         </div>
 
         <div
@@ -1303,12 +1296,6 @@ if (
 
                 </button>
 
-                <div
-                    class="old-seasons-archive-title"
-                >
-                    Season ${seasonEntry.season}
-                    · Server vs Server
-                </div>
 
             </div>
 

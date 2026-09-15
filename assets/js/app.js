@@ -31,7 +31,7 @@
     "K630 Application Router";
 
   const MODULE_VERSION =
-    "630.2.4";
+    "630.2.5";
 
   const RELEASE_NAME =
     "Gold Master";

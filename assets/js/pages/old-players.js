@@ -1183,38 +1183,38 @@
   ===================================================== */
 
   function createStatusMarkup(player) {
-    return `
-      <span
-        class="
-          old-players-status
-          old-players-status-${escapeHtml(
-            player.serverStatusColor
-          )}
-        "
-      >
-        ${escapeHtml(
-          player.serverStatus
+  return `
+    <span
+      class="
+        op-status
+        op-status-${escapeHtml(
+          player.serverStatusColor
         )}
-      </span>
-    `;
-  }
+      "
+    >
+      ${escapeHtml(
+        player.serverStatus
+      )}
+    </span>
+  `;
+}
 
   function createTierMarkup(player) {
-    return `
-      <span
-        class="
-          old-players-tier
-          old-players-tier-${normalizeLower(
-            player.troopTier
-          )}
-        "
-      >
-        ${escapeHtml(
+  return `
+    <span
+      class="
+        op-tier
+        op-tier-${normalizeLower(
           player.troopTier
         )}
-      </span>
-    `;
-  }
+      "
+    >
+      ${escapeHtml(
+        player.troopTier
+      )}
+    </span>
+  `;
+}
 
   function renderFixedTable(
     elements
@@ -1816,12 +1816,13 @@ if (
     }
 
     queryAll(
-      [
-        "[data-old-players-sort]",
-        ".old-players-sort-select"
-      ],
-      elements.page
-    ).forEach(select => {
+  [
+    "[data-old-players-sort]",
+    ".op-sort-select"
+  ],
+  elements.page
+)
+    .forEach(select => {
       select.value =
         "";
     });
@@ -1846,12 +1847,12 @@ if (
       );
 
     queryAll(
-      [
-        "[data-old-players-sort]",
-        ".old-players-sort-select"
-      ],
-      getPage()
-    ).forEach(other => {
+  [
+    "[data-old-players-sort]",
+    ".op-sort-select"
+  ],
+  getPage()
+).forEach(other => {
       if (other !== select) {
         other.value =
           "";
@@ -1942,12 +1943,12 @@ if (
         "change",
         event => {
           const select =
-            event.target.closest(
-              (
-                "[data-old-players-sort]," +
-                ".old-players-sort-select"
-              )
-            );
+  event.target.closest(
+    (
+      "[data-old-players-sort]," +
+      ".op-sort-select"
+    )
+  );
 
           if (!select) {
             return;

@@ -849,6 +849,281 @@ function formatCompactNumber(value) {
     return canvas;
   }
 
+/* =====================================================
+   HOME CHART MOVING GLOW
+===================================================== */
+
+const homeMovingGlowPlugin = {
+
+  id:
+    "homeMovingGlow",
+
+  afterDatasetsDraw(chart, args, pluginOptions) {
+
+    const datasets =
+      chart?.data?.datasets || [];
+
+    if (!datasets.length) {
+      return;
+    }
+
+    const canvas =
+      chart.canvas;
+
+    if (!canvas) {
+      return;
+    }
+
+    const ctx =
+      chart.ctx;
+
+    const prefersReducedMotion =
+      window.matchMedia &&
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+    const now =
+      performance.now();
+
+    const phase =
+      prefersReducedMotion
+        ? 0.5
+        : (now % 4200) / 4200;
+
+    datasets.forEach(
+      (dataset, datasetIndex) => {
+
+        const meta =
+          chart.getDatasetMeta(
+            datasetIndex
+          );
+
+        if (
+          !meta ||
+          !meta.data ||
+          meta.data.length < 2
+        ) {
+          return;
+        }
+
+        const points =
+          meta.data.filter(
+            point =>
+              point &&
+              !Number.isNaN(point.x) &&
+              !Number.isNaN(point.y)
+          );
+
+        if (points.length < 2) {
+          return;
+        }
+
+        const isPowerChart =
+          dataset._homeChartType ===
+          "power";
+
+        const glowColor =
+          isPowerChart
+            ? "rgba(255, 208, 0, 0.95)"
+            : "rgba(184, 51, 255, 0.95)";
+
+        const glowSoft =
+          isPowerChart
+            ? "rgba(255, 208, 0, 0.32)"
+            : "rgba(184, 51, 255, 0.32)";
+
+        const lengths = [];
+
+        let totalLength = 0;
+
+        for (
+          let i = 0;
+          i < points.length - 1;
+          i++
+        ) {
+
+          const dx =
+            points[i + 1].x -
+            points[i].x;
+
+          const dy =
+            points[i + 1].y -
+            points[i].y;
+
+          const length =
+            Math.sqrt(
+              dx * dx +
+              dy * dy
+            );
+
+          lengths.push(length);
+
+          totalLength +=
+            length;
+        }
+
+        if (totalLength <= 0) {
+          return;
+        }
+
+        /*
+          Moving position along
+          the complete chart line.
+        */
+        const travel =
+          phase *
+          totalLength;
+
+        let accumulated =
+          0;
+
+        let startPoint =
+          points[0];
+
+        let endPoint =
+          points[1];
+
+        for (
+          let i = 0;
+          i < lengths.length;
+          i++
+        ) {
+
+          if (
+            travel <=
+            accumulated +
+            lengths[i]
+          ) {
+
+            startPoint =
+              points[i];
+
+            endPoint =
+              points[i + 1];
+
+            break;
+          }
+
+          accumulated +=
+            lengths[i];
+        }
+
+        const localDistance =
+          travel -
+          accumulated;
+
+        const segmentLength =
+          Math.max(
+            lengths[
+              points.indexOf(
+                endPoint
+              ) - 1
+            ] || 1,
+            1
+          );
+
+        const progress =
+          Math.max(
+            0,
+            Math.min(
+              1,
+              localDistance /
+              segmentLength
+            )
+          );
+
+        const x =
+          startPoint.x +
+          (
+            endPoint.x -
+            startPoint.x
+          ) *
+          progress;
+
+        const y =
+          startPoint.y +
+          (
+            endPoint.y -
+            startPoint.y
+          ) *
+          progress;
+
+        ctx.save();
+
+        /*
+          Soft glow travelling
+          over the existing line.
+        */
+        ctx.beginPath();
+
+        ctx.arc(
+          x,
+          y,
+          5,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle =
+          glowColor;
+
+        ctx.shadowColor =
+          glowColor;
+
+        ctx.shadowBlur =
+          16;
+
+        ctx.globalAlpha =
+          0.95;
+
+        ctx.fill();
+
+        /*
+          Larger soft halo.
+        */
+        ctx.beginPath();
+
+        ctx.arc(
+          x,
+          y,
+          11,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle =
+          glowSoft;
+
+        ctx.shadowColor =
+          glowColor;
+
+        ctx.shadowBlur =
+          22;
+
+        ctx.globalAlpha =
+          0.42;
+
+        ctx.fill();
+
+        ctx.restore();
+      }
+    );
+
+    if (!prefersReducedMotion) {
+      requestAnimationFrame(() => {
+        if (
+          chart &&
+          chart.canvas &&
+          chart.canvas.isConnected
+        ) {
+          chart.draw();
+        }
+      });
+    }
+  }
+};
+
   function createChart(
     canvas,
     chartData,
@@ -882,37 +1157,81 @@ function formatCompactNumber(value) {
           "line",
 
         data: {
-          labels,
+  labels,
 
-          datasets:
-            datasets.map(
-              dataset => ({
-                label:
-                  normalizeText(
-                    dataset.label
-                  ) ||
-                  label,
+  datasets:
+    datasets.map(
+      dataset => ({
+        label:
+          normalizeText(
+            dataset.label
+          ) ||
+          label,
 
-                data:
-                  Array.isArray(
-                    dataset.data
-                  )
-                    ? dataset.data
-                    : [],
+        data:
+          Array.isArray(
+            dataset.data
+          )
+            ? dataset.data
+            : [],
 
-                borderWidth:
-                  2,
+        borderWidth:
+          2,
 
-                tension:
-                  0.25,
+        tension:
+          0.25,
 
-                fill:
-                  false
-              })
-            )
-        },
+        fill:
+          false,
 
-        options: {
+        borderColor:
+          label === "Server Power"
+            ? "#b833ff"
+            : "#ffd000",
+
+        backgroundColor:
+          label === "Server Power"
+            ? "#b833ff"
+            : "#ffd000",
+
+        pointRadius:
+          4,
+
+        pointHoverRadius:
+          6,
+
+        pointBorderWidth:
+          2,
+
+        pointBackgroundColor:
+          label === "Server Power"
+            ? "#b833ff"
+            : "#ffd000",
+
+        pointBorderColor:
+          "#08090d",
+
+        pointHoverBackgroundColor:
+          label === "Server Power"
+            ? "#d68aff"
+            : "#fff0a3",
+
+        pointHoverBorderColor:
+          "#ffffff",
+
+        _homeChartType:
+          label === "Server Power"
+            ? "power"
+            : "merits"
+      })
+    )
+},
+
+plugins: [
+  homeMovingGlowPlugin
+],
+
+options: {
           responsive:
             true,
 
